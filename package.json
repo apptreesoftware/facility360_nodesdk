@@ -1,0 +1,15 @@
+{
+  "name": "facility360",
+  "version": "1.0.0-beta1",
+  "description": "A Node based 360Facility client SDK",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com:apptreesoftware/facility360_nodesdk.git"
+  },
+  "author": "AppTree Software",
+  "license": "ISC"
+}
