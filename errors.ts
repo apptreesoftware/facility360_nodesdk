@@ -1,0 +1,1 @@
+export const AuthorizationError = Error("not authorized");

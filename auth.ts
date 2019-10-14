@@ -1,5 +1,6 @@
 import axios from "axios";
 import {LoginResponse} from "./model/login_response";
+import {AuthorizationError} from "./errors";
 
 export interface AuthCredential {
     refresh(): Promise<AuthCredential>;
@@ -33,18 +34,20 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
     }
 
     async refresh(): Promise<AuthCredential> {
-        const http = axios.create({
-            baseURL: this.baseUrl,
-        });
-        const resp = await http.post('MobileWebServices/api/refreshtoken', {
-            grant_type: this.tokenType,
-            refresh_token: this.refreshToken
-        });
-        const loginResponse = resp.data as LoginResponse;
-        if (!loginResponse.Result) {
-            throw Error("not authorized");
+        if (this.expires <= new Date()) {
+            const http = axios.create({
+                baseURL: this.baseUrl,
+            });
+            const resp = await http.post('MobileWebServices/api/refreshtoken', {
+                grant_type: this.tokenType,
+                refresh_token: this.refreshToken
+            });
+            const loginResponse = resp.data as LoginResponse;
+            if (!loginResponse.Result) {
+                throw AuthorizationError;
+            }
+            this.updateFromLoginResponse(loginResponse);
         }
-        this.updateFromLoginResponse(loginResponse);
         return this;
     }
 
@@ -79,7 +82,7 @@ export class UsernamePasswordCredential extends BaseCredential implements AuthCr
         });
         const loginResponse = resp.data as LoginResponse;
         if (!loginResponse.Result) {
-            throw Error("not authorized");
+            throw AuthorizationError;
         }
         return new OAuthCredential(loginResponse, this.baseUrl);
     }
