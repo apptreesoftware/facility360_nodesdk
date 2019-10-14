@@ -11,5 +11,8 @@
     "url": "github.com:apptreesoftware/facility360_nodesdk.git"
   },
   "author": "AppTree Software",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.0"
+  }
 }
