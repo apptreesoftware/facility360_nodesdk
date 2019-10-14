@@ -9,8 +9,8 @@ export class FamisClient {
         this.credentials = credentials;
         this.http = http;
         this.http.interceptors.request.use(async (config) => {
-            let token = await this.credentials.getToken();
-            config.headers = {"Authorization": token}
+            this.credentials = await this.credentials.refresh();
+            config.headers = {"Authorization": this.credentials.accessToken};
             return config;
         })
     }
