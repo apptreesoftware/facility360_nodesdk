@@ -1,8 +1,15 @@
 import axios, {AxiosInstance} from "axios";
 import {AuthCredential} from "./auth";
-import {FamisAttachment} from "./model/famis_attachment";
 import {AuthorizationError} from "./errors";
 import {JsonObject} from "./model/common";
+import {
+    AccountSegment,
+    ActivityGroup, Asset,
+    AssetClass,
+    AssetKeyword,
+    FamisAttachment, Property,
+    WorkType
+} from "./model/famis_models";
 
 export class FamisClient {
     host: string;
@@ -25,6 +32,42 @@ export class FamisClient {
     async getAttachments(): Promise<FamisAttachment[]> {
         const startPath = 'MobileWebServices/apis/360facility/v1/attachments';
         return this.getAllUsingLink<FamisAttachment>(startPath);
+    }
+
+    async getAccountSegments(): Promise<AccountSegment[]> {
+        const startPath = 'MobileWebServices/apis/360facility/v1/accountsegmentnpfa';
+        return this.getAllUsingLink<AccountSegment>(startPath);
+    }
+
+    async getActivityGroups(): Promise<ActivityGroup[]> {
+        const startPath = 'MobileWebServices/apis/360facility/v1/activitygroups';
+        return this.getAllUsingLink<ActivityGroup>(startPath);
+    }
+
+    async getAssetClasses(): Promise<AssetClass[]> {
+        const startPath = 'MobileWebServices/apis/360facility/v1/assetclasses';
+        return this.getAllUsingLink<AssetClass>(startPath);
+    }
+
+    async getAssetKeywords(): Promise<AssetKeyword[]> {
+        return this.getAllUsingLink<AssetKeyword>('MobileWebServices/apis/360facility/v1/assetkeywords');
+    }
+
+    async getWorkTypes(): Promise<WorkType[]> {
+        return this.getAllUsingLink<WorkType>('MobileWebServices/apis/360facility/v1/worktypes');
+    }
+
+    async getProperties(): Promise<Property[]> {
+        return this.getAllUsingLink<Property>('MobileWebServices/apis/360facility/v1/properties');
+    }
+
+    async getAssets(): Promise<Asset[]> {
+        return this.getAllUsingLink<Asset>('MobileWebServices/apis/360facility/v1/assets');
+    }
+
+    async getAssetsForFilter(filter: string): Promise<Asset[]> {
+        const startPath = `MobileWebServices/apis/360facility/v1/assets?$filter=${filter}`;
+        return this.getAllUsingLink<Asset>(startPath);
     }
 
     async getAllUsingLink<T>(startPath: string): Promise<T[]> {
