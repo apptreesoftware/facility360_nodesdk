@@ -37,21 +37,19 @@ export class FamisClient {
         let itemResponse = resp.data as JsonObject;
         let nextLink: string | undefined = itemResponse['@odata.nextLink'] as string;
         let items = itemResponse['value'] as T[];
-        let url = new URL(nextLink);
-        let path = url.pathname;
 
         while (nextLink) {
-            resp = await this.http.get(path);
+            resp = await this.http.get(nextLink);
             if (resp.status !== 200) {
                 if (resp.status === 401) {
                     throw AuthorizationError;
                 }
                 throw Error(`error: status ${resp.status}`);
             }
-            const itemsToAdd = itemResponse['value'] as T[];
+            let newResponse = resp.data as JsonObject;
+            const itemsToAdd = newResponse['value'] as T[];
             items = items.concat(itemsToAdd);
-            let newLink = itemResponse['@odata.nextLink'] as string;
-            nextLink = newLink != nextLink ? newLink : undefined;
+            nextLink = newResponse['@odata.nextLink'] as string;
         }
         return items;
     }
