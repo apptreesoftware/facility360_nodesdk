@@ -21,7 +21,7 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
     refreshToken: string;
     tokenType: string;
 
-    accessToken: string = `${this.tokenType} ${this.token}`;
+    accessToken: string;
 
     constructor(resp: LoginResponse, baseUrl: string) {
         super(baseUrl);
@@ -31,6 +31,7 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
         this.refreshToken = resp.Item.refresh_token;
         this.token = resp.Item.access_token;
         this.tokenType = resp.Item.token_type;
+        this.accessToken = `${this.tokenType} ${this.token}`;
     }
 
     async refresh(): Promise<AuthCredential> {
@@ -58,6 +59,7 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
         this.refreshToken = response.Item.refresh_token;
         this.token = response.Item.access_token;
         this.tokenType = response.Item.token_type;
+        this.accessToken = `${this.tokenType} ${this.token}`;
     }
 }
 

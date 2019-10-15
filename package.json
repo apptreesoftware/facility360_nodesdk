@@ -13,6 +13,13 @@
   "author": "AppTree Software",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.0"
+    "axios": "^0.19.0",
+    "firebase-functions": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.19",
+    "jest": "^24.9.0",
+    "ts-jest": "^24.1.0",
+    "typescript": "^3.6.4"
   }
 }
