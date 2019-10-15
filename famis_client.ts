@@ -3,10 +3,20 @@ import {AuthCredential} from "./auth";
 import {AuthorizationError} from "./errors";
 import {
     AccountSegment,
-    ActivityGroup, Asset,
+    ActivityGroup,
+    Asset,
     AssetClass,
     AssetKeyword,
-    FamisAttachment, FamisResponse, Property,
+    FamisAttachment,
+    FamisResponse,
+    Floor,
+    Property,
+    RequestPriority, RequestStatus,
+    RequestSubType,
+    RequestType,
+    Space,
+    WorkOrder,
+    WorkOrderComment,
     WorkType
 } from "./model/famis_models";
 import {QueryContext} from "./model/query_context";
@@ -61,6 +71,38 @@ export class FamisClient {
         return this.getAll<Asset>(context, 'assets');
     }
 
+    async getSpaces(context: QueryContext): Promise<Space[]> {
+        return this.getAll<Space>(context, "spaces");
+    }
+
+    async getFloors(context: QueryContext): Promise<Floor[]> {
+        return this.getAll<Floor>(context, 'floors');
+    }
+
+    async getWorkOrders(context: QueryContext): Promise<WorkOrder[]> {
+        return this.getAll<WorkOrder>(context, 'workorders');
+    }
+
+    async getRequestTypes(context: QueryContext): Promise<RequestType[]> {
+        return this.getAll<RequestType>(context, 'requesttypes');
+    }
+
+    async getRequestSubtypes(context: QueryContext): Promise<RequestSubType[]> {
+        return this.getAll<RequestSubType>(context, 'requestsubtypes')
+    }
+
+    async getRequestPriorities(context: QueryContext): Promise<RequestPriority[]> {
+        return this.getAll<RequestPriority>(context, 'requestpriorities');
+    }
+
+    async getWorkOrderComments(context: QueryContext): Promise<WorkOrderComment[]> {
+        return this.getAll<WorkOrderComment>(context, 'workordercomments');
+    }
+
+    async getRequestStatuses(context: QueryContext): Promise<RequestStatus[]> {
+        return this.getAll<RequestStatus>(context, 'requeststatuses');
+    }
+
     async getAll<T>(context: QueryContext, type: string): Promise<T[]> {
         if (supportsNextLink(type)) {
             return this.getAllUsingLink<T>(context.buildUrl(type));
@@ -96,14 +138,14 @@ export class FamisClient {
     }
 
     async getAllPaged<T>(context: QueryContext, type: string): Promise<T[]> {
-        const top = 100;
+        const top = 500;
         let skip = 0;
-        let startUrl = context.buildPagedUrl(type, top, skip);
-        let count = 100;
+        let count = 500;
         let items: T[] = [];
 
         while (count >= top) {
-            let resp = await this.http.get(startUrl);
+            let url = context.buildPagedUrl(type, top, skip);
+            let resp = await this.http.get(url);
             if (resp.status === 401) {
                 throw AuthorizationError;
             } else if (resp.status !== 200) {
@@ -119,7 +161,7 @@ export class FamisClient {
 }
 
 function supportsNextLink(type: string) : boolean {
-    if (type === 'workorder' || type === 'spaces') {
+    if (type === 'workorders') {
         return false;
     }
     return true;

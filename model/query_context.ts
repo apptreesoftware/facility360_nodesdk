@@ -34,7 +34,7 @@ export class QueryContext {
     }
 
     buildPagedUrl(entity: string, top: number, skip: number) {
-        let urlPath = `${basePath}/${entity}?top=${top}&skip=${skip}`;
+        let urlPath = `${basePath}/${entity}?$top=${top}&$skip=${skip}`;
         if (this.filter) {
             urlPath += `&$filter=${this.filter}`;
         }

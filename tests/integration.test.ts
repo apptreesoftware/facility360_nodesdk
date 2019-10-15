@@ -16,7 +16,7 @@ describe('Attachments', () => {
 
         const attachments = await famisClient.getAttachments(new QueryContext());
         expect(attachments).toBeTruthy();
-        expect(attachments.length).toBeGreaterThan(0);
+        expect(attachments.length).toBeGreaterThan(1000);
     })
 });
 
@@ -62,5 +62,21 @@ describe('Lists', () => {
         const assets = await famisClient.getAssets(context);
         expect(assets).toBeTruthy();
         expect(assets.length).toBe(1);
+    });
+
+    it('should fetch all spaces', async function () {
+        const spaces = await famisClient.getSpaces(new QueryContext().setFilter('PropertyId eq 187'));
+        expect(spaces).toBeTruthy();
+        expect(spaces.length).toBe(276);
+    });
+
+    it('should fetch work orders based on filter', async function () {
+        const context = new QueryContext().setFilter('Id eq 3').setExpand('Attachments');
+        const workOrders = await famisClient.getWorkOrders(context);
+        expect(workOrders).toBeTruthy();
+        expect(workOrders.length).toBe(1);
+        const attachments = workOrders[0].Attachments;
+        expect(attachments).toBeTruthy();
+        expect(attachments ? attachments.length : 0).toBe(1);
     });
 });
