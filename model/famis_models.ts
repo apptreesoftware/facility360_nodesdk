@@ -1,3 +1,8 @@
+export interface FamisResponse<T>{
+    "@odata.nextLink"? : string;
+    value : T[]
+}
+
 export interface ActivityGroup {
     Id: number;
     Name: string;

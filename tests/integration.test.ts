@@ -1,5 +1,6 @@
 import {UsernamePasswordCredential} from "../auth";
 import {FamisClient} from "../famis_client";
+import {QueryContext} from "../model/query_context";
 
 describe('Attachments', () => {
     it('should fetch all attachments', async function() {
@@ -13,7 +14,7 @@ describe('Attachments', () => {
         const credential = new UsernamePasswordCredential(user, psswd, baseUrl);
         const famisClient = new FamisClient(credential, baseUrl);
 
-        const attachments = await famisClient.getAttachments();
+        const attachments = await famisClient.getAttachments(new QueryContext());
         expect(attachments).toBeTruthy();
         expect(attachments.length).toBeGreaterThan(0);
     })
@@ -30,32 +31,35 @@ describe('Lists', () => {
     const credential = new UsernamePasswordCredential(user, psswd, baseUrl);
     const famisClient = new FamisClient(credential, baseUrl);
 
+    const baseContext = new QueryContext();
+
     it('should fetch all account segments', async function() {
-        const accountSegments = await famisClient.getAccountSegments();
+        const accountSegments = await famisClient.getAccountSegments(baseContext);
         expect(accountSegments).toBeTruthy();
         expect(accountSegments.length).toBe(6);
     });
 
     it('should fetch all activity groups', async function () {
-        const actvityGroups = await famisClient.getActivityGroups();
+        const actvityGroups = await famisClient.getActivityGroups(baseContext);
         expect(actvityGroups).toBeTruthy();
         expect(actvityGroups.length).toBe(4);
     });
 
     it('should fetch all asset classes', async function () {
-        const assetClasses = await famisClient.getAssetClasses();
+        const assetClasses = await famisClient.getAssetClasses(baseContext);
         expect(assetClasses).toBeTruthy();
         expect(assetClasses.length).toBe(144);
     });
 
     it('should fetch all asset keywords', async function () {
-        const assetKeywords = await famisClient.getAssetKeywords();
+        const assetKeywords = await famisClient.getAssetKeywords(baseContext);
         expect(assetKeywords).toBeTruthy();
         expect(assetKeywords.length).toBe(217);
     });
 
     it('should fetch asset with id 2575', async function () {
-        const assets = await famisClient.getAssetsForFilter('Id eq 2575');
+        const context = new QueryContext().setFilter('Id eq 2575');
+        const assets = await famisClient.getAssets(context);
         expect(assets).toBeTruthy();
         expect(assets.length).toBe(1);
     });

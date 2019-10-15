@@ -1,15 +1,15 @@
 import axios, {AxiosInstance} from "axios";
 import {AuthCredential} from "./auth";
 import {AuthorizationError} from "./errors";
-import {JsonObject} from "./model/common";
 import {
     AccountSegment,
     ActivityGroup, Asset,
     AssetClass,
     AssetKeyword,
-    FamisAttachment, Property,
+    FamisAttachment, FamisResponse, Property,
     WorkType
 } from "./model/famis_models";
+import {QueryContext} from "./model/query_context";
 
 export class FamisClient {
     host: string;
@@ -29,45 +29,44 @@ export class FamisClient {
         });
     }
 
-    async getAttachments(): Promise<FamisAttachment[]> {
-        const startPath = 'MobileWebServices/apis/360facility/v1/attachments';
-        return this.getAllUsingLink<FamisAttachment>(startPath);
+    async getAttachments(context: QueryContext): Promise<FamisAttachment[]> {
+        return this.getAll<FamisAttachment>(context, "attachments");
     }
 
-    async getAccountSegments(): Promise<AccountSegment[]> {
-        const startPath = 'MobileWebServices/apis/360facility/v1/accountsegmentnpfa';
-        return this.getAllUsingLink<AccountSegment>(startPath);
+    async getAccountSegments(context: QueryContext): Promise<AccountSegment[]> {
+        return this.getAll<AccountSegment>(context, "accountsegmentnpfa");
     }
 
-    async getActivityGroups(): Promise<ActivityGroup[]> {
-        const startPath = 'MobileWebServices/apis/360facility/v1/activitygroups';
-        return this.getAllUsingLink<ActivityGroup>(startPath);
+    async getActivityGroups(context: QueryContext): Promise<ActivityGroup[]> {
+        return this.getAll<ActivityGroup>(context, "activitygroups");
     }
 
-    async getAssetClasses(): Promise<AssetClass[]> {
-        const startPath = 'MobileWebServices/apis/360facility/v1/assetclasses';
-        return this.getAllUsingLink<AssetClass>(startPath);
+    async getAssetClasses(context: QueryContext): Promise<AssetClass[]> {
+        return this.getAll<AssetClass>(context, "assetclasses");
     }
 
-    async getAssetKeywords(): Promise<AssetKeyword[]> {
-        return this.getAllUsingLink<AssetKeyword>('MobileWebServices/apis/360facility/v1/assetkeywords');
+    async getAssetKeywords(context: QueryContext): Promise<AssetKeyword[]> {
+        return this.getAll<AssetKeyword>(context, "assetkeywords");
     }
 
-    async getWorkTypes(): Promise<WorkType[]> {
-        return this.getAllUsingLink<WorkType>('MobileWebServices/apis/360facility/v1/worktypes');
+    async getWorkTypes(context: QueryContext): Promise<WorkType[]> {
+        return this.getAll<WorkType>(context, "worktypes");
     }
 
-    async getProperties(): Promise<Property[]> {
-        return this.getAllUsingLink<Property>('MobileWebServices/apis/360facility/v1/properties');
+    async getProperties(context: QueryContext): Promise<Property[]> {
+        return this.getAll<Property>(context, "properties");
     }
 
-    async getAssets(): Promise<Asset[]> {
-        return this.getAllUsingLink<Asset>('MobileWebServices/apis/360facility/v1/assets');
+    async getAssets(context: QueryContext): Promise<Asset[]> {
+        return this.getAll<Asset>(context, 'assets');
     }
 
-    async getAssetsForFilter(filter: string): Promise<Asset[]> {
-        const startPath = `MobileWebServices/apis/360facility/v1/assets?$filter=${filter}`;
-        return this.getAllUsingLink<Asset>(startPath);
+    async getAll<T>(context: QueryContext, type: string): Promise<T[]> {
+        if (supportsNextLink(type)) {
+            return this.getAllUsingLink<T>(context.buildUrl(type));
+        } else {
+            return this.getAllPaged<T>(context, type);
+        }
     }
 
     async getAllUsingLink<T>(startPath: string): Promise<T[]> {
@@ -77,9 +76,9 @@ export class FamisClient {
         } else if (resp.status !== 200) {
             throw Error(`http error: status ${resp.status}`);
         }
-        let itemResponse = resp.data as JsonObject;
-        let nextLink: string | undefined = itemResponse['@odata.nextLink'] as string;
-        let items = itemResponse['value'] as T[];
+        let itemResponse = resp.data as FamisResponse<T>;
+        let nextLink = itemResponse["@odata.nextLink"];
+        let items = itemResponse.value;
 
         while (nextLink) {
             resp = await this.http.get(nextLink);
@@ -89,11 +88,39 @@ export class FamisClient {
                 }
                 throw Error(`error: status ${resp.status}`);
             }
-            let newResponse = resp.data as JsonObject;
-            const itemsToAdd = newResponse['value'] as T[];
-            items = items.concat(itemsToAdd);
-            nextLink = newResponse['@odata.nextLink'] as string;
+            let newResponse = resp.data as FamisResponse<T>;
+            items = items.concat(newResponse.value);
+            nextLink = newResponse['@odata.nextLink'];
         }
         return items;
     }
+
+    async getAllPaged<T>(context: QueryContext, type: string): Promise<T[]> {
+        const top = 100;
+        let skip = 0;
+        let startUrl = context.buildPagedUrl(type, top, skip);
+        let count = 100;
+        let items: T[] = [];
+
+        while (count >= top) {
+            let resp = await this.http.get(startUrl);
+            if (resp.status === 401) {
+                throw AuthorizationError;
+            } else if (resp.status !== 200) {
+                throw Error(`http error: status ${resp.status}`);
+            }
+            let famisResp = resp.data as FamisResponse<T>;
+            items = items.concat(famisResp.value)
+            skip += top;
+            count = famisResp.value.length;
+        }
+        return items;
+    }
+}
+
+function supportsNextLink(type: string) : boolean {
+    if (type === 'workorder' || type === 'spaces') {
+        return false;
+    }
+    return true;
 }
