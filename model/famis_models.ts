@@ -1,6 +1,14 @@
+import {Asset} from "./assets";
+
 export interface FamisResponse<T>{
     "@odata.nextLink"? : string;
     value : T[]
+}
+
+export interface FamisErrorResponse {
+    Result: boolean;
+    Context: number;
+    Message: string;
 }
 
 export interface ActivityGroup {
@@ -37,29 +45,6 @@ export interface FamisAttachment {
     AttachmentTypeId?: string;
     RequestExternalId?: string;
     Contents?: any;
-}
-
-export interface AssetClass {
-    Id: number;
-    Description: string;
-    UpdateDate: Date;
-    UpdatedById: number;
-    UpdatedByExternalId: string;
-    ActiveFlag: boolean;
-    TabOrder: number;
-    AssetTag: string;
-    MeterClass: boolean;
-    Guid: string;
-}
-
-export interface AssetKeyword {
-    Id: number;
-    Name: string;
-    Description: string;
-    TabOrder: number;
-    ActiveFlag: boolean;
-    UpdatedByName: string;
-    UpdateDate: Date;
 }
 
 export interface WorkType {
@@ -206,87 +191,6 @@ export interface Property {
     TimeZoneExternalId: string;
     TotalArea1: number;
     TotalArea2: number;
-}
-
-export interface Asset {
-    Id: number;
-    Name: string;
-    Description: string;
-    AssetNumber: string;
-    SerialNumber: string;
-    AssetClassId: number;
-    AssetRankId: number;
-    EcriCodeId?: any;
-    MakeId: number;
-    ModelId: number;
-    InServiceDate?: Date;
-    PurchasedFromVendor?: any;
-    AssetStatusId: number;
-    StatusComment?: string;
-    BarcodeNumber: string;
-    FinancialSystemId: string;
-    AssetSafetyComments?: any;
-    AssetKeywordId?: number;
-    ExternalId: string;
-    AssetTypeId?: number;
-    RiskAssessment?: any;
-    ExternalSystemId?: any;
-    Guid: string;
-    PropertyId: number;
-    SpaceId: number;
-    EmployeeId?: any;
-    Room: string;
-    QuantityAvailable: number;
-    Comments: string;
-    ActiveFlag: boolean;
-    FloorId: number;
-    SubSpaceId?: any;
-    AutoAssignedToId?: any;
-    WarrantyContractNumber?: any;
-    WarrantyEffectiveDate?: Date;
-    WarrantyExpirationDate?: Date;
-    WarrantyExpirationContact?: any;
-    WarrantyExpirationContactPhone?: any;
-    WarrantyVendorId?: any;
-    WarrantyPoNumberId?: any;
-    MaintenanceContractNumber?: any;
-    MaintenanceContractVendorId?: any;
-    MaintenanceContractExpirationDate?: any;
-    MaintenanceContractNotificationDays?: any;
-    PurchaseDate?: Date;
-    PurchaseAmount?: number;
-    ExternalCostCenterId?: any;
-    PurchaseCostCenter?: any;
-    PoNumber?: any;
-    EstimatedLifeInYears: number;
-    EstimatedLifeInHours: number;
-    AnnualRuntimeInHours: number;
-    CapitalRepairCost: number;
-    EstimatedReplacementCost?: any;
-    LifeExpectancy?: any;
-    UnitMultiplier?: any;
-    MeterMultiplier?: any;
-    MeterFormat?: any;
-    UomId?: any;
-    UtilityId?: any;
-    LastCalibrationDate?: any;
-    MeterSiteId?: any;
-    MeterInstallationDate?: any;
-    MeterInitialReading?: any;
-    MeterLastReadingDate?: any;
-    MeterLastReading?: any;
-    UpdateDate: Date;
-    UpdatedById: number;
-    FcaRankId?: number;
-    PropertyExternalId: string;
-    SpaceExternalId: string;
-    EmployeeExternalId?: any;
-    WarrantyVendorExternalId?: any;
-    MaintenanceContractVendorExternalId?: any;
-    UpdatedByExternalId: string;
-    FloorExternalId: string;
-    SubSpaceExternalId?: any;
-    AutoAssignedToExternalId?: any;
 }
 
 export interface Space {
@@ -809,4 +713,48 @@ export interface WorkOrder {
     RequestSubType?: RequestSubType;
     WorkOrderComment?: WorkOrderComment;
     Attachments?: FamisAttachment[];
+}
+
+export interface Crew {
+    Id: number;
+    ExternalId: string;
+    ActiveFlag: boolean;
+    UpdateDate: Date;
+    UpdatedById: number;
+    ExternalUpdatedById: string;
+    Description: string;
+    Rate: number;
+    OT: number;
+    DT: number;
+    CompanyId: number;
+    CompanyExternalId: string;
+    DepartmentId: number;
+    DepartmentExternalId: string;
+    RateScheduleFlag: boolean;
+    IsCrewFlag: boolean;
+    CrewHoursDay: number;
+}
+
+export interface WorkOrderCreate {
+    StatementOfWork: string;
+    SpaceId: number;
+    SubSpaceId?: number;
+    AssetId?: number;
+    RequestPriorityId: number;
+    RequestTypeId: number;
+    RequestSubTypeId: number;
+    RequestorId: number;
+    AssignedToId: number;
+    ProcedureId: number;
+    CrewId: number;
+    DepartmentId: number;
+    RequestorFirstName: string;
+    RequestorLastName: string;
+    RequestorEmail: string;
+    RequestorPhone: string;
+    CompleteByDate: Date;
+    ExternalId: string;
+    Crew: Crew;
+    ParentWOId: number;
+    AccountInfo: AccountInfo;
 }

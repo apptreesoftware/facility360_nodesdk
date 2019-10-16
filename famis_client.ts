@@ -4,10 +4,7 @@ import {AuthorizationError} from "./errors";
 import {
     AccountSegment,
     ActivityGroup,
-    Asset,
-    AssetClass,
-    AssetKeyword,
-    FamisAttachment,
+    FamisAttachment, FamisErrorResponse,
     FamisResponse,
     Floor,
     Property,
@@ -19,7 +16,16 @@ import {
     WorkOrderComment,
     WorkType
 } from "./model/famis_models";
-import {QueryContext} from "./model/query_context";
+import {buildEntityUrl, QueryContext} from "./model/request_context";
+import {
+    Asset,
+    AssetClass,
+    AssetCreateRequest,
+    AssetKeyword,
+    AssetMake, AssetModel,
+    AssetStatus,
+    CreateAssetMake, CreateAssetModel
+} from "./model/assets";
 
 export class FamisClient {
     host: string;
@@ -39,6 +45,59 @@ export class FamisClient {
         });
     }
 
+    // Assets
+    async getAssetClasses(context: QueryContext): Promise<AssetClass[]> {
+        return this.getAll<AssetClass>(context, "assetclasses");
+    }
+
+    async getAssetKeywords(context: QueryContext): Promise<AssetKeyword[]> {
+        return this.getAll<AssetKeyword>(context, "assetkeywords");
+    }
+
+    async getAssetStatuses(context: QueryContext): Promise<AssetStatus[]> {
+        return this.getAll<AssetStatus>(context, "assetstatuses");
+    }
+
+    async getAssetMakes(context: QueryContext): Promise<AssetMake[]> {
+        return this.getAll<AssetMake>(context, "assetmakes");
+    }
+
+    async createAssetMake(assetMake: AssetMake): Promise<AssetMake> {
+        return this.createObject<CreateAssetMake, AssetMake>(assetMake, 'assetmakes');
+    }
+
+    async getAssetModels(context: QueryContext): Promise<AssetModel[]> {
+        return this.getAll<AssetModel>(context, "assetmodels");
+    }
+
+    async createAssetModel(assetModel: CreateAssetModel): Promise<AssetModel> {
+        return this.createObject<CreateAssetModel, AssetModel>(assetModel, "assetmodels");
+    }
+
+    async getAssets(context: QueryContext): Promise<Asset[]> {
+        return this.getAll<Asset>(context, 'assets');
+    }
+
+    async createAsset(asset: AssetCreateRequest): Promise<Asset> {
+        return this.createObject<AssetCreateRequest, Asset>(asset, 'assets');
+    }
+
+    async patchAsset(asset: Asset): Promise<Asset> {
+        const resp = await this.http.patch(buildEntityUrl('assets'), asset);
+        if (resp.status === 401) {
+            throw AuthorizationError;
+        } else if (resp.status !== 200) {
+            const errorResponse = resp.data as FamisErrorResponse;
+            if (errorResponse.Message) {
+                throw Error(`error; message: ${errorResponse.Message}`);
+            }
+            throw Error(`http error: status ${resp.status}`);
+        }
+
+        return resp.data as Asset;
+    }
+    //
+
     async getAttachments(context: QueryContext): Promise<FamisAttachment[]> {
         return this.getAll<FamisAttachment>(context, "attachments");
     }
@@ -51,24 +110,12 @@ export class FamisClient {
         return this.getAll<ActivityGroup>(context, "activitygroups");
     }
 
-    async getAssetClasses(context: QueryContext): Promise<AssetClass[]> {
-        return this.getAll<AssetClass>(context, "assetclasses");
-    }
-
-    async getAssetKeywords(context: QueryContext): Promise<AssetKeyword[]> {
-        return this.getAll<AssetKeyword>(context, "assetkeywords");
-    }
-
     async getWorkTypes(context: QueryContext): Promise<WorkType[]> {
         return this.getAll<WorkType>(context, "worktypes");
     }
 
     async getProperties(context: QueryContext): Promise<Property[]> {
         return this.getAll<Property>(context, "properties");
-    }
-
-    async getAssets(context: QueryContext): Promise<Asset[]> {
-        return this.getAll<Asset>(context, 'assets');
     }
 
     async getSpaces(context: QueryContext): Promise<Space[]> {
@@ -102,6 +149,8 @@ export class FamisClient {
     async getRequestStatuses(context: QueryContext): Promise<RequestStatus[]> {
         return this.getAll<RequestStatus>(context, 'requeststatuses');
     }
+
+    // generic get methods
 
     async getAll<T>(context: QueryContext, type: string): Promise<T[]> {
         if (supportsNextLink(type)) {
@@ -158,6 +207,27 @@ export class FamisClient {
         }
         return items;
     }
+
+    //
+
+    // generic create request
+
+    async createObject<T, K>(toCreate: T, entity: string): Promise<K> {
+        const url = buildEntityUrl(entity);
+        const resp = await this.http.post(url, toCreate);
+        if (resp.status === 401) {
+            throw AuthorizationError;
+        } else if (resp.status !== 200) {
+            const errorResponse = resp.data as FamisErrorResponse;
+            if (errorResponse.Message) {
+                throw Error(`error; message: ${errorResponse.Message}`);
+            }
+            throw Error(`http error: status ${resp.status}`);
+        }
+
+        return resp.data as K;
+    }
+    //
 }
 
 function supportsNextLink(type: string) : boolean {
@@ -166,3 +236,4 @@ function supportsNextLink(type: string) : boolean {
     }
     return true;
 }
+

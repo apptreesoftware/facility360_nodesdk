@@ -1,6 +1,7 @@
 import {UsernamePasswordCredential} from "../auth";
 import {FamisClient} from "../famis_client";
-import {QueryContext} from "../model/query_context";
+import {QueryContext} from "../model/request_context";
+import {CreateAssetModel} from "../model/assets";
 
 describe('Attachments', () => {
     it('should fetch all attachments', async function() {
@@ -78,5 +79,17 @@ describe('Lists', () => {
         const attachments = workOrders[0].Attachments;
         expect(attachments).toBeTruthy();
         expect(attachments ? attachments.length : 0).toBe(1);
+    });
+
+    it('should create an asset model and return it', async function () {
+       const toCreate: CreateAssetModel = {
+           ActiveFlag: true,
+           Description: "Testing, please ignore",
+           MakeId: 951
+        };
+
+       const asset = await famisClient.createAssetModel(toCreate);
+       expect(asset).toBeTruthy();
+       expect(asset.Description).toBe("Testing, please ignore");
     });
 });

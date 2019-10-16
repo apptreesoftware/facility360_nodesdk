@@ -48,4 +48,8 @@ export class QueryContext {
     }
 }
 
-export const basePath = 'MobileWebServices/apis/360facility/v1'
+export function buildEntityUrl(entity: string): string {
+    return `${basePath}/${entity}`;
+}
+
+export const basePath = 'MobileWebServices/apis/360facility/v1';
