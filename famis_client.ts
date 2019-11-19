@@ -18,6 +18,7 @@ import {
   RequestSubType,
   RequestType,
   Space,
+  UserPropertyAssociation,
   UserRegionAssociation,
   WorkOrder,
   WorkOrderComment,
@@ -198,6 +199,15 @@ export class FamisClient {
     );
   }
 
+  async getUserPropertyAssociations(
+    context: QueryContext
+  ): Promise<Result<UserPropertyAssociation>> {
+    return this.getAll<UserPropertyAssociation>(
+      context,
+      "userpropertyassociation"
+    );
+  }
+
   async getRequestSubtypes(
     context: QueryContext
   ): Promise<Result<RequestSubType>> {
@@ -338,6 +348,8 @@ function supportsNextLink(type: string): boolean {
   } else if (type === "userregionassociations") {
     return false;
   } else if (type === "propertyrequesttypeassociations") {
+    return false;
+  } else if (type === "userpropertyassociation") {
     return false;
   }
   return true;
