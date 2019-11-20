@@ -18,19 +18,19 @@ export interface Crew {
     CrewHoursDay: number;
 }
 
-export interface CrewUserAssoc {
+export interface CrewUserAssociation {
     Id: number;
     UserId: number;
-    UserExternalId: string;
+    UserExternalId?: string;
     CrewId: number;
-    CrewExternalId: string;
-    UpdateDate: Date;
-    UpdatedById: number;
-    UpdatedByExternalId: string;
+    CrewExternalId?: string;
+    UpdateDate?: Date;
+    UpdatedById?: number;
+    UpdatedByExternalId?: null;
     Rate?: number;
     OT?: number;
     DT?: number;
-    UseCrewRatesFlag: boolean;
-    DefaultCrewFlag: boolean;
-    CrewLeaderFlag: boolean;
+    UseCrewRatesFlag?: boolean;
+    DefaultCrewFlag?: boolean;
+    CrewLeaderFlag?: boolean;
 }

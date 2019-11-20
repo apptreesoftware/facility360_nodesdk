@@ -84,7 +84,7 @@ export interface Asset {
     SerialNumber: string;
     AssetClassId: number;
     AssetRankId: number;
-    EcriCodeId?: any;
+    EcriCodeId?: number;
     MakeId: number;
     ModelId: number;
     InServiceDate?: Date;
