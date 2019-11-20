@@ -1,7 +1,6 @@
 import {UsernamePasswordCredential} from "../auth";
 import {FamisClient} from "../famis_client";
 import {QueryContext} from "../model/request_context";
-import {CreateAssetModel} from "../model/assets";
 
 describe('Attachments', () => {
     it('should fetch all attachments', async function() {
