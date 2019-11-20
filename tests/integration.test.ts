@@ -43,7 +43,7 @@ describe('Lists', () => {
     it('should fetch all activity groups', async function () {
         const actvityGroups = await famisClient.getActivityGroups(baseContext);
         expect(actvityGroups).toBeTruthy();
-        expect(actvityGroups.length).toBe(4);
+        expect(actvityGroups.length).toBe(5);
     });
 
     it('should fetch all asset classes', async function () {

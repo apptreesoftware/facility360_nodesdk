@@ -23,9 +23,11 @@ import {
     AssetCreateRequest,
     AssetKeyword,
     AssetMake, AssetModel,
-    AssetStatus,
+    AssetStatus, AssetType,
     CreateAssetMake, CreateAssetModel
 } from "./model/assets";
+import {Crew, CrewUserAssoc} from "./model/crews";
+import {Company, CreateCompanyRequest, PatchCompanyRequest} from "./model/companies";
 
 export class FamisClient {
     host: string;
@@ -74,6 +76,10 @@ export class FamisClient {
         return this.createObject<CreateAssetModel, AssetModel>(assetModel, "assetmodels");
     }
 
+    async getAssetTypes(context: QueryContext): Promise<AssetType[]> {
+        return this.getAll<AssetType>(context, "assettypes");
+    }
+
     async getAssets(context: QueryContext): Promise<Asset[]> {
         return this.getAll<Asset>(context, 'assets');
     }
@@ -83,18 +89,33 @@ export class FamisClient {
     }
 
     async patchAsset(asset: Asset): Promise<Asset> {
-        const resp = await this.http.patch(buildEntityUrl('assets'), asset);
-        if (resp.status === 401) {
-            throw AuthorizationError;
-        } else if (resp.status !== 200) {
-            const errorResponse = resp.data as FamisErrorResponse;
-            if (errorResponse.Message) {
-                throw Error(`error; message: ${errorResponse.Message}`);
-            }
-            throw Error(`http error: status ${resp.status}`);
-        }
+        return this.patchObject<Asset, Asset>(asset, "assets");
+    }
+    //
 
-        return resp.data as Asset;
+    // crews
+
+    async getCrews(context: QueryContext): Promise<Crew[]> {
+        return this.getAll<Crew>(context, "crews");
+    }
+
+    async getCrewUserAssociations(context: QueryContext): Promise<CrewUserAssoc[]> {
+        return this.getAll<CrewUserAssoc>(context, "crewuserassociations");
+    }
+
+    //
+
+    // companies
+    async getCompanies(context: QueryContext): Promise<Company[]> {
+        return this.getAll<Company>(context, "companies");
+    }
+
+    async createCompany(company: CreateCompanyRequest): Promise<Company> {
+        return this.createObject<CreateCompanyRequest, Company>(company, "companies");
+    }
+
+    async patchCompany(company: PatchCompanyRequest): Promise<Company> {
+        return this.patchObject<PatchCompanyRequest, Company>(company, "companies");
     }
     //
 
@@ -210,11 +231,27 @@ export class FamisClient {
 
     //
 
-    // generic create request
+    // generic requests
 
     async createObject<T, K>(toCreate: T, entity: string): Promise<K> {
         const url = buildEntityUrl(entity);
         const resp = await this.http.post(url, toCreate);
+        if (resp.status === 401) {
+            throw AuthorizationError;
+        } else if (resp.status !== 200) {
+            const errorResponse = resp.data as FamisErrorResponse;
+            if (errorResponse.Message) {
+                throw Error(`error; message: ${errorResponse.Message}`);
+            }
+            throw Error(`http error: status ${resp.status}`);
+        }
+
+        return resp.data as K;
+    }
+
+    async patchObject<T, K>(patch: T, entity: string): Promise<K> {
+        const url = buildEntityUrl(entity);
+        const resp = await this.http.patch(url, patch);
         if (resp.status === 401) {
             throw AuthorizationError;
         } else if (resp.status !== 200) {

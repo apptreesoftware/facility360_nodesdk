@@ -1,4 +1,5 @@
 import {Asset} from "./assets";
+import {Crew} from "./crews";
 
 export interface FamisResponse<T>{
     "@odata.nextLink"? : string;
@@ -713,26 +714,6 @@ export interface WorkOrder {
     RequestSubType?: RequestSubType;
     WorkOrderComment?: WorkOrderComment;
     Attachments?: FamisAttachment[];
-}
-
-export interface Crew {
-    Id: number;
-    ExternalId: string;
-    ActiveFlag: boolean;
-    UpdateDate: Date;
-    UpdatedById: number;
-    ExternalUpdatedById: string;
-    Description: string;
-    Rate: number;
-    OT: number;
-    DT: number;
-    CompanyId: number;
-    CompanyExternalId: string;
-    DepartmentId: number;
-    DepartmentExternalId: string;
-    RateScheduleFlag: boolean;
-    IsCrewFlag: boolean;
-    CrewHoursDay: number;
 }
 
 export interface WorkOrderCreate {

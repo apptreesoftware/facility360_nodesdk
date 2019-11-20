@@ -66,6 +66,16 @@ export interface CreateAssetModel {
     Url?: string;
 }
 
+export interface AssetType {
+    Id: number;
+    Description: string;
+    Name: string;
+    ActiveFlag: boolean;
+    UpdateDate: Date;
+    UpdatedByName: string;
+    TabOrder: number;
+}
+
 export interface Asset {
     Id: number;
     Name: string;
