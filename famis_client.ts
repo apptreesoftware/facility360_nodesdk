@@ -50,6 +50,11 @@ export class FamisClient {
         });
     }
 
+    async getCredentials(): Promise<AuthCredential> {
+        await this.credentials.refresh();
+        return this.credentials;
+    }
+
     // Assets
     async getAssetClasses(context: QueryContext): Promise<Result<AssetClass>> {
         return this.getAll<AssetClass>(context, "assetclasses");

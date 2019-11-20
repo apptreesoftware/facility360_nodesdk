@@ -87,22 +87,22 @@ export interface CreateCompanyRequest {
     SicCode?: string;
     InternalVendorCode?: string;
     TaxpayerId?: string;
-    ContractTypeId?: any;
+    ContractTypeId?: number;
     ContractComments?: string;
     MobilePhone?: string;
     InternalVendorCode2?: string;
     RiskRating?: string;
-    TypeOfAccessId?: any;
+    TypeOfAccessId?: number;
     PaymentTermId?: number;
-    ShippingMethodId?: any;
-    FreeOnBoardId?: any;
+    ShippingMethodId?: number;
+    FreeOnBoardId?: number;
     Addr3?: string;
     RemAddr1?: string;
     RemAddr2?: string;
     RemAddr3?: string;
     RemCity?: string;
     RemZip?: string;
-    RemStateId?: any;
+    RemStateId?: number;
     Description?: string;
 }
 
@@ -141,22 +141,22 @@ export interface PatchCompanyRequest {
     SicCode?: string;
     InternalVendorCode?: string;
     TaxpayerId?: string;
-    ContractTypeId?: any;
+    ContractTypeId?: number;
     ContractComments?: string;
     MobilePhone?: string;
     InternalVendorCode2?: string;
     RiskRating?: string;
-    TypeOfAccessId?: any;
+    TypeOfAccessId?: number;
     PaymentTermId?: number;
-    ShippingMethodId?: any;
-    FreeOnBoardId?: any;
+    ShippingMethodId?: number;
+    FreeOnBoardId?: number;
     Addr3?: string;
     RemAddr1?: string;
     RemAddr2?: string;
     RemAddr3?: string;
     RemCity?: string;
     RemZip?: string;
-    RemStateId?: any;
+    RemStateId?: number;
     Description?: string;
 }
 

@@ -44,32 +44,32 @@ export interface FamisUser {
     DefaultPage: string;
     DepartmentDescription: string;
     DepartmentId: number;
-    PositionDescription?: any;
+    PositionDescription?: string;
     PositionId?: any;
-    PositionStandardId?: any;
-    ExternalSystemId?: any;
+    PositionStandardId?: number;
+    ExternalSystemId?: string;
     ProfileId?: number;
-    LanguageId?: any;
+    LanguageId?: number;
     UseRateScheduleFlag: boolean;
     TimeCardFormatId?: number;
-    PayrollExternalId?: any;
+    PayrollExternalId?: string;
     RequestsPerPage: number;
     SelfRegistrationProfileFlag: boolean;
     MarkupFlag: boolean;
     MobileRequestFutureDays: number;
     MobileRequestHistoryDays: number;
     MobileRequestsPerPage: number;
-    CoiExpirationDate?: any;
+    CoiExpirationDate?: Date;
     CountryId: number;
     StateId: number;
-    AccountId?: any;
-    DateFormatId?: any;
-    MobileDateFormatId?: any;
-    WoApprovalLevelId?: any;
-    PoApprovalLevelId?: any;
-    ProjectApprovalLevelId?: any;
-    PrApprovalId?: any;
-    PrimaryTimeCardApproverId?: any;
+    AccountId?: number;
+    DateFormatId?: number;
+    MobileDateFormatId?: number;
+    WoApprovalLevelId?: number;
+    PoApprovalLevelId?: number;
+    ProjectApprovalLevelId?: number;
+    PrApprovalId?: number;
+    PrimaryTimeCardApproverId?: number;
     PrBuyerFlag: boolean;
     ProfileFlag: boolean;
     PasswordNeverExpiresFlag: boolean;
@@ -77,7 +77,7 @@ export interface FamisUser {
     AlsIncorrectLoginCount: number;
     AlsForcePasswordChangeFlag: boolean;
     AlsNeverInactivateFlag: boolean;
-    AlsLoginExpirationDate?: any;
+    AlsLoginExpirationDate?: Date;
     AlsLoginStatus: number;
     CompanyExternalId: string;
     ProfileExternalId: string;
@@ -85,8 +85,8 @@ export interface FamisUser {
     Name: string;
     LockAssignedWorkOrdersFlag: boolean;
     IsAllocatingIndividual: boolean;
-    LaborEntryIds: any[];
-    LaborEntryComment?: any;
+    LaborEntryIds: number[];
+    LaborEntryComment?: string;
 }
 
 export interface UserRegionAssociation {
