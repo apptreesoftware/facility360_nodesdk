@@ -4,6 +4,7 @@ import {AuthorizationError} from "./errors";
 
 export interface AuthCredential {
     refresh(): Promise<AuthCredential>;
+
     accessToken: string;
 }
 
@@ -25,7 +26,7 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
 
     constructor(resp: LoginResponse, baseUrl: string) {
         super(baseUrl);
-        let expires = new Date();
+        const expires = new Date();
         expires.setSeconds(expires.getSeconds() + resp.Item.expires_in);
         this.expires = expires;
         this.refreshToken = resp.Item.refresh_token;
@@ -53,7 +54,7 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
     }
 
     updateFromLoginResponse(response: LoginResponse) {
-        let expires = new Date()
+        const expires = new Date()
         expires.setSeconds(expires.getSeconds() + response.Item.expires_in);
         this.expires = expires;
         this.refreshToken = response.Item.refresh_token;
