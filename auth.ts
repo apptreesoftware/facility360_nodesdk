@@ -2,6 +2,13 @@ import axios from "axios";
 import {LoginResponse} from "./model/login_response";
 import {AuthorizationError} from "./errors";
 
+export interface OAuthSetting {
+    token: string;
+    expires: Date;
+    refreshToken: string;
+    tokenType: string;
+}
+
 export interface AuthCredential {
     refresh(): Promise<AuthCredential>;
 
@@ -24,14 +31,23 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
 
     accessToken: string;
 
-    constructor(resp: LoginResponse, baseUrl: string) {
+    constructor(baseUrl: string, settings?: OAuthSetting, response?: LoginResponse) {
         super(baseUrl);
-        const expires = new Date();
-        expires.setSeconds(expires.getSeconds() + resp.Item.expires_in);
-        this.expires = expires;
-        this.refreshToken = resp.Item.refresh_token;
-        this.token = resp.Item.access_token;
-        this.tokenType = resp.Item.token_type;
+        if (settings) {
+            this.expires = settings.expires;
+            this.refreshToken = settings.refreshToken;
+            this.token = settings.refreshToken;
+            this.tokenType = settings.tokenType;
+        } else if (response) {
+            const expires = new Date();
+            expires.setSeconds(expires.getSeconds() + response.Item.expires_in);
+            this.expires = expires;
+            this.refreshToken = response.Item.refresh_token;
+            this.token = response.Item.access_token;
+            this.tokenType = response.Item.token_type;
+        } else {
+            throw Error("either settings or login response is required for OAuthCredential constructor");
+        }
         this.accessToken = `${this.tokenType} ${this.token}`;
     }
 
@@ -87,7 +103,7 @@ export class UsernamePasswordCredential extends BaseCredential implements AuthCr
         if (!loginResponse.Result) {
             throw AuthorizationError;
         }
-        return new OAuthCredential(loginResponse, this.baseUrl);
+        return new OAuthCredential(this.baseUrl, undefined, loginResponse);
     }
 }
 
