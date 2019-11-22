@@ -8,6 +8,17 @@ export interface OAuthToken {
     tokenType: string;
 }
 
+function loginToOauthToken(response: LoginResponse): OAuthToken {
+    const expires = new Date();
+    expires.setSeconds(expires.getSeconds() + response.Item.expires_in);
+    return {
+        expires: expires,
+        refreshToken: response.Item.refresh_token,
+        token: response.Item.access_token,
+        tokenType: response.Item.token_type
+    }
+}
+
 interface Info {
     access_token: string;
     token_type: string;
@@ -49,23 +60,12 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
 
     accessToken: string;
 
-    constructor(baseUrl: string, oAuthToken?: OAuthToken, response?: LoginResponse) {
+    constructor(baseUrl: string, oAuthToken: OAuthToken) {
         super(baseUrl);
-        if (oAuthToken) {
-            this.expires = oAuthToken.expires;
-            this.refreshToken = oAuthToken.refreshToken;
-            this.token = oAuthToken.refreshToken;
-            this.tokenType = oAuthToken.tokenType;
-        } else if (response) {
-            const expires = new Date();
-            expires.setSeconds(expires.getSeconds() + response.Item.expires_in);
-            this.expires = expires;
-            this.refreshToken = response.Item.refresh_token;
-            this.token = response.Item.access_token;
-            this.tokenType = response.Item.token_type;
-        } else {
-            throw Error("either settings or login response is required for OAuthCredential constructor");
-        }
+        this.expires = oAuthToken.expires;
+        this.refreshToken = oAuthToken.refreshToken;
+        this.token = oAuthToken.token;
+        this.tokenType = oAuthToken.tokenType;
         this.accessToken = `${this.tokenType} ${this.token}`;
     }
 
@@ -121,7 +121,7 @@ export class UsernamePasswordCredential extends BaseCredential implements AuthCr
         if (!loginResponse.Result) {
             throw AuthorizationError;
         }
-        return new OAuthCredential(this.baseUrl, undefined, loginResponse);
+        return new OAuthCredential(this.baseUrl, loginToOauthToken(loginResponse));
     }
 }
 
