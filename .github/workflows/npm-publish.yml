@@ -13,6 +13,7 @@ jobs:
         with:
           node-version: 8
           registry-url: https://registry.npmjs.org/
+      - run: npm ci
       - run: npm run-script build
       - run: npm publish
         env:
