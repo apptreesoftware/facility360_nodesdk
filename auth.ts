@@ -1,12 +1,30 @@
 import axios from "axios";
-import {LoginResponse} from "./model/login_response";
 import {AuthorizationError} from "./errors";
 
-export interface OAuthSetting {
+export interface OAuthToken {
     token: string;
     expires: Date;
     refreshToken: string;
     tokenType: string;
+}
+
+interface Info {
+    access_token: string;
+    token_type: string;
+    expires_in: number;
+    refresh_token: string;
+    user_id: string;
+    first_name: string;
+    last_name: string;
+    installation_id: string;
+    installation_name: string;
+}
+
+interface LoginResponse {
+    Item: Info;
+    Result: boolean;
+    Context: number;
+    Message: string;
 }
 
 export interface AuthCredential {
@@ -31,13 +49,13 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
 
     accessToken: string;
 
-    constructor(baseUrl: string, settings?: OAuthSetting, response?: LoginResponse) {
+    constructor(baseUrl: string, oAuthToken?: OAuthToken, response?: LoginResponse) {
         super(baseUrl);
-        if (settings) {
-            this.expires = settings.expires;
-            this.refreshToken = settings.refreshToken;
-            this.token = settings.refreshToken;
-            this.tokenType = settings.tokenType;
+        if (oAuthToken) {
+            this.expires = oAuthToken.expires;
+            this.refreshToken = oAuthToken.refreshToken;
+            this.token = oAuthToken.refreshToken;
+            this.tokenType = oAuthToken.tokenType;
         } else if (response) {
             const expires = new Date();
             expires.setSeconds(expires.getSeconds() + response.Item.expires_in);
