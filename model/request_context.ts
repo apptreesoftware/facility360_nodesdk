@@ -23,9 +23,11 @@ export class QueryContext {
         let hasQuery = false;
         if (this.filter) {
            urlPath += `${hasQuery ? '&' : '?'}$filter=${this.filter}`;
+           hasQuery = true
         }
         if (this.expand) {
             urlPath += `${hasQuery ? '&' : '?'}$expand=${this.expand}`;
+            hasQuery = true
         }
         if (this.select) {
             urlPath += `${hasQuery ? '&' : '?'}$select=${this.select}`;

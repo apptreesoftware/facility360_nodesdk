@@ -51,7 +51,7 @@ export class FamisClient {
     }
 
     async getCredentials(): Promise<AuthCredential> {
-        await this.credentials.refresh();
+        this.credentials = await this.credentials.refresh();
         return this.credentials;
     }
 
@@ -218,7 +218,7 @@ export class FamisClient {
     async getAllUsingLink<T>(startPath: string): Promise<Result<T>> {
         let fetchCount = 1;
         let durationMs = 0;
-        let startDate = new Date();
+        const startDate = new Date();
         let resp = await this.http.get(startPath);
         durationMs += moment(Date.now()).diff(startDate);
         if (resp.status === 401) {
@@ -226,7 +226,7 @@ export class FamisClient {
         } else if (resp.status !== 200) {
             throw Error(`http error: status ${resp.status}`);
         }
-        let itemResponse = resp.data as FamisResponse<T>;
+        const itemResponse = resp.data as FamisResponse<T>;
         let nextLink = itemResponse["@odata.nextLink"] as string;
         if (nextLink) {
             nextLink = nextLink.replace("http:", "https:");
@@ -235,16 +235,16 @@ export class FamisClient {
 
         while (nextLink) {
             fetchCount++;
-            let startDate = new Date();
+            const innerStartDate = new Date();
             resp = await this.http.get(nextLink);
-            durationMs += moment(Date.now()).diff(startDate);
+            durationMs += moment(Date.now()).diff(innerStartDate);
             if (resp.status !== 200) {
                 if (resp.status === 401) {
                     throw AuthorizationError;
                 }
                 throw Error(`error: status ${resp.status}`);
             }
-            let newResponse = resp.data as FamisResponse<T>;
+            const newResponse = resp.data as FamisResponse<T>;
             items = items.concat(newResponse.value);
             nextLink = newResponse['@odata.nextLink'] as string;
             if (nextLink) {
@@ -268,16 +268,16 @@ export class FamisClient {
 
         while (count >= top) {
             fetchCount++;
-            let startDate = new Date();
-            let url = context.buildPagedUrl(type, top, skip);
-            let resp = await this.http.get(url);
+            const startDate = new Date();
+            const url = context.buildPagedUrl(type, top, skip);
+            const resp = await this.http.get(url);
             durationMs += moment(Date.now()).diff(startDate);
             if (resp.status === 401) {
                 throw AuthorizationError;
             } else if (resp.status !== 200) {
                 throw Error(`http error: status ${resp.status}`);
             }
-            let famisResp = resp.data as FamisResponse<T>;
+            const famisResp = resp.data as FamisResponse<T>;
             items = items.concat(famisResp.value)
             skip += top;
             count = famisResp.value.length;
