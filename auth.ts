@@ -1,6 +1,42 @@
 import axios from "axios";
-import {LoginResponse} from "./model/login_response";
 import {AuthorizationError} from "./errors";
+
+export interface OAuthToken {
+    token: string;
+    expires: Date;
+    refreshToken: string;
+    tokenType: string;
+}
+
+function loginToOauthToken(response: LoginResponse): OAuthToken {
+    const expires = new Date();
+    expires.setSeconds(expires.getSeconds() + response.Item.expires_in);
+    return {
+        expires: expires,
+        refreshToken: response.Item.refresh_token,
+        token: response.Item.access_token,
+        tokenType: response.Item.token_type
+    }
+}
+
+interface Info {
+    access_token: string;
+    token_type: string;
+    expires_in: number;
+    refresh_token: string;
+    user_id: string;
+    first_name: string;
+    last_name: string;
+    installation_id: string;
+    installation_name: string;
+}
+
+interface LoginResponse {
+    Item: Info;
+    Result: boolean;
+    Context: number;
+    Message: string;
+}
 
 export interface AuthCredential {
     refresh(): Promise<AuthCredential>;
@@ -24,14 +60,12 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
 
     accessToken: string;
 
-    constructor(resp: LoginResponse, baseUrl: string) {
+    constructor(baseUrl: string, oAuthToken: OAuthToken) {
         super(baseUrl);
-        const expires = new Date();
-        expires.setSeconds(expires.getSeconds() + resp.Item.expires_in);
-        this.expires = expires;
-        this.refreshToken = resp.Item.refresh_token;
-        this.token = resp.Item.access_token;
-        this.tokenType = resp.Item.token_type;
+        this.expires = oAuthToken.expires;
+        this.refreshToken = oAuthToken.refreshToken;
+        this.token = oAuthToken.token;
+        this.tokenType = oAuthToken.tokenType;
         this.accessToken = `${this.tokenType} ${this.token}`;
     }
 
@@ -87,7 +121,7 @@ export class UsernamePasswordCredential extends BaseCredential implements AuthCr
         if (!loginResponse.Result) {
             throw AuthorizationError;
         }
-        return new OAuthCredential(loginResponse, this.baseUrl);
+        return new OAuthCredential(this.baseUrl, loginToOauthToken(loginResponse));
     }
 }
 
