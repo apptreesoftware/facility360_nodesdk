@@ -6,6 +6,7 @@ export interface OAuthToken {
     expires: Date;
     refreshToken: string;
     tokenType: string;
+    userId: string;
 }
 
 function loginToOauthToken(response: LoginResponse): OAuthToken {
@@ -15,7 +16,8 @@ function loginToOauthToken(response: LoginResponse): OAuthToken {
         expires: expires,
         refreshToken: response.Item.refresh_token,
         token: response.Item.access_token,
-        tokenType: response.Item.token_type
+        tokenType: response.Item.token_type,
+        userId: response.Item.user_id,
     }
 }
 
@@ -57,6 +59,7 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
     expires: Date;
     refreshToken: string;
     tokenType: string;
+    userId: string;
 
     accessToken: string;
 
@@ -67,6 +70,7 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
         this.token = oAuthToken.token;
         this.tokenType = oAuthToken.tokenType;
         this.accessToken = `${this.tokenType} ${this.token}`;
+        this.userId = oAuthToken.userId;
     }
 
     async refresh(): Promise<AuthCredential> {
