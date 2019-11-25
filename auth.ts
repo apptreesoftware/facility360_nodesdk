@@ -85,15 +85,19 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
             const http = axios.create({
                 baseURL: this.baseUrl,
             });
-            const resp = await http.post('MobileWebServices/api/refreshtoken', {
-                grant_type: this.tokenType,
-                refresh_token: this.refreshToken
-            });
-            const loginResponse = resp.data as LoginResponse;
-            if (!loginResponse.Result) {
+            try {
+                const resp = await http.post('MobileWebServices/api/refreshtoken', {
+                    grant_type: this.tokenType,
+                    refresh_token: this.refreshToken
+                });
+                const loginResponse = resp.data as LoginResponse;
+                if (!loginResponse.Result) {
+                    throw AuthorizationError;
+                }
+                this.updateFromLoginResponse(loginResponse);
+            } catch (e) {
                 throw AuthorizationError;
             }
-            this.updateFromLoginResponse(loginResponse);
         }
         return this;
     }
@@ -103,16 +107,20 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
             const http = axios.create({
                 baseURL: this.baseUrl,
             });
-            const resp = await http.post('MobileWebServices/api/refreshtoken', {
-                grant_type: this.tokenType,
-                refresh_token: this.refreshToken
-            });
-            const loginResponse = resp.data as LoginResponse;
-            if (!loginResponse.Result) {
+            try {
+                const resp = await http.post('MobileWebServices/api/refreshtoken', {
+                    grant_type: this.tokenType,
+                    refresh_token: this.refreshToken
+                });
+                const loginResponse = resp.data as LoginResponse;
+                if (!loginResponse.Result) {
+                    return [this, AuthState.Expired];
+                }
+                this.updateFromLoginResponse(loginResponse);
+                return [this, AuthState.Refreshed];
+            } catch (e) {
                 return [this, AuthState.Expired];
             }
-            this.updateFromLoginResponse(loginResponse);
-            return [this, AuthState.Refreshed];
         }
         return [this, AuthState.Valid];
     }
@@ -147,26 +155,34 @@ export class UsernamePasswordCredential extends BaseCredential implements AuthCr
             username: this.username,
             password: this.password
         });
-        const loginResponse = resp.data as LoginResponse;
-        if (!loginResponse.Result) {
+        try {
+            const loginResponse = resp.data as LoginResponse;
+            if (!loginResponse.Result) {
+                throw AuthorizationError;
+            }
+            return new OAuthCredential(this.baseUrl, loginToOauthToken(loginResponse));
+        } catch (e) {
             throw AuthorizationError;
         }
-        return new OAuthCredential(this.baseUrl, loginToOauthToken(loginResponse));
     }
 
     async refreshIfNeeded(): Promise<[AuthCredential, AuthState]> {
         const http = axios.create({
             baseURL: this.baseUrl,
         });
-        const resp = await http.post('MobileWebServices/api/Login', {
-            username: this.username,
-            password: this.password
-        });
-        const loginResponse = resp.data as LoginResponse;
-        if (!loginResponse.Result) {
+        try {
+            const resp = await http.post('MobileWebServices/api/Login', {
+                username: this.username,
+                password: this.password
+            });
+            const loginResponse = resp.data as LoginResponse;
+            if (!loginResponse.Result) {
+                throw AuthorizationError;
+            }
+            return [new OAuthCredential(this.baseUrl, loginToOauthToken(loginResponse)), AuthState.Refreshed];
+        } catch (e) {
             throw AuthorizationError;
         }
-        return [new OAuthCredential(this.baseUrl, loginToOauthToken(loginResponse)), AuthState.Refreshed];
     }
 }
 
