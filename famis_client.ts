@@ -1,13 +1,15 @@
 import axios, {AxiosInstance} from "axios";
-import {AuthCredential} from "./auth";
+import {AuthCredential, AuthState} from "./auth";
 import {AuthorizationError} from "./errors";
 import {
     AccountSegment,
     ActivityGroup,
-    FamisAttachment, FamisErrorResponse,
+    FamisAttachment,
+    FamisErrorResponse,
     FamisResponse,
     Floor,
-    RequestPriority, RequestStatus,
+    RequestPriority,
+    RequestStatus,
     RequestSubType,
     RequestType,
     Space,
@@ -21,33 +23,48 @@ import {
     AssetClass,
     AssetCreateRequest,
     AssetKeyword,
-    AssetMake, AssetModel,
-    AssetStatus, AssetType,
-    CreateAssetMake, CreateAssetModel
+    AssetMake,
+    AssetModel,
+    AssetStatus,
+    AssetType,
+    CreateAssetMake,
+    CreateAssetModel
 } from "./model/assets";
 import {Crew, CrewUserAssociation} from "./model/crews";
 import {Company, CreateCompanyRequest, PatchCompanyRequest} from "./model/companies";
 import {Result} from "./model/common";
-import moment = require("moment");
 import {Property, PropertyRegionAssociation, PropertyRequestTypeAssociation} from "./model/properties";
 import {UserPropertyAssociation, UserRegionAssociation} from "./model/user";
+import moment = require("moment");
 
 export class FamisClient {
     host: string;
     http: AxiosInstance;
     credentials: AuthCredential;
+    autoRefresh: boolean;
 
-    constructor(credentials: AuthCredential, host: string) {
+    constructor(credentials: AuthCredential, host: string, autoRefresh: boolean) {
         this.credentials = credentials;
         this.host = host;
         this.http = axios.create({
             baseURL: host,
         });
+        this.autoRefresh = autoRefresh;
         this.http.interceptors.request.use(async (config) => {
-            this.credentials = await this.credentials.refresh();
+            if (this.autoRefresh) {
+                this.credentials = await this.credentials.refresh();
+            }
             config.headers.Authorization = this.credentials.accessToken;
             return config;
         });
+    }
+
+    async refreshCredentials(): Promise<[AuthCredential, AuthState]> {
+        const credTuple = await this.credentials.refreshIfNeeded();
+        if (credTuple[1] != AuthState.Expired) {
+            this.credentials = credTuple[0];
+        }
+        return credTuple;
     }
 
     async getCredentials(): Promise<AuthCredential> {

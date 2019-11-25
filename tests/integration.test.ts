@@ -12,7 +12,7 @@ describe('Attachments', () => {
             fail("environment variables aren't set");
         }
         const credential = new UsernamePasswordCredential(user, psswd, baseUrl);
-        const famisClient = new FamisClient(credential, baseUrl);
+        const famisClient = new FamisClient(credential, baseUrl, true);
 
         const resp = await famisClient.getAttachments(new QueryContext());
         expect(resp).toBeTruthy();
@@ -30,7 +30,7 @@ describe('Lists', () => {
         fail("environment variables aren't set");
     }
     const credential = new UsernamePasswordCredential(user, psswd, baseUrl);
-    const famisClient = new FamisClient(credential, baseUrl);
+    const famisClient = new FamisClient(credential, baseUrl, true);
 
     const baseContext = new QueryContext();
 
