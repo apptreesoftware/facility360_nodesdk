@@ -40,8 +40,15 @@ interface LoginResponse {
     Message: string;
 }
 
+export enum AuthState {
+    Valid,
+    Refreshed,
+    Expired
+}
+
 export interface AuthCredential {
     refresh(): Promise<AuthCredential>;
+    refreshWithState(): Promise<[AuthCredential, AuthState]>
 
     accessToken: string;
 }
@@ -91,6 +98,25 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
         return this;
     }
 
+    async refreshWithState(): Promise<[AuthCredential, AuthState]> {
+        if (this.expires <= new Date()) {
+            const http = axios.create({
+                baseURL: this.baseUrl,
+            });
+            const resp = await http.post('MobileWebServices/api/refreshtoken', {
+                grant_type: this.tokenType,
+                refresh_token: this.refreshToken
+            });
+            const loginResponse = resp.data as LoginResponse;
+            if (!loginResponse.Result) {
+                return [this, AuthState.Expired];
+            }
+            this.updateFromLoginResponse(loginResponse);
+            return [this, AuthState.Refreshed];
+        }
+        return [this, AuthState.Valid];
+    }
+
     updateFromLoginResponse(response: LoginResponse) {
         const expires = new Date()
         expires.setSeconds(expires.getSeconds() + response.Item.expires_in);
@@ -127,6 +153,21 @@ export class UsernamePasswordCredential extends BaseCredential implements AuthCr
         }
         return new OAuthCredential(this.baseUrl, loginToOauthToken(loginResponse));
     }
+
+    async refreshWithState(): Promise<[AuthCredential, AuthState]> {
+        const http = axios.create({
+            baseURL: this.baseUrl,
+        });
+        const resp = await http.post('MobileWebServices/api/Login', {
+            username: this.username,
+            password: this.password
+        });
+        const loginResponse = resp.data as LoginResponse;
+        if (!loginResponse.Result) {
+            throw AuthorizationError;
+        }
+        return [new OAuthCredential(this.baseUrl, loginToOauthToken(loginResponse)), AuthState.Refreshed];
+    }
 }
 
 export class TokenCredential implements AuthCredential {
@@ -138,5 +179,9 @@ export class TokenCredential implements AuthCredential {
 
     async refresh(): Promise<AuthCredential> {
         return this;
+    }
+
+    async refreshWithState(): Promise<[AuthCredential, AuthState]> {
+        return [this, AuthState.Valid];
     }
 }
