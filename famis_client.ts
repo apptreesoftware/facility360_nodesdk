@@ -60,7 +60,7 @@ export class FamisClient {
     }
 
     async refreshCredentials(): Promise<[AuthCredential, AuthState]> {
-        const credTuple = await this.credentials.refreshWithState();
+        const credTuple = await this.credentials.refreshIfNeeded();
         if (credTuple[1] != AuthState.Expired) {
             this.credentials = credTuple[0];
         }

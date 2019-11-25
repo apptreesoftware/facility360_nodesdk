@@ -48,7 +48,7 @@ export enum AuthState {
 
 export interface AuthCredential {
     refresh(): Promise<AuthCredential>;
-    refreshWithState(): Promise<[AuthCredential, AuthState]>
+    refreshIfNeeded(): Promise<[AuthCredential, AuthState]>
 
     accessToken: string;
 }
@@ -98,7 +98,7 @@ export class OAuthCredential extends BaseCredential implements AuthCredential {
         return this;
     }
 
-    async refreshWithState(): Promise<[AuthCredential, AuthState]> {
+    async refreshIfNeeded(): Promise<[AuthCredential, AuthState]> {
         if (this.expires <= new Date()) {
             const http = axios.create({
                 baseURL: this.baseUrl,
@@ -154,7 +154,7 @@ export class UsernamePasswordCredential extends BaseCredential implements AuthCr
         return new OAuthCredential(this.baseUrl, loginToOauthToken(loginResponse));
     }
 
-    async refreshWithState(): Promise<[AuthCredential, AuthState]> {
+    async refreshIfNeeded(): Promise<[AuthCredential, AuthState]> {
         const http = axios.create({
             baseURL: this.baseUrl,
         });
@@ -181,7 +181,7 @@ export class TokenCredential implements AuthCredential {
         return this;
     }
 
-    async refreshWithState(): Promise<[AuthCredential, AuthState]> {
+    async refreshIfNeeded(): Promise<[AuthCredential, AuthState]> {
         return [this, AuthState.Valid];
     }
 }
