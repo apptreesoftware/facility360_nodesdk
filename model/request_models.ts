@@ -1,62 +1,26 @@
-export interface Company {
-    Id: number;
+export interface AssetCreateRequest {
     Name: string;
-    Addr1: string;
-    City: string;
-    Zip: string;
-    StateId: number;
-    State: string;
-    CountryId?: number;
-    Country: string;
-    TypeId: number;
-    Phone: string;
-    ActiveFlag: boolean;
-    UpdateDate: Date;
-    ExternalId: string;
-    TimeCardFlag: boolean;
-    VendorFlag: boolean;
-    MinorityFlag: boolean;
-    WomanOwnedFlag: boolean;
-    PreferredVendorFlag: boolean;
-    SupplierFlag: boolean;
-    SubcontractorAuthFlag: boolean;
-    W9OnFileFlag: boolean;
-    CurrencyInstallId?: number;
-    Addr2: string;
-    Fax: string;
-    Website: string;
-    EmergencyPhone: string;
-    Email: string;
-    PagerNumber: string;
-    PrimaryContactName: string;
-    CategoryId?: number;
-    SecondaryCategoryId?: number;
-    SicCode: string;
-    InternalVendorCode: string;
-    TaxpayerId: string;
-    ContractTypeId?: any;
-    ContractComments: string;
-    MobilePhone: string;
-    InternalVendorCode2: string;
-    RiskRating: string;
-    TypeOfAccessId?: any;
-    PaymentTermId?: number;
-    ShippingMethodId?: any;
-    FreeOnBoardId?: any;
-    RoutingNumber: string;
-    Addr3: string;
-    RemAddr1: string;
-    RemAddr2: string;
-    RemAddr3: string;
-    RemCity: string;
-    RemZip: string;
-    RemStateId?: any;
     Description: string;
-    VisitAutoCreateFlag: boolean;
-    DebtorFlag: boolean;
-    LandOwnerFlag: boolean;
-    MeterSiteFlag: boolean;
-    ExtMasterCompanyFlag: boolean;
+    AssetNumber: string;
+    SerialNumber: string;
+    AssetClassId: number;
+    AssetRankId: number;
+    MakeId: number;
+    ModelId: number;
+    AssetStatusId: number;
+    AssetKeywordId: number;
+    AssetTypeId: number;
+    SpaceId: number;
+    QuantityAvailable: number;
+    ActiveFlag: boolean;
+    FloorId: number;
+    PurchaseDate: Date;
+    EstimatedLifeInYears: number;
+    EstimatedLifeInHours: number;
+    AnnualRuntimeInHours: number;
+    CapitalRepairCost: number;
+    SpaceExternalId: string;
+    FloorExternalId: string;
 }
 
 export interface CreateCompanyRequest {
@@ -158,15 +122,4 @@ export interface PatchCompanyRequest {
     RemZip?: string;
     RemStateId?: number;
     Description?: string;
-}
-
-export interface Currency {
-    Id: number;
-    Name: string;
-    Abbreviation: string;
-    Code: number;
-    ActiveFlag?: boolean;
-    InstalledFlag: boolean;
-    CurrencyInstallId?: number;
-    Sign: string;
 }

@@ -3,38 +3,36 @@ import {AuthCredential, AuthState} from "./auth";
 import {AuthorizationError} from "./errors";
 import {
     AccountSegment,
-    ActivityGroup,
+    ActivityGroup, Asset,
+    AssetClass,
+    AssetKeyword,
+    AssetMake,
+    AssetModel,
+    AssetStatus, AssetType, Company,
+    CreateAssetMake,
+    CreateAssetModel, Crew, CrewUserAssociation,
     FamisAttachment,
     FamisErrorResponse,
     FamisResponse,
-    Floor,
+    Floor, Property, PropertyRegionAssociation, PropertyRequestTypeAssociation,
     RequestPriority,
     RequestStatus,
     RequestSubType,
     RequestType,
-    Space,
+    Space, UserPropertyAssociation, UserRegionAssociation,
     WorkOrder,
     WorkOrderComment,
     WorkType
 } from "./model/famis_models";
 import {buildEntityUrl, QueryContext} from "./model/request_context";
-import {
-    Asset,
-    AssetClass,
-    AssetCreateRequest,
-    AssetKeyword,
-    AssetMake,
-    AssetModel,
-    AssetStatus,
-    AssetType,
-    CreateAssetMake,
-    CreateAssetModel
-} from "./model/assets";
-import {Crew, CrewUserAssociation} from "./model/crews";
-import {Company, CreateCompanyRequest, PatchCompanyRequest} from "./model/companies";
+
+
 import {Result} from "./model/common";
-import {Property, PropertyRegionAssociation, PropertyRequestTypeAssociation} from "./model/properties";
-import {UserPropertyAssociation, UserRegionAssociation} from "./model/user";
+import {
+    AssetCreateRequest,
+    CreateCompanyRequest,
+    PatchCompanyRequest
+} from "./model/request_models";
 import moment = require("moment");
 
 export class FamisClient {

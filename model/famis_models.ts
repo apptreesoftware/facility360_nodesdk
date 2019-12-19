@@ -1,8 +1,3 @@
-import {Asset} from "./assets";
-import {Crew} from "./crews";
-import {Property} from "./properties";
-import {FamisUser} from "./user";
-
 export interface FamisResponse<T>{
     "@odata.nextLink"? : string;
     value : T[]
@@ -92,6 +87,7 @@ export interface Space {
     LongDescription: string;
     EpPlanChildId?: number;
     RequestPriorityListId?: number;
+    Floor?: Floor
 }
 
 export interface Floor {
@@ -509,4 +505,561 @@ export interface WorkOrderCreate {
     Crew: Crew;
     ParentWOId: number;
     AccountInfo: AccountInfo;
+}
+
+export interface AssetClass {
+    Id: number;
+    Description: string;
+    UpdateDate: Date;
+    UpdatedById: number;
+    UpdatedByExternalId: string;
+    ActiveFlag: boolean;
+    TabOrder: number;
+    AssetTag: string;
+    MeterClass: boolean;
+    Guid: string;
+}
+
+export interface AssetKeyword {
+    Id: number;
+    Name: string;
+    Description: string;
+    TabOrder: number;
+    ActiveFlag: boolean;
+    UpdatedByName: string;
+    UpdateDate: Date;
+}
+
+export interface AssetStatus {
+    Id: number;
+    Name: string;
+    Value: number;
+    UpdateDate: Date;
+    UpdatedById: number;
+    UpdatedByExternalId: string;
+    ActiveFlag: boolean;
+    TabOrder: number;
+}
+
+export interface AssetMake {
+    Id: number;
+    Description: string;
+    Url: string;
+    ActiveFlag: boolean;
+    UpdateDate: Date;
+    UpdatedById: number;
+    UpdatedByExternalId: string;
+}
+
+export interface CreateAssetMake {
+    Description: string;
+    Url?: string;
+    ActiveFlag: boolean;
+}
+
+export interface AssetModel {
+    ActiveFlag: boolean;
+    Description: string;
+    Id: number;
+    MakeId: number;
+    UpdateDate: Date;
+    UpdatedById: number;
+    Url?: string;
+    UpdatedByExternalId: string;
+}
+
+export interface CreateAssetModel {
+    ActiveFlag: boolean;
+    Description: string;
+    MakeId: number;
+    Url?: string;
+}
+
+export interface AssetType {
+    Id: number;
+    Description: string;
+    Name: string;
+    ActiveFlag: boolean;
+    UpdateDate: Date;
+    UpdatedByName: string;
+    TabOrder: number;
+}
+
+export interface Asset {
+    Id: number;
+    Name: string;
+    Description: string;
+    AssetNumber: string;
+    SerialNumber: string;
+    AssetClassId: number;
+    AssetRankId: number;
+    EcriCodeId?: number;
+    MakeId: number;
+    ModelId: number;
+    InServiceDate?: Date;
+    PurchasedFromVendor?: string;
+    AssetStatusId: number;
+    StatusComment?: string;
+    BarcodeNumber: string;
+    FinancialSystemId: string;
+    AssetSafetyComments?: string;
+    AssetKeywordId?: number;
+    ExternalId: string;
+    AssetTypeId?: number;
+    RiskAssessment?: any;
+    ExternalSystemId?: any;
+    Guid: string;
+    PropertyId: number;
+    SpaceId: number;
+    EmployeeId?: number;
+    Room: string;
+    QuantityAvailable: number;
+    Comments: string;
+    ActiveFlag: boolean;
+    FloorId: number;
+    SubSpaceId?: number;
+    AutoAssignedToId?: number;
+    WarrantyContractNumber?: string;
+    WarrantyEffectiveDate?: Date;
+    WarrantyExpirationDate?: Date;
+    WarrantyExpirationContact?: number;
+    WarrantyExpirationContactPhone?: string;
+    WarrantyVendorId?: number;
+    WarrantyPoNumberId?: number;
+    MaintenanceContractNumber?: number;
+    MaintenanceContractVendorId?: number;
+    MaintenanceContractExpirationDate?: Date;
+    MaintenanceContractNotificationDays?: string;
+    PurchaseDate?: Date;
+    PurchaseAmount?: number;
+    ExternalCostCenterId?: number;
+    PurchaseCostCenter?: number;
+    PoNumber?: string;
+    EstimatedLifeInYears: number;
+    EstimatedLifeInHours: number;
+    AnnualRuntimeInHours: number;
+    CapitalRepairCost: number;
+    EstimatedReplacementCost?: number;
+    LifeExpectancy?: number;
+    UnitMultiplier?: number;
+    MeterMultiplier?: number;
+    MeterFormat?: string;
+    UomId?: number;
+    UtilityId?: number;
+    LastCalibrationDate?: Date;
+    MeterSiteId?: number;
+    MeterInstallationDate?: Date;
+    MeterInitialReading?: string;
+    MeterLastReadingDate?: Date;
+    MeterLastReading?: number;
+    UpdateDate: Date;
+    UpdatedById: number;
+    FcaRankId?: number;
+    PropertyExternalId: string;
+    SpaceExternalId: string;
+    EmployeeExternalId?: string;
+    WarrantyVendorExternalId?: string;
+    MaintenanceContractVendorExternalId?: string;
+    UpdatedByExternalId: string;
+    FloorExternalId: string;
+    SubSpaceExternalId?: string;
+    AutoAssignedToExternalId?: string;
+    Space? : Space
+    AssetUdfs? : Udf[]
+}
+
+export interface Crew {
+    Id: number;
+    ExternalId: string;
+    ActiveFlag: boolean;
+    UpdateDate: Date;
+    UpdatedById: number;
+    ExternalUpdatedById: string;
+    Description: string;
+    Rate: number;
+    OT: number;
+    DT: number;
+    CompanyId: number;
+    CompanyExternalId: string;
+    DepartmentId: number;
+    DepartmentExternalId: string;
+    RateScheduleFlag: boolean;
+    IsCrewFlag: boolean;
+    CrewHoursDay: number;
+}
+
+export interface CrewUserAssociation {
+    Id: number;
+    UserId: number;
+    UserExternalId?: string;
+    CrewId: number;
+    CrewExternalId?: string;
+    UpdateDate?: Date;
+    UpdatedById?: number;
+    UpdatedByExternalId?: null;
+    Rate?: number;
+    OT?: number;
+    DT?: number;
+    UseCrewRatesFlag?: boolean;
+    DefaultCrewFlag?: boolean;
+    CrewLeaderFlag?: boolean;
+}
+
+export interface Company {
+    Id: number;
+    Name: string;
+    Addr1: string;
+    City: string;
+    Zip: string;
+    StateId: number;
+    State: string;
+    CountryId?: number;
+    Country: string;
+    TypeId: number;
+    Phone: string;
+    ActiveFlag: boolean;
+    UpdateDate: Date;
+    ExternalId: string;
+    TimeCardFlag: boolean;
+    VendorFlag: boolean;
+    MinorityFlag: boolean;
+    WomanOwnedFlag: boolean;
+    PreferredVendorFlag: boolean;
+    SupplierFlag: boolean;
+    SubcontractorAuthFlag: boolean;
+    W9OnFileFlag: boolean;
+    CurrencyInstallId?: number;
+    Addr2: string;
+    Fax: string;
+    Website: string;
+    EmergencyPhone: string;
+    Email: string;
+    PagerNumber: string;
+    PrimaryContactName: string;
+    CategoryId?: number;
+    SecondaryCategoryId?: number;
+    SicCode: string;
+    InternalVendorCode: string;
+    TaxpayerId: string;
+    ContractTypeId?: any;
+    ContractComments: string;
+    MobilePhone: string;
+    InternalVendorCode2: string;
+    RiskRating: string;
+    TypeOfAccessId?: any;
+    PaymentTermId?: number;
+    ShippingMethodId?: any;
+    FreeOnBoardId?: any;
+    RoutingNumber: string;
+    Addr3: string;
+    RemAddr1: string;
+    RemAddr2: string;
+    RemAddr3: string;
+    RemCity: string;
+    RemZip: string;
+    RemStateId?: any;
+    Description: string;
+    VisitAutoCreateFlag: boolean;
+    DebtorFlag: boolean;
+    LandOwnerFlag: boolean;
+    MeterSiteFlag: boolean;
+    ExtMasterCompanyFlag: boolean;
+}
+
+export interface Currency {
+    Id: number;
+    Name: string;
+    Abbreviation: string;
+    Code: number;
+    ActiveFlag?: boolean;
+    InstalledFlag: boolean;
+    CurrencyInstallId?: number;
+    Sign: string;
+}
+
+export interface Property {
+    Id: number;
+    UpdateDate: Date;
+    CreateDate: Date;
+    InactiveDate?: Date;
+    UpdatedbyName: string;
+    Name: string;
+    Addr1: string;
+    City: string;
+    StateId: number;
+    Zip: string;
+    CountryId: number;
+    TypeId: number;
+    ActiveFlag: boolean;
+    DefaultPmCompanyId: number;
+    DefaultSpCompanyId: number;
+    DefaultPmEmployeeId: number;
+    DefaultSpEmployeeId: number;
+    RequestCloseNotification: boolean;
+    PrintProcedureFlag: boolean;
+    WoPrintId: number;
+    TimeZoneId: number;
+    SlaExcludeWeekendsFlag: boolean;
+    InventoryFlag: boolean;
+    RequestCloseNotificationScheduled: boolean;
+    SurveyFlag: boolean;
+    UnitOfMeasurement: string;
+    Addr2: string;
+    SqFt: number;
+    ExternalId: string;
+    Guid: string;
+    MaterialsListId?: number;
+    RequestPriorityListId?: number;
+    SlaBusinessStartTime: string;
+    SlaBusinessEndTime: string;
+    SfOffice?: number;
+    SfWhse?: number;
+    InvoiceFormatId?: number;
+    DefaultCostCenterId?: number;
+    WoPrintScheduledId: number;
+    RateScheduleId?: number;
+    SurveyRulesId?: number;
+    BudgetCalendarId?: number;
+    ExternalId2: string;
+    HolidayId?: number;
+    ExternalIdEp: string;
+    CloseNotificationBody?: string;
+    CloseNotificationSubject?: string;
+    RemitTo: string;
+    NotifyRequestorAutoSetting: number;
+    ExternalId2Reimbursable: string;
+    LanguageId?: number;
+    SfRetail: number;
+    SfOther: number;
+    BillToAddress: string;
+    SfResidential: number;
+    SfManufacturing: number;
+    DefaultNteAmount?: number;
+    CurrencyInstallId?: number;
+    TierId?: number;
+    DispositionId?: number;
+    Description: string;
+    LocationId: string;
+    Territory: string;
+    AccrualAmount: string;
+    CashAmount: string;
+    SubtypeId?: number;
+    ExternalLinkUrl: string;
+    SfHealthcare: number;
+    ExternalUpdateDate?: Date;
+    EmergencyEscalationAlertFrequency: number;
+    RequestConfirmationDescription?: string;
+    PrintBarCodeFlag: boolean;
+    SurveyLink?: string;
+    SalesTaxGroupId?: number;
+    DefaultMessageBody?: string;
+    DefaultMessageSubject?: string;
+    DefaultMobileBody?: string;
+    DefaultMobileSubject?: string;
+    FollowupMessagePrefix?: string;
+    FollowupMobilePrefix?: string;
+    RequestConfirmationBody?: string;
+    RequestConfirmationSubject?: string;
+    RequestNotifyRequestorBody?: string;
+    RequestNotifyRequestorSubject?: string;
+    SchedNotificationBody?: string;
+    SchedNotificationBodyMobile?: string;
+    SchedNotificationSubject?: string;
+    SchedNotificationSubjectMobile?: string;
+    SurveyConfirmationText?: string;
+    SurveyText?: string;
+    UpdateNotificationBody?: string;
+    UpdateNotificationBodyMobile?: string;
+    UpdateNotificationSubject?: string;
+    UpdateNotificationSubjectMobile?: string;
+    VisitorBadgeFormat?: string;
+    NotifyRequestorAutoSentSubject?: string;
+    NotifyRequestorAutoSentBody?: string;
+    ApprovalWoMessageSubject?: string;
+    ApprovalWoMessageBody?: string;
+    ApprovalPoMessageSubject?: string;
+    ApprovalPoMessageBody?: string;
+    ApprovalProjectMessageSubject?: string;
+    ApprovalProjectMessageBody?: string;
+    IncidentNotificationSubject?: string;
+    IncidentNotificationBody?: string;
+    InspectionNotificationSubject?: string;
+    InspectionNotificationBody?: string;
+    IncidentNotificationUpdateSubject?: string;
+    IncidentNotificationUpdateBody?: string;
+    ApprovalPrMessageSubject?: string;
+    ApprovalPrMessageBody?: string;
+    VisitorStartTime: string;
+    VisitorEndTime: string;
+    VisitorImageFilename: string;
+    VisitorDeskRefreshRate?: string;
+    VisitorDeskRollingWindow?: boolean;
+    VisitorEntryEnabledFlag: boolean;
+    ChartOfAccountsId?: number;
+    ChartOfAccountsCustomerId?: number;
+    AccountCreateFlag: boolean;
+    ReservationFlag: boolean;
+    DefaultPoFormatId?: number;
+    PushWosToExternalSystem: boolean;
+    ShipToAddress?: string;
+    ProbilCustomField1?: string;
+    OperationalStatusId?: number;
+    FacilityManagerId?: number;
+    RegionManagerId?: number;
+    DefaultPmCompanyExternalId: string;
+    DefaultSpCompanyExternalId: string;
+    DefaultPmEmployeeExternalId?: string;
+    DefaultSpEmployeeExternalId?: string;
+    FacilityManagerExternalId?: string;
+    RegionManagerExternalId?: string;
+    TimeZoneExternalId: string;
+    TotalArea1: number;
+    TotalArea2: number;
+}
+
+export interface PropertyRequestTypeAssociation {
+    Id: number;
+    PropertyId: number;
+    PropertyExternalId?: string;
+    RequestTypeId: number;
+    RequestTypeExternalId?: string;
+    ActiveFlag?: boolean;
+    UpdateDate?: Date;
+    DefaultFollowUpAlert?: number;
+    EscalateToId?: null;
+    EscalateToExternalId?: null;
+    DefaultSlaResponseTime?: number;
+    DefaultSlaCompletionTime?: number;
+    SlaOverdueAlertFlag?: boolean;
+    SlaSendNotificationsFlag?: boolean;
+    SecurityFilter?: null;
+}
+
+export interface PropertyRegionAssociation {
+    Id: number;
+    PropertyId: number;
+    RegionId: number;
+    UpdateDate: Date;
+    PropertyExternalId: string;
+    RegionExternalId: string;
+}
+
+export interface FamisUser {
+    Id: number;
+    CompanyId: number;
+    FirstName: string;
+    LastName: string;
+    Title: string;
+    TypeId: number;
+    Addr1: string;
+    Addr2: string;
+    City: string;
+    State: string;
+    Zip: string;
+    Country: string;
+    BusPhone: string;
+    MobPhone: string;
+    Fax: string;
+    Email: string;
+    MobEmail: string;
+    HomePhone: string;
+    AsstPhone: string;
+    UserName: string;
+    Password?: any;
+    ActiveFlag: boolean;
+    UpdateDate: Date;
+    RequestHistoryDays: number;
+    RegHourlyRate: number;
+    ExternalId: string;
+    UpdatedById: number;
+    WoAuthFlag: boolean;
+    WoAuthComments: string;
+    OtHourlyRate: number;
+    DotHourlyRate: number;
+    IntRegHourlyRate: number;
+    IntOtHourlyRate: number;
+    IntDotHourlyRate: number;
+    VisitorEmailFlag: boolean;
+    EmailWoConfirmationFlag: boolean;
+    TimeCardFlag: boolean;
+    DefOriginationCodeId: number;
+    RequestFutureDays: number;
+    CubeNumber: string;
+    RestrictedFullUserFlag: boolean;
+    WorkStatusFlag: boolean;
+    DefaultPage: string;
+    DepartmentDescription: string;
+    DepartmentId: number;
+    PositionDescription?: string;
+    PositionId?: any;
+    PositionStandardId?: number;
+    ExternalSystemId?: string;
+    ProfileId?: number;
+    LanguageId?: number;
+    UseRateScheduleFlag: boolean;
+    TimeCardFormatId?: number;
+    PayrollExternalId?: string;
+    RequestsPerPage: number;
+    SelfRegistrationProfileFlag: boolean;
+    MarkupFlag: boolean;
+    MobileRequestFutureDays: number;
+    MobileRequestHistoryDays: number;
+    MobileRequestsPerPage: number;
+    CoiExpirationDate?: Date;
+    CountryId: number;
+    StateId: number;
+    AccountId?: number;
+    DateFormatId?: number;
+    MobileDateFormatId?: number;
+    WoApprovalLevelId?: number;
+    PoApprovalLevelId?: number;
+    ProjectApprovalLevelId?: number;
+    PrApprovalId?: number;
+    PrimaryTimeCardApproverId?: number;
+    PrBuyerFlag: boolean;
+    ProfileFlag: boolean;
+    PasswordNeverExpiresFlag: boolean;
+    SsoRequiredFlag: boolean;
+    AlsIncorrectLoginCount: number;
+    AlsForcePasswordChangeFlag: boolean;
+    AlsNeverInactivateFlag: boolean;
+    AlsLoginExpirationDate?: Date;
+    AlsLoginStatus: number;
+    CompanyExternalId: string;
+    ProfileExternalId: string;
+    UpdatedByExternalId: string;
+    Name: string;
+    LockAssignedWorkOrdersFlag: boolean;
+    IsAllocatingIndividual: boolean;
+    LaborEntryIds: number[];
+    LaborEntryComment?: string;
+}
+
+export interface UserRegionAssociation {
+    Id: number;
+    UserId: number;
+    RegionId: number;
+    TabOrder: number;
+    GuestFlag: boolean;
+    UserExternalId: string;
+    RegionExternalId: string;
+}
+
+export interface UserPropertyAssociation {
+    Id: number;
+    UserId: number;
+    PropertyId: number;
+    DefaultPropertyFlag: boolean;
+    DefaultSpaceId: number;
+    GuestFlag: boolean;
+    DefaultSubspaceId: number;
+    UserExternalId: string;
+    PropertyExternalId: string;
+    DefaultSpaceExternalId: string;
+    DefaultSubspaceExternalId: string;
+}
+
+export interface Udf {
+    FieldName: string;
+    Value: string;
 }
