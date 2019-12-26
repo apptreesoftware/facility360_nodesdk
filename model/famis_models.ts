@@ -664,8 +664,10 @@ export interface Asset {
     FloorExternalId: string;
     SubSpaceExternalId?: string;
     AutoAssignedToExternalId?: string;
+    // Expandable properties
     Space? : Space
     AssetUdfs? : Udf[]
+    AssetModel? : AssetModel
 }
 
 export interface Crew {
