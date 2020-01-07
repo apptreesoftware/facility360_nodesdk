@@ -2,6 +2,8 @@ export class QueryContext {
     filter?: string;
     expand?: string;
     select?: string;
+    top?: number;
+    skip?: number;
 
     setFilter(filter : string) {
         this.filter = filter;
@@ -18,6 +20,16 @@ export class QueryContext {
         return this;
     }
 
+    setTop(top: number) {
+        this.top = top;
+        return this;
+    }
+
+    setSkip(skip: number) {
+        this.skip = skip;
+        return this;
+    }
+
     buildUrl(entity: string) {
         let urlPath = `${basePath}/${entity}`;
         let hasQuery = false;
@@ -31,6 +43,15 @@ export class QueryContext {
         }
         if (this.select) {
             urlPath += `${hasQuery ? '&' : '?'}$select=${this.select}`;
+            hasQuery = true
+        }
+        if (this.top) {
+            urlPath += `${hasQuery ? '&' : '?'}$top=${this.top}`;
+            hasQuery = true
+        }
+        if (this.skip) {
+            urlPath += `${hasQuery ? '&' : '?'}$skip=${this.skip}`;
+            hasQuery = true
         }
         return urlPath;
     }
