@@ -127,7 +127,7 @@ export class FamisClient {
   }
 
   async patchAsset(asset: Asset): Promise<Asset> {
-    return this.patchObject<Asset, Asset>(asset, "assets");
+    return this.patchObject<Asset, Asset>(asset, "assets", asset.Id.toString());
   }
 
   //
@@ -159,7 +159,7 @@ export class FamisClient {
   }
 
   async patchCompany(company: PatchCompanyRequest): Promise<Company> {
-    return this.patchObject<PatchCompanyRequest, Company>(company, "companies");
+    return this.patchObject<PatchCompanyRequest, Company>(company, "companies", company.Id.toString());
   }
 
   //
@@ -395,11 +395,9 @@ export class FamisClient {
     return resp.data as K;
   }
 
-  async patchObject<T, K>(patch: T, entity: string, entityId?: string): Promise<K> {
+  async patchObject<T, K>(patch: T, entity: string, entityId: string): Promise<K> {
     let url = buildEntityUrl(entity);
-    if (entityId) {
-      url += `?key=${entityId}`;
-    }
+    url += `?key=${entityId}`;
     const resp = await this.http.patch(url, patch);
     if (resp.status === 401) {
       throw AuthorizationError;
