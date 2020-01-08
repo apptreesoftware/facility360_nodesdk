@@ -1,6 +1,7 @@
 import {UsernamePasswordCredential} from "../auth";
 import {FamisClient} from "../famis_client";
 import {QueryContext} from "../model/request_context";
+import {PatchWorkOrderRequest} from "../model/request_models";
 
 describe('Attachments', () => {
     it('should fetch all attachments', async function() {
@@ -87,4 +88,13 @@ describe('Lists', () => {
         expect(attachments).toBeTruthy();
         expect(attachments ? attachments.length : 0).toBe(1);
     });
+
+    it('should patch a work order with a general comment', async function () {
+        const patchRequest: PatchWorkOrderRequest = {
+            GeneralComments: "This is a test comment by apptree",
+        };
+        const testWoId = "7";
+        const updatedWo = await famisClient.patchWorkOrder(testWoId, patchRequest);
+        expect(updatedWo).toBeTruthy();
+    })
 });
