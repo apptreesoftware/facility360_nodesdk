@@ -366,6 +366,9 @@ export class FamisClient {
 
       skip += top;
       count = famisResp.value.length;
+      if (context.pageLimit && fetchCount >= context.pageLimit) {
+        break;
+      }
     }
     return {
       first: items.length > 0 ? items[0] : null,
