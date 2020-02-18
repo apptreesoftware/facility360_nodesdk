@@ -96,5 +96,20 @@ describe('Lists', () => {
         const testWoId = "7";
         const updatedWo = await famisClient.patchWorkOrder(testWoId, patchRequest);
         expect(updatedWo).toBeTruthy();
+    });
+
+    it('should fetch all work orders and then a subset of work orders', async function () {
+        jest.setTimeout(30000);
+        let context = new QueryContext()
+          .setOrderBy('Id desc');
+
+        let response = await famisClient.getWorkOrders(context);
+        expect(response).toBeTruthy();
+        expect(response.results.length).toBe(1056);
+
+        context = context.setTop(5);
+        response = await famisClient.getWorkOrders(context);
+        expect(response).toBeTruthy();
+        expect(response.results.length).toBe(5);
     })
 });
