@@ -4,7 +4,6 @@ export class QueryContext {
     select?: string;
     top?: number;
     skip?: number;
-    pageLimit?: number;
 
     setFilter(filter : string) {
         this.filter = filter;
@@ -28,11 +27,6 @@ export class QueryContext {
 
     setSkip(skip: number) {
         this.skip = skip;
-        return this;
-    }
-
-    setPageLimit(limit: number) {
-        this.pageLimit = limit;
         return this;
     }
 
