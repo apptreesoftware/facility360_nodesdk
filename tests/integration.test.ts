@@ -98,7 +98,7 @@ describe('Lists', () => {
         expect(updatedWo).toBeTruthy();
     });
 
-    it('should fetch all work orders and then a subset of work orders', async function () {
+    it('testing top for paged records', async function () {
         jest.setTimeout(30000);
         let context = new QueryContext()
           .setOrderBy('Id desc');
@@ -111,5 +111,18 @@ describe('Lists', () => {
         response = await famisClient.getWorkOrders(context);
         expect(response).toBeTruthy();
         expect(response.results.length).toBe(5);
+    });
+
+    it('testing top for link records', async function () {
+        let resp = await famisClient.getRequestTypes(baseContext);
+        expect(resp).toBeTruthy();
+        expect(resp.results).toBeTruthy();
+        expect(resp.results.length).toBe(43);
+
+        const context = baseContext.setTop(10);
+        resp = await famisClient.getRequestTypes(context);
+        expect(resp).toBeTruthy();
+        expect(resp.results).toBeTruthy();
+        expect(resp.results.length).toBe(10);
     })
 });
