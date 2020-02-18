@@ -4,6 +4,7 @@ export class QueryContext {
     select?: string;
     top?: number;
     skip?: number;
+    orderBy?: string;
 
     setFilter(filter : string) {
         this.filter = filter;
@@ -30,6 +31,11 @@ export class QueryContext {
         return this;
     }
 
+    setOrderBy(orderBy: string) {
+        this.orderBy = orderBy;
+        return this;
+    }
+
     buildUrl(entity: string) {
         let urlPath = `${basePath}/${entity}`;
         let hasQuery = false;
@@ -53,6 +59,9 @@ export class QueryContext {
             urlPath += `${hasQuery ? '&' : '?'}$skip=${this.skip}`;
             hasQuery = true
         }
+        if (this.orderBy) {
+            urlPath += `${hasQuery ? '&' : '?'}$orderby=${this.orderBy}`;
+        }
         return urlPath;
     }
 
@@ -66,6 +75,9 @@ export class QueryContext {
         }
         if (this.select) {
             urlPath += `&$select=${this.select}`;
+        }
+        if (this.orderBy) {
+            urlPath += `&$orderby=${this.orderBy}`;
         }
         return urlPath;
     }
