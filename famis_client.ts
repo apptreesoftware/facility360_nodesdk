@@ -343,7 +343,12 @@ export class FamisClient {
     context: QueryContext,
     type: string
   ): Promise<Result<T>> {
-    const top = context.top ?? 500;
+    let fetchAll = true;
+    let top = 500;
+    if (context.top) {
+      fetchAll = false;
+      top = context.top;
+    }
     let skip = context.skip ?? 0;
     let count = top;
     let items: T[] = [];
@@ -366,6 +371,9 @@ export class FamisClient {
 
       skip += top;
       count = famisResp.value.length;
+      if (!fetchAll) {
+        break;
+      }
     }
     return {
       first: items.length > 0 ? items[0] : null,

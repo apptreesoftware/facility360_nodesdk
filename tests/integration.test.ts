@@ -96,5 +96,33 @@ describe('Lists', () => {
         const testWoId = "7";
         const updatedWo = await famisClient.patchWorkOrder(testWoId, patchRequest);
         expect(updatedWo).toBeTruthy();
+    });
+
+    it('testing top for paged records', async function () {
+        jest.setTimeout(30000);
+        let context = new QueryContext()
+          .setOrderBy('Id desc');
+
+        let response = await famisClient.getWorkOrders(context);
+        expect(response).toBeTruthy();
+        expect(response.results.length).toBe(1056);
+
+        context = context.setTop(5);
+        response = await famisClient.getWorkOrders(context);
+        expect(response).toBeTruthy();
+        expect(response.results.length).toBe(5);
+    });
+
+    it('testing top for link records', async function () {
+        let resp = await famisClient.getRequestTypes(baseContext);
+        expect(resp).toBeTruthy();
+        expect(resp.results).toBeTruthy();
+        expect(resp.results.length).toBe(43);
+
+        const context = baseContext.setTop(10);
+        resp = await famisClient.getRequestTypes(context);
+        expect(resp).toBeTruthy();
+        expect(resp.results).toBeTruthy();
+        expect(resp.results.length).toBe(10);
     })
 });
