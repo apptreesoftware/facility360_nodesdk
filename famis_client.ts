@@ -27,7 +27,7 @@ import {
   RequestStatus,
   RequestSubType,
   RequestType,
-  Space,
+  Space, SpaceClass,
   UserPropertyAssociation,
   UserRegionAssociation,
   WorkOrder,
@@ -247,6 +247,10 @@ export class FamisClient {
 
   async getSpaces(context: QueryContext): Promise<Result<Space>> {
     return this.getAll<Space>(context, "spaces");
+  }
+
+  async getSpaceClasses(context: QueryContext): Promise<Result<SpaceClass>> {
+    return this.getAll<SpaceClass>(context, "spaceclasses");
   }
 
   async getFloors(context: QueryContext): Promise<Result<Floor>> {

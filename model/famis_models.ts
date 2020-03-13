@@ -9,6 +9,16 @@ export interface FamisErrorResponse {
     Message: string;
 }
 
+export interface SpaceClass {
+    Id?: number;
+    Name?: string;
+    Description?: string;
+    TabOrder?: number;
+    Active?: boolean;
+    UpdateDate?: string;
+    UpdatedByName?: string;
+}
+
 export interface ActivityGroup {
     Id: number;
     Name: string;
@@ -87,7 +97,8 @@ export interface Space {
     LongDescription: string;
     EpPlanChildId?: number;
     RequestPriorityListId?: number;
-    Floor?: Floor
+    Floor?: Floor;
+    Udfs?: Udf[];
 }
 
 export interface Floor {
