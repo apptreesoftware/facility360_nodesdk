@@ -98,7 +98,7 @@ export interface Space {
     EpPlanChildId?: number;
     RequestPriorityListId?: number;
     Floor?: Floor;
-    Udfs: Udf[];
+    Udfs?: Udf[];
 }
 
 export interface Floor {
