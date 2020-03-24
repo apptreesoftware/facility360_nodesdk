@@ -19,6 +19,24 @@ export interface SpaceClass {
     UpdatedByName?: string;
 }
 
+export interface Department {
+    Id?: number,
+    Number?: string,
+    Description?: string,
+    AuthorizingManagerId?: number,
+    AuthorizingManagerExternalId?:string,
+    CompanyId?: number,
+    CompanyExternalId?: string,
+    OrganizationUnitCode?: string,
+    Active?: boolean,
+    TabOrder?: number,
+    ParentDepartmentId?: number,
+    UpdateDate?: string,
+    UpdatedById?: number,
+    UpdatedByExternalId?: string
+
+}
+
 export interface ActivityGroup {
     Id: number;
     Name: string;
