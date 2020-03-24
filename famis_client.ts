@@ -15,7 +15,7 @@ import {
   CreateAssetMake,
   CreateAssetModel,
   Crew,
-  CrewUserAssociation,
+  CrewUserAssociation, Department,
   FamisAttachment,
   FamisErrorResponse,
   FamisResponse, FamisUser,
@@ -287,6 +287,10 @@ export class FamisClient {
 
   async getGeoLocations(context: QueryContext): Promise<Result<Geolocation>> {
     return this.getAll<Geolocation>(context, "geolocations");
+  }
+
+  async getDepartments(context: QueryContext): Promise<Result<Department>> {
+    return this.getAll<Department>(context, "departments");
   }
 
   // generic get methods
