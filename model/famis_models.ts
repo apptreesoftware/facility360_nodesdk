@@ -20,7 +20,7 @@ export interface SpaceClass {
 }
 
 export interface Department {
-    Id: number,
+    Id?: number,
     Number?: string,
     Description?: string,
     AuthorizingManagerId?: number,
