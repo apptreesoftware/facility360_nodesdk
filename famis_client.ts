@@ -442,6 +442,8 @@ function supportsNextLink(type: string): boolean {
     return false;
   } else if (type === "userpropertyassociation") {
     return false;
+  } else if (type === "assets") {
+    return false;
   }
   return true;
 }
