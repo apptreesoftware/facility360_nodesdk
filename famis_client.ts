@@ -352,7 +352,7 @@ export class FamisClient {
     type: string
   ): Promise<Result<T>> {
     let fetchAll = true;
-    let top = 500;
+    let top = 1000;
     if (context.top) {
       fetchAll = false;
       top = context.top;
