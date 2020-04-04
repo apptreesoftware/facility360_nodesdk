@@ -49,13 +49,15 @@ export class FamisClient {
   http: AxiosInstance;
   credentials: AuthCredential;
   autoRefresh: boolean;
+  debug: boolean;
 
-  constructor(credentials: AuthCredential, host: string, autoRefresh: boolean) {
+  constructor(credentials: AuthCredential, host: string, autoRefresh: boolean, debug: boolean = false) {
     this.credentials = credentials;
     this.host = host;
     this.http = axios.create({
       baseURL: host
     });
+    this.debug = debug;
     this.autoRefresh = autoRefresh;
     this.http.interceptors.request.use(async config => {
       if (this.autoRefresh) {
@@ -367,6 +369,9 @@ export class FamisClient {
       fetchCount++;
       const startDate = new Date();
       const url = context.buildPagedUrl(type, top, skip);
+      if (this.debug) {
+        console.log(`Fetching ${url}`);
+      }
       const resp = await this.http.get(url);
       durationMs += moment(Date.now()).diff(startDate);
       if (resp.status === 401) {
@@ -375,6 +380,9 @@ export class FamisClient {
         throw Error(`http error: status ${resp.status}`);
       }
       const famisResp = resp.data as FamisResponse<T>;
+      if (this.debug) {
+        console.log(`Received ${famisResp.value.length} records from ${url}`);
+      }
       items = items.concat(famisResp.value);
 
       skip += top;
