@@ -697,6 +697,16 @@ export interface Asset {
     Space? : Space
     AssetUdfs? : Udf[]
     AssetModel? : AssetModel
+    AssetRank?: AssetRank
+    AssetClass?: AssetClass
+}
+
+export interface AssetRank {
+    Description?: string
+    Value?: number,
+    Id?: number
+    UpdateDate?: Date
+    Active?: boolean
 }
 
 export interface Crew {
@@ -1092,5 +1102,11 @@ export interface UserPropertyAssociation {
 
 export interface Udf {
     FieldName: string;
-    Value: string;
+    Value?: string;
+    ListboxDescription?: string
+    DataType? : string
+    ListBoxId?: string
+    AssetClassId?: number
+    AssetId?: number
+    FieldId?: number
 }
