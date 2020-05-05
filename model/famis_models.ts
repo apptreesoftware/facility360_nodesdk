@@ -1,5 +1,6 @@
 export interface FamisResponse<T>{
     "@odata.nextLink"? : string;
+    "@odata.count"? : number;
     value : T[]
 }
 

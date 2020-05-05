@@ -2,7 +2,7 @@ import {UsernamePasswordCredential} from "../auth";
 import {FamisClient} from "../famis_client";
 import {QueryContext} from "../model/request_context";
 import {PatchWorkOrderRequest} from "../model/request_models";
-
+require('dotenv').config()
 describe('Attachments', () => {
     it('should fetch all attachments', async function() {
         const user = process.env.UNIT_TEST_USER as string;
@@ -31,7 +31,7 @@ describe('Lists', () => {
         fail("environment variables aren't set");
     }
     const credential = new UsernamePasswordCredential(user, psswd, baseUrl);
-    const famisClient = new FamisClient(credential, baseUrl, true);
+    const famisClient = new FamisClient(credential, baseUrl, true, true);
 
     const baseContext = new QueryContext();
 
@@ -124,5 +124,15 @@ describe('Lists', () => {
         expect(resp).toBeTruthy();
         expect(resp.results).toBeTruthy();
         expect(resp.results.length).toBe(10);
+    })
+
+    it('testing get all assets', async function () {
+        jest.setTimeout(900 * 1000)
+        baseContext.setSelect("Id,Name,Description,AssetNumber,SerialNumber,FinancialSystemId,InServiceDate,UpdateDate")
+        baseContext.setExpand('AssetClass($select=Description),AssetRank($select=Description),AssetUdfs($select=FieldName,Value,ListboxDescription), AssetModel($select=MakeId,Description,Id),AssetStatus($select=Id,Name),Space($expand=Floor($select=FloorId,Description),Property($select=Id,Name,Addr1,Description);$select=Name,LongDescription,Id)');
+        let resp = await famisClient.getAssetsBatch(baseContext);
+        console.log(`Duration = ${resp.totalDuration}`);
+
+        expect(resp.results.length).toBe(115782);
     })
 });
