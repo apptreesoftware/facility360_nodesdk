@@ -2,6 +2,8 @@ import {UsernamePasswordCredential} from "../auth";
 import {FamisClient} from "../famis_client";
 import {QueryContext} from "../model/request_context";
 import {PatchWorkOrderRequest} from "../model/request_models";
+import {Asset} from "../model/famis_models";
+require('dotenv').config()
 
 describe('Attachments', () => {
     it('should fetch all attachments', async function() {
@@ -31,7 +33,7 @@ describe('Lists', () => {
         fail("environment variables aren't set");
     }
     const credential = new UsernamePasswordCredential(user, psswd, baseUrl);
-    const famisClient = new FamisClient(credential, baseUrl, true);
+    const famisClient = new FamisClient(credential, baseUrl, true, true);
 
     const baseContext = new QueryContext();
 
@@ -124,5 +126,16 @@ describe('Lists', () => {
         expect(resp).toBeTruthy();
         expect(resp.results).toBeTruthy();
         expect(resp.results.length).toBe(10);
+    })
+
+    it('testing get all assets', async function () {
+        jest.setTimeout(900 * 1000)
+        baseContext.setSelect("Id")
+        let allRecords : Array<Asset> = [];
+
+        await famisClient.getAllAssetsBatch(baseContext, (results => {
+            allRecords = allRecords.concat(results.value);
+        }));
+        expect(allRecords.length).toBe(115782);
     })
 });

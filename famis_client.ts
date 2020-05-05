@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, {AxiosError, AxiosInstance, AxiosResponse} from "axios";
 import { AuthCredential, AuthState } from "./auth";
 import { AuthorizationError } from "./errors";
 import {
@@ -43,6 +43,8 @@ import {
   PatchCompanyRequest, PatchWorkOrderRequest
 } from "./model/request_models";
 import moment = require("moment");
+
+type ResultCallback<T> = (results: FamisResponse<T>) => void;
 
 export class FamisClient {
   host: string;
@@ -124,6 +126,10 @@ export class FamisClient {
     return this.getAll<Asset>(context, "assets");
   }
 
+  async getAllAssetsBatch(context: QueryContext, callback: ResultCallback<Asset>) : Promise<void> {
+    return this.getAllBatch(context, "assets", callback);
+  }
+
   async createAsset(asset: AssetCreateRequest): Promise<Asset> {
     return this.createObject<AssetCreateRequest, Asset>(asset, "assets");
   }
@@ -170,6 +176,10 @@ export class FamisClient {
 
   async getUsers(context : QueryContext) : Promise<Result<FamisUser>> {
     return this.getAll(context, "users");
+  }
+
+  async getAllUsersBatch(context: QueryContext, callback: ResultCallback<FamisUser>) : Promise<void> {
+    return this.getAllBatch<FamisUser>(context, "users", callback);
   }
 
   async getUserRegionAssociations(
@@ -228,6 +238,11 @@ export class FamisClient {
   async getProperties(context: QueryContext): Promise<Result<Property>> {
     return this.getAll<Property>(context, "properties");
   }
+
+  async getAllPropertiesBatch(context: QueryContext, callback: ResultCallback<Property>) : Promise<void> {
+    return this.getAllBatch<Property>(context, "properties", callback);
+  }
+
 
   async getPropertyRequestTypeAssociations(
     context: QueryContext
@@ -304,7 +319,6 @@ export class FamisClient {
       return this.getAllPaged<T>(context, type);
     }
   }
-
   async getAllUsingLink<T>(startPath: string): Promise<Result<T>> {
     let fetchCount = 1;
     let durationMs = 0;
@@ -347,6 +361,58 @@ export class FamisClient {
       totalDuration: durationMs,
       averageDuration: durationMs / fetchCount
     };
+  }
+
+
+  async getAllBatch<T>(context: QueryContext, type: string, callback: ResultCallback<T>) : Promise<void> {
+    let top = 1000;
+    const url = context.buildPagedUrl(type, top, 0, true);
+    const resp = await this.http.get(url);
+
+    if (resp.status === 401) {
+      throw AuthorizationError;
+    } else if (resp.status !== 200) {
+      throw Error(`http error: status ${resp.status}`);
+    }
+    const famisResp = resp.data as FamisResponse<T>;
+    if (this.debug) {
+      console.log(`Received ${famisResp.value.length} records from ${url}`);
+    }
+    if (callback) {
+      callback(famisResp);
+    }
+    const totalCount = famisResp["@odata.count"] ?? 0;
+
+    if (totalCount <= famisResp.value.length) {
+      return;
+    }
+    const pageCount = Math.ceil(totalCount / top);
+    const promises = [];
+    for (let i = 1; i < pageCount; i++) {
+      const url = context.buildPagedUrl(type, top, i * top);
+      const req = this.http.get(url).then((resp : AxiosResponse<FamisResponse<T>>) => {
+        if (resp.status === 401) {
+          throw AuthorizationError;
+        } else if (resp.status !== 200) {
+          throw Error(`http error: status ${resp.status}`);
+        }
+        if (this.debug) {
+          console.log(`Received ${resp.data.value.length} records from ${url}`);
+        }
+        callback(resp.data);
+      }).catch((e : AxiosError) => {
+        if (e.response?.status === 401) {
+          throw AuthorizationError;
+        } else if (e.response?.status !== 200) {
+          throw Error(`http error: status ${resp.status}`);
+        } else {
+          throw e;
+        }
+      })
+      promises.push(req);
+    }
+
+    await Promise.all(promises);
   }
 
   async getAllPaged<T>(

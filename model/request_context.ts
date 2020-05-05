@@ -65,7 +65,7 @@ export class QueryContext {
         return urlPath;
     }
 
-    buildPagedUrl(entity: string, top: number, skip: number) {
+    buildPagedUrl(entity: string, top: number, skip: number, count: boolean = false) {
         let urlPath = `${basePath}/${entity}?$top=${top}&$skip=${skip}`;
         if (this.filter) {
             urlPath += `&$filter=${this.filter}`;
@@ -78,6 +78,9 @@ export class QueryContext {
         }
         if (this.orderBy) {
             urlPath += `&$orderby=${this.orderBy}`;
+        }
+        if (count) {
+            urlPath += "&$count=true"
         }
         return urlPath;
     }
