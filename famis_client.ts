@@ -1,6 +1,6 @@
-import axios, {AxiosError, AxiosInstance, AxiosResponse} from "axios";
+import axios, {AxiosError, AxiosInstance, AxiosResponse, Method} from "axios";
 import { AuthCredential, AuthState } from "./auth";
-import { AuthorizationError } from "./errors";
+import {ApiError} from "./errors";
 import {
   AccountSegment,
   ActivityGroup,
@@ -35,7 +35,7 @@ import {
   WorkType
 } from "./model/famis_models";
 import { buildEntityUrl, QueryContext } from "./model/request_context";
-
+import * as AxiosLogger from 'axios-logger';
 import { Result } from "./model/common";
 import {
   AssetCreateRequest,
@@ -57,7 +57,8 @@ export class FamisClient {
     this.credentials = credentials;
     this.host = host;
     this.http = axios.create({
-      baseURL: host
+      baseURL: host,
+      validateStatus: (status) => true
     });
     this.debug = debug;
     this.autoRefresh = autoRefresh;
@@ -66,8 +67,13 @@ export class FamisClient {
         this.credentials = await this.credentials.refresh();
       }
       config.headers.Authorization = this.credentials.accessToken;
+      config.transformRequest
       return config;
     });
+    if (debug) {
+      this.http.interceptors.request.use(AxiosLogger.requestLogger);
+      this.http.interceptors.response.use(AxiosLogger.responseLogger);
+    }
   }
 
   async refreshCredentials(): Promise<[AuthCredential, AuthState]> {
@@ -325,11 +331,8 @@ export class FamisClient {
     const startDate = new Date();
     let resp = await this.http.get(startPath);
     durationMs += moment(Date.now()).diff(startDate);
-    if (resp.status === 401) {
-      throw AuthorizationError;
-    } else if (resp.status !== 200) {
-      throw Error(`http error: status ${resp.status}`);
-    }
+    this.throwResponseError(resp);
+
     const itemResponse = resp.data as FamisResponse<T>;
     let nextLink = itemResponse["@odata.nextLink"] as string;
     if (nextLink) {
@@ -342,12 +345,7 @@ export class FamisClient {
       const innerStartDate = new Date();
       resp = await this.http.get(nextLink);
       durationMs += moment(Date.now()).diff(innerStartDate);
-      if (resp.status !== 200) {
-        if (resp.status === 401) {
-          throw AuthorizationError;
-        }
-        throw Error(`error: status ${resp.status}`);
-      }
+      this.throwResponseError(resp);
       const newResponse = resp.data as FamisResponse<T>;
       items = items.concat(newResponse.value);
       nextLink = newResponse["@odata.nextLink"] as string;
@@ -369,11 +367,7 @@ export class FamisClient {
     const url = context.buildPagedUrl(type, top, 0, true);
     const resp = await this.http.get(url);
 
-    if (resp.status === 401) {
-      throw AuthorizationError;
-    } else if (resp.status !== 200) {
-      throw Error(`http error: status ${resp.status}`);
-    }
+    this.throwResponseError(resp);
     const famisResp = resp.data as FamisResponse<T>;
     if (this.debug) {
       console.log(`Received ${famisResp.value.length} records from ${url}`);
@@ -391,23 +385,13 @@ export class FamisClient {
     for (let i = 1; i < pageCount; i++) {
       const url = context.buildPagedUrl(type, top, i * top);
       const req = this.http.get(url).then((resp : AxiosResponse<FamisResponse<T>>) => {
-        if (resp.status === 401) {
-          throw AuthorizationError;
-        } else if (resp.status !== 200) {
-          throw Error(`http error: status ${resp.status}`);
-        }
+        this.throwResponseError(resp);
         if (this.debug) {
           console.log(`Received ${resp.data.value.length} records from ${url}`);
         }
         callback(resp.data);
       }).catch((e : AxiosError) => {
-        if (e.response?.status === 401) {
-          throw AuthorizationError;
-        } else if (e.response?.status !== 200) {
-          throw Error(`http error: status ${resp.status}`);
-        } else {
-          throw e;
-        }
+        this.throwResponseError(e.response!);
       })
       promises.push(req);
     }
@@ -440,11 +424,7 @@ export class FamisClient {
       }
       const resp = await this.http.get(url);
       durationMs += moment(Date.now()).diff(startDate);
-      if (resp.status === 401) {
-        throw AuthorizationError;
-      } else if (resp.status !== 200) {
-        throw Error(`http error: status ${resp.status}`);
-      }
+      this.throwResponseError(resp);
       const famisResp = resp.data as FamisResponse<T>;
       if (this.debug) {
         console.log(`Received ${famisResp.value.length} records from ${url}`);
@@ -469,19 +449,27 @@ export class FamisClient {
 
   // generic requests
 
+  async rawRequest<T>(method: string, endpoint: string, params: any, payload: any) : Promise<T> {
+    const uri = this.http.getUri({url: buildEntityUrl(endpoint)});
+
+    const resp = await this.http.request({
+      method: method as Method,
+      url: uri,
+      data: payload,
+      params: params,
+      responseType: "json",
+      headers: {
+        "Content-Type": 'application/json'
+      }
+    })
+    this.throwResponseError(resp);
+    return resp.data as T;
+  }
+
   async createObject<T, K>(toCreate: T, entity: string): Promise<K> {
     const url = buildEntityUrl(entity);
     const resp = await this.http.post(url, toCreate);
-    if (resp.status === 401) {
-      throw AuthorizationError;
-    } else if (resp.status !== 200) {
-      const errorResponse = resp.data as FamisErrorResponse;
-      if (errorResponse.Message) {
-        throw Error(`error; message: ${errorResponse.Message}`);
-      }
-      throw Error(`http error: status ${resp.status}`);
-    }
-
+    this.throwResponseError(resp);
     return resp.data as K;
   }
 
@@ -489,19 +477,16 @@ export class FamisClient {
     let url = buildEntityUrl(entity);
     url += `?key=${entityId}`;
     const resp = await this.http.patch(url, patch);
-    if (resp.status === 401) {
-      throw AuthorizationError;
-    } else if (resp.status !== 200) {
-      const errorResponse = resp.data as FamisErrorResponse;
-      if (errorResponse.Message) {
-        throw Error(`error; message: ${errorResponse.Message}`);
-      }
-      throw Error(`http error: status ${resp.status}`);
-    }
+    this.throwResponseError(resp);
 
     return resp.data as K;
   }
 
+  throwResponseError(resp: AxiosResponse) {
+    if (resp.status !== 200) {
+      throw new ApiError(resp);
+    }
+  }
   //
 }
 
