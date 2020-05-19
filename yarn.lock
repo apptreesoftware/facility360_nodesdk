@@ -818,7 +818,7 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.9.1.tgz#7e33d8f7d449b3f673cd72deb9abdc552dbe528e"
   integrity sha512-wMHVg2EOHaMRxbzgFJ9gtjOOCrI80OHLG14rxi28XwOW8ux6IiEbRCGGGqCtdAIg4FQCbW20k9RsT4y3gJlFug==
 
-axios-logger@^2.2.1:
+axios-logger@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/axios-logger/-/axios-logger-2.3.1.tgz#52d01cbd991ba5626547a448088c3fc250a32e40"
   integrity sha512-rXtvRBgbEqX3FBosp1CbKunLiHbvCyFcBdpWw974WHeRZMIBj5lh4uiLKYUiC0E5JLGPopg51ZLvWnKMeJXN7g==
@@ -827,7 +827,7 @@ axios-logger@^2.2.1:
     chalk "^2.4.1"
     dateformat "^3.0.3"
 
-axios@^0.19.0:
+axios@^0.19.2:
   version "0.19.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.19.2.tgz#3ea36c5d8818d0d5f8a8a97a6d36b86cdc00cb27"
   integrity sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==
