@@ -1,6 +1,6 @@
-import axios, {AxiosError, AxiosInstance, AxiosResponse, Method} from "axios";
-import { AuthCredential, AuthState } from "./auth";
-import {ApiError} from "./errors";
+import axios, { AxiosError, AxiosInstance, AxiosResponse, Method } from 'axios';
+import { AuthCredential, AuthState } from './auth';
+import { ApiError } from './errors';
 import {
   AccountSegment,
   ActivityGroup,
@@ -15,10 +15,12 @@ import {
   CreateAssetMake,
   CreateAssetModel,
   Crew,
-  CrewUserAssociation, Department,
+  CrewUserAssociation,
+  Department,
   FamisAttachment,
   FamisErrorResponse,
-  FamisResponse, FamisUser,
+  FamisResponse,
+  FamisUser,
   Floor,
   Property,
   PropertyRegionAssociation,
@@ -27,22 +29,25 @@ import {
   RequestStatus,
   RequestSubType,
   RequestType,
-  Space, SpaceClass,
+  Space,
+  SpaceClass,
   UserPropertyAssociation,
   UserRegionAssociation,
   WorkOrder,
   WorkOrderComment,
-  WorkType
-} from "./model/famis_models";
-import { buildEntityUrl, QueryContext } from "./model/request_context";
+  WorkType,
+  CreateAssetAttachment,
+} from './model/famis_models';
+import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
-import { Result } from "./model/common";
+import { Result } from './model/common';
 import {
   AssetCreateRequest,
   CreateCompanyRequest,
-  PatchCompanyRequest, PatchWorkOrderRequest
-} from "./model/request_models";
-import moment = require("moment");
+  PatchCompanyRequest,
+  PatchWorkOrderRequest,
+} from './model/request_models';
+import moment = require('moment');
 
 type ResultCallback<T> = (results: FamisResponse<T>) => void;
 
@@ -53,21 +58,26 @@ export class FamisClient {
   autoRefresh: boolean;
   debug: boolean;
 
-  constructor(credentials: AuthCredential, host: string, autoRefresh: boolean, debug: boolean = false) {
+  constructor(
+    credentials: AuthCredential,
+    host: string,
+    autoRefresh: boolean,
+    debug: boolean = false
+  ) {
     this.credentials = credentials;
     this.host = host;
     this.http = axios.create({
       baseURL: host,
-      validateStatus: (status) => true
+      validateStatus: (status) => true,
     });
     this.debug = debug;
     this.autoRefresh = autoRefresh;
-    this.http.interceptors.request.use(async config => {
+    this.http.interceptors.request.use(async (config) => {
       if (this.autoRefresh) {
         this.credentials = await this.credentials.refresh();
       }
       config.headers.Authorization = this.credentials.accessToken;
-      config.transformRequest
+      config.transformRequest;
       return config;
     });
     if (debug) {
@@ -91,57 +101,57 @@ export class FamisClient {
 
   // Assets
   async getAssetClasses(context: QueryContext): Promise<Result<AssetClass>> {
-    return this.getAll<AssetClass>(context, "assetclasses");
+    return this.getAll<AssetClass>(context, 'assetclasses');
   }
 
   async getAssetKeywords(context: QueryContext): Promise<Result<AssetKeyword>> {
-    return this.getAll<AssetKeyword>(context, "assetkeywords");
+    return this.getAll<AssetKeyword>(context, 'assetkeywords');
   }
 
   async getAssetStatuses(context: QueryContext): Promise<Result<AssetStatus>> {
-    return this.getAll<AssetStatus>(context, "assetstatuses");
+    return this.getAll<AssetStatus>(context, 'assetstatuses');
   }
 
   async getAssetMakes(context: QueryContext): Promise<Result<AssetMake>> {
-    return this.getAll<AssetMake>(context, "assetmakes");
+    return this.getAll<AssetMake>(context, 'assetmakes');
   }
 
   async createAssetMake(assetMake: AssetMake): Promise<AssetMake> {
-    return this.createObject<CreateAssetMake, AssetMake>(
-      assetMake,
-      "assetmakes"
-    );
+    return this.createObject<CreateAssetMake, AssetMake>(assetMake, 'assetmakes');
   }
 
   async getAssetModels(context: QueryContext): Promise<Result<AssetModel>> {
-    return this.getAll<AssetModel>(context, "assetmodels");
+    return this.getAll<AssetModel>(context, 'assetmodels');
   }
 
   async createAssetModel(assetModel: CreateAssetModel): Promise<AssetModel> {
-    return this.createObject<CreateAssetModel, AssetModel>(
-      assetModel,
-      "assetmodels"
-    );
+    return this.createObject<CreateAssetModel, AssetModel>(assetModel, 'assetmodels');
   }
 
   async getAssetTypes(context: QueryContext): Promise<Result<AssetType>> {
-    return this.getAll<AssetType>(context, "assettypes");
+    return this.getAll<AssetType>(context, 'assettypes');
   }
 
   async getAssets(context: QueryContext): Promise<Result<Asset>> {
-    return this.getAll<Asset>(context, "assets");
+    return this.getAll<Asset>(context, 'assets');
   }
 
-  async getAllAssetsBatch(context: QueryContext, callback: ResultCallback<Asset>) : Promise<void> {
-    return this.getAllBatch(context, "assets", callback);
+  async getAllAssetsBatch(context: QueryContext, callback: ResultCallback<Asset>): Promise<void> {
+    return this.getAllBatch(context, 'assets', callback);
   }
 
   async createAsset(asset: AssetCreateRequest): Promise<Asset> {
-    return this.createObject<AssetCreateRequest, Asset>(asset, "assets");
+    return this.createObject<AssetCreateRequest, Asset>(asset, 'assets');
   }
 
   async patchAsset(asset: Asset): Promise<Asset> {
-    return this.patchObject<Asset, Asset>(asset, "assets", asset.Id.toString());
+    return this.patchObject<Asset, Asset>(asset, 'assets', asset.Id.toString());
+  }
+
+  async createAssetAttachment(attachment: CreateAssetAttachment): Promise<void> {
+    const url = buildEntityUrl('assetattachments');
+    const resp = await this.http.post(url, attachment);
+    this.throwResponseError(resp);
   }
 
   //
@@ -149,61 +159,55 @@ export class FamisClient {
   // crews
 
   async getCrews(context: QueryContext): Promise<Result<Crew>> {
-    return this.getAll<Crew>(context, "crews");
+    return this.getAll<Crew>(context, 'crews');
   }
 
-  async getCrewUserAssociations(
-    context: QueryContext
-  ): Promise<Result<CrewUserAssociation>> {
-    return this.getAll<CrewUserAssociation>(context, "crewuserassociations");
+  async getCrewUserAssociations(context: QueryContext): Promise<Result<CrewUserAssociation>> {
+    return this.getAll<CrewUserAssociation>(context, 'crewuserassociations');
   }
 
   //
 
   // companies
   async getCompanies(context: QueryContext): Promise<Result<Company>> {
-    return this.getAll<Company>(context, "companies");
+    return this.getAll<Company>(context, 'companies');
   }
 
   async createCompany(company: CreateCompanyRequest): Promise<Company> {
-    return this.createObject<CreateCompanyRequest, Company>(
-      company,
-      "companies"
-    );
+    return this.createObject<CreateCompanyRequest, Company>(company, 'companies');
   }
 
   async patchCompany(company: PatchCompanyRequest): Promise<Company> {
-    return this.patchObject<PatchCompanyRequest, Company>(company, "companies", company.Id.toString());
+    return this.patchObject<PatchCompanyRequest, Company>(
+      company,
+      'companies',
+      company.Id.toString()
+    );
   }
 
   //
 
   // users
 
-  async getUsers(context : QueryContext) : Promise<Result<FamisUser>> {
-    return this.getAll(context, "users");
+  async getUsers(context: QueryContext): Promise<Result<FamisUser>> {
+    return this.getAll(context, 'users');
   }
 
-  async getAllUsersBatch(context: QueryContext, callback: ResultCallback<FamisUser>) : Promise<void> {
-    return this.getAllBatch<FamisUser>(context, "users", callback);
+  async getAllUsersBatch(
+    context: QueryContext,
+    callback: ResultCallback<FamisUser>
+  ): Promise<void> {
+    return this.getAllBatch<FamisUser>(context, 'users', callback);
   }
 
-  async getUserRegionAssociations(
-    context: QueryContext
-  ): Promise<Result<UserRegionAssociation>> {
-    return this.getAll<UserRegionAssociation>(
-      context,
-      "userregionassociations"
-    );
+  async getUserRegionAssociations(context: QueryContext): Promise<Result<UserRegionAssociation>> {
+    return this.getAll<UserRegionAssociation>(context, 'userregionassociations');
   }
 
   async getUserPropertyAssociations(
     context: QueryContext
   ): Promise<Result<UserPropertyAssociation>> {
-    return this.getAll<UserPropertyAssociation>(
-      context,
-      "userpropertyassociation"
-    );
+    return this.getAll<UserPropertyAssociation>(context, 'userpropertyassociation');
   }
 
   //
@@ -211,109 +215,91 @@ export class FamisClient {
   // work orders
 
   async getWorkOrders(context: QueryContext): Promise<Result<WorkOrder>> {
-    return this.getAll<WorkOrder>(context, "workorders");
+    return this.getAll<WorkOrder>(context, 'workorders');
   }
 
   async patchWorkOrder(workOrderId: string, workOrder: PatchWorkOrderRequest): Promise<WorkOrder> {
-    return this.patchObject<PatchWorkOrderRequest, WorkOrder>(workOrder, "workorders", workOrderId);
+    return this.patchObject<PatchWorkOrderRequest, WorkOrder>(workOrder, 'workorders', workOrderId);
   }
 
   //
-  async getAttachments(
-    context: QueryContext
-  ): Promise<Result<FamisAttachment>> {
-    return this.getAll<FamisAttachment>(context, "attachments");
+  async getAttachments(context: QueryContext): Promise<Result<FamisAttachment>> {
+    return this.getAll<FamisAttachment>(context, 'attachments');
   }
 
-  async getAccountSegments(
-    context: QueryContext
-  ): Promise<Result<AccountSegment>> {
-    return this.getAll<AccountSegment>(context, "accountsegmentnpfa");
+  async getAccountSegments(context: QueryContext): Promise<Result<AccountSegment>> {
+    return this.getAll<AccountSegment>(context, 'accountsegmentnpfa');
   }
 
-  async getActivityGroups(
-    context: QueryContext
-  ): Promise<Result<ActivityGroup>> {
-    return this.getAll<ActivityGroup>(context, "activitygroups");
+  async getActivityGroups(context: QueryContext): Promise<Result<ActivityGroup>> {
+    return this.getAll<ActivityGroup>(context, 'activitygroups');
   }
 
   async getWorkTypes(context: QueryContext): Promise<Result<WorkType>> {
-    return this.getAll<WorkType>(context, "worktypes");
+    return this.getAll<WorkType>(context, 'worktypes');
   }
 
   async getProperties(context: QueryContext): Promise<Result<Property>> {
-    return this.getAll<Property>(context, "properties");
+    return this.getAll<Property>(context, 'properties');
   }
 
-  async getAllPropertiesBatch(context: QueryContext, callback: ResultCallback<Property>) : Promise<void> {
-    return this.getAllBatch<Property>(context, "properties", callback);
+  async getAllPropertiesBatch(
+    context: QueryContext,
+    callback: ResultCallback<Property>
+  ): Promise<void> {
+    return this.getAllBatch<Property>(context, 'properties', callback);
   }
-
 
   async getPropertyRequestTypeAssociations(
     context: QueryContext
   ): Promise<Result<PropertyRequestTypeAssociation>> {
-    return this.getAll<PropertyRequestTypeAssociation>(
-      context,
-      "propertyrequesttypeassociations"
-    );
+    return this.getAll<PropertyRequestTypeAssociation>(context, 'propertyrequesttypeassociations');
   }
 
   async getPropertyRegionAssociations(
     context: QueryContext
   ): Promise<Result<PropertyRegionAssociation>> {
-    return this.getAll<PropertyRegionAssociation>(
-      context,
-      "propertyregionassociations"
-    );
+    return this.getAll<PropertyRegionAssociation>(context, 'propertyregionassociations');
   }
 
   async getSpaces(context: QueryContext): Promise<Result<Space>> {
-    return this.getAll<Space>(context, "spaces");
+    return this.getAll<Space>(context, 'spaces');
   }
 
   async getSpaceClasses(context: QueryContext): Promise<Result<SpaceClass>> {
-    return this.getAll<SpaceClass>(context, "spaceclasses");
+    return this.getAll<SpaceClass>(context, 'spaceclasses');
   }
 
   async getFloors(context: QueryContext): Promise<Result<Floor>> {
-    return this.getAll<Floor>(context, "floors");
+    return this.getAll<Floor>(context, 'floors');
   }
 
   async getRequestTypes(context: QueryContext): Promise<Result<RequestType>> {
-    return this.getAll<RequestType>(context, "requesttypes");
+    return this.getAll<RequestType>(context, 'requesttypes');
   }
 
-  async getRequestSubtypes(
-    context: QueryContext
-  ): Promise<Result<RequestSubType>> {
-    return this.getAll<RequestSubType>(context, "requestsubtypes");
+  async getRequestSubtypes(context: QueryContext): Promise<Result<RequestSubType>> {
+    return this.getAll<RequestSubType>(context, 'requestsubtypes');
   }
 
-  async getRequestPriorities(
-    context: QueryContext
-  ): Promise<Result<RequestPriority>> {
-    return this.getAll<RequestPriority>(context, "requestpriorities");
+  async getRequestPriorities(context: QueryContext): Promise<Result<RequestPriority>> {
+    return this.getAll<RequestPriority>(context, 'requestpriorities');
   }
 
-  async getWorkOrderComments(
-    context: QueryContext
-  ): Promise<Result<WorkOrderComment>> {
-    return this.getAll<WorkOrderComment>(context, "workordercomments");
+  async getWorkOrderComments(context: QueryContext): Promise<Result<WorkOrderComment>> {
+    return this.getAll<WorkOrderComment>(context, 'workordercomments');
   }
 
-  async getRequestStatuses(
-    context: QueryContext
-  ): Promise<Result<RequestStatus>> {
-    return this.getAll<RequestStatus>(context, "requeststatuses");
+  async getRequestStatuses(context: QueryContext): Promise<Result<RequestStatus>> {
+    return this.getAll<RequestStatus>(context, 'requeststatuses');
   }
 
   async getGeoLocations(context: QueryContext): Promise<Result<Geolocation>> {
-    return this.getAll<Geolocation>(context, "geolocations");
+    return this.getAll<Geolocation>(context, 'geolocations');
   }
 
   async getDepartments(context: QueryContext): Promise<Result<Department>> {
-    return this.getAll<Department>(context, "departments");
+    return this.getAll<Department>(context, 'departments');
   }
 
   // generic get methods
@@ -334,9 +320,9 @@ export class FamisClient {
     this.throwResponseError(resp);
 
     const itemResponse = resp.data as FamisResponse<T>;
-    let nextLink = itemResponse["@odata.nextLink"] as string;
+    let nextLink = itemResponse['@odata.nextLink'] as string;
     if (nextLink) {
-      nextLink = nextLink.replace("http:", "https:");
+      nextLink = nextLink.replace('http:', 'https:');
     }
     let items = itemResponse.value;
 
@@ -348,21 +334,24 @@ export class FamisClient {
       this.throwResponseError(resp);
       const newResponse = resp.data as FamisResponse<T>;
       items = items.concat(newResponse.value);
-      nextLink = newResponse["@odata.nextLink"] as string;
+      nextLink = newResponse['@odata.nextLink'] as string;
       if (nextLink) {
-        nextLink = nextLink.replace("http:", "https:");
+        nextLink = nextLink.replace('http:', 'https:');
       }
     }
     return {
       first: items.length > 0 ? items[0] : null,
       results: items,
       totalDuration: durationMs,
-      averageDuration: durationMs / fetchCount
+      averageDuration: durationMs / fetchCount,
     };
   }
 
-
-  async getAllBatch<T>(context: QueryContext, type: string, callback: ResultCallback<T>) : Promise<void> {
+  async getAllBatch<T>(
+    context: QueryContext,
+    type: string,
+    callback: ResultCallback<T>
+  ): Promise<void> {
     let top = 1000;
     const url = context.buildPagedUrl(type, top, 0, true);
     const resp = await this.http.get(url);
@@ -375,7 +364,7 @@ export class FamisClient {
     if (callback) {
       callback(famisResp);
     }
-    const totalCount = famisResp["@odata.count"] ?? 0;
+    const totalCount = famisResp['@odata.count'] ?? 0;
 
     if (totalCount <= famisResp.value.length) {
       return;
@@ -384,25 +373,25 @@ export class FamisClient {
     const promises = [];
     for (let i = 1; i < pageCount; i++) {
       const url = context.buildPagedUrl(type, top, i * top);
-      const req = this.http.get(url).then((resp : AxiosResponse<FamisResponse<T>>) => {
-        this.throwResponseError(resp);
-        if (this.debug) {
-          console.log(`Received ${resp.data.value.length} records from ${url}`);
-        }
-        callback(resp.data);
-      }).catch((e : AxiosError) => {
-        this.throwResponseError(e.response!);
-      })
+      const req = this.http
+        .get(url)
+        .then((resp: AxiosResponse<FamisResponse<T>>) => {
+          this.throwResponseError(resp);
+          if (this.debug) {
+            console.log(`Received ${resp.data.value.length} records from ${url}`);
+          }
+          callback(resp.data);
+        })
+        .catch((e: AxiosError) => {
+          this.throwResponseError(e.response!);
+        });
       promises.push(req);
     }
 
     await Promise.all(promises);
   }
 
-  async getAllPaged<T>(
-    context: QueryContext,
-    type: string
-  ): Promise<Result<T>> {
+  async getAllPaged<T>(context: QueryContext, type: string): Promise<Result<T>> {
     let fetchAll = true;
     let top = 1000;
     if (context.top) {
@@ -441,7 +430,7 @@ export class FamisClient {
       first: items.length > 0 ? items[0] : null,
       averageDuration: durationMs / fetchCount,
       results: items,
-      totalDuration: durationMs
+      totalDuration: durationMs,
     };
   }
 
@@ -449,19 +438,19 @@ export class FamisClient {
 
   // generic requests
 
-  async rawRequest<T>(method: string, endpoint: string, params: any, payload: any) : Promise<T> {
-    const uri = this.http.getUri({url: buildEntityUrl(endpoint)});
+  async rawRequest<T>(method: string, endpoint: string, params: any, payload: any): Promise<T> {
+    const uri = this.http.getUri({ url: buildEntityUrl(endpoint) });
 
     const resp = await this.http.request({
       method: method as Method,
       url: uri,
       data: payload,
       params: params,
-      responseType: "json",
+      responseType: 'json',
       headers: {
-        "Content-Type": 'application/json'
-      }
-    })
+        'Content-Type': 'application/json',
+      },
+    });
     this.throwResponseError(resp);
     return resp.data as T;
   }
@@ -491,17 +480,17 @@ export class FamisClient {
 }
 
 function supportsNextLink(type: string): boolean {
-  if (type === "workorders") {
+  if (type === 'workorders') {
     return false;
-  } else if (type === "propertyregionassociations") {
+  } else if (type === 'propertyregionassociations') {
     return false;
-  } else if (type === "userregionassociations") {
+  } else if (type === 'userregionassociations') {
     return false;
-  } else if (type === "propertyrequesttypeassociations") {
+  } else if (type === 'propertyrequesttypeassociations') {
     return false;
-  } else if (type === "userpropertyassociation") {
+  } else if (type === 'userpropertyassociation') {
     return false;
-  } else if (type === "assets") {
+  } else if (type === 'assets') {
     return false;
   }
   return true;
