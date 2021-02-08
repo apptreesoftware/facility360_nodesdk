@@ -1,6 +1,6 @@
 {
   "name": "facility360",
-  "version": "1.0.0-beta25",
+  "version": "1.0.0-beta26",
   "description": "A Node based 360Facility client SDK",
   "main": "dist/index.js",
   "scripts": {
@@ -19,9 +19,8 @@
     "axios": "^0.19.2",
     "axios-logger": "^2.3.1",
     "dotenv": "^8.2.0",
-    "firebase-admin": "^8.8.0",
-    "firebase-functions": "^3.3.0",
-    "moment": "^2.24.0"
+    "moment": "^2.24.0",
+    "lodash": "^4.17.20"
   },
   "prettier": {
     "singleQuote": true,
@@ -30,6 +29,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.19",
     "@types/node": "^12.12.11",
+    "@types/lodash": "^4.14.168",
     "jest": "^24.9.0",
     "ts-jest": "^24.1.0",
     "typescript": "^3.7.4"

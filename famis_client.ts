@@ -1,6 +1,6 @@
-import axios, { AxiosError, AxiosInstance, AxiosResponse, Method } from 'axios';
-import { AuthCredential, AuthState } from './auth';
-import { ApiError } from './errors';
+import axios from 'axios';
+import Axios, { AxiosError, AxiosInstance, AxiosResponse, Method } from 'axios';
+import { ApiError, AuthorizationError } from './errors';
 import {
   AccountSegment,
   ActivityGroup,
@@ -12,13 +12,13 @@ import {
   AssetStatus,
   AssetType,
   Company,
+  CreateAssetAttachment,
   CreateAssetMake,
   CreateAssetModel,
   Crew,
   CrewUserAssociation,
   Department,
   FamisAttachment,
-  FamisErrorResponse,
   FamisResponse,
   FamisUser,
   Floor,
@@ -35,8 +35,7 @@ import {
   UserRegionAssociation,
   WorkOrder,
   WorkOrderComment,
-  WorkType,
-  CreateAssetAttachment,
+  WorkType
 } from './model/famis_models';
 import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
@@ -44,22 +43,111 @@ import { Result } from './model/common';
 import {
   AssetCreateRequest,
   CreateCompanyRequest,
+  FamisOAuthCredential,
+  LoginResponse,
   PatchCompanyRequest,
-  PatchWorkOrderRequest,
+  PatchWorkOrderRequest
 } from './model/request_models';
+import _ from 'lodash';
 import moment = require('moment');
 
 type ResultCallback<T> = (results: FamisResponse<T>) => void;
 
+export const DefaultUserSelect = [
+  'Id',
+  'FirstName',
+  'LastName',
+  'Title',
+  'BusPhone',
+  'UserName',
+  'Name',
+  'Email'
+];
+export const DefaultPropertySelect = ['Id', 'Name', 'Addr1', 'City', 'StateId', 'Zip'];
+export const DefaultPropertyExpand = [
+  'State($select=Id,CountryName,Name,Abbreviation,Description,StateCode)'
+];
+
 export class FamisClient {
   host: string;
   http: AxiosInstance;
-  credentials: AuthCredential;
+  credentials: FamisOAuthCredential;
   autoRefresh: boolean;
   debug: boolean;
 
+  static async withLoginCredential(opts: {
+    username: string;
+    password: string;
+    host: string;
+    autoRefresh?: boolean;
+    debug?: boolean;
+  }) {
+    const cred = await this.login({
+      username: opts.username,
+      password: opts.password,
+      url: opts.host
+    });
+    if (opts.debug) {
+      console.log(`Logged in with ${JSON.stringify(cred)}`);
+    }
+    console.log();
+    return new FamisClient(cred.Item, opts.host, opts.autoRefresh ?? false, opts.debug ?? false);
+  }
+
+  static async login(opts: {
+    username: string;
+    password: string;
+    url: string;
+  }): Promise<LoginResponse> {
+    const http = axios.create({
+      baseURL: opts.url
+    });
+    console.log(`Logging into ${opts.url}. ${(opts.username, opts.password)}`);
+    const resp = await http.post('MobileWebServices/api/Login', {
+      username: opts.username,
+      password: opts.password
+    });
+    try {
+      const loginResponse = resp.data as LoginResponse;
+      if (!loginResponse.Result) {
+        throw AuthorizationError;
+      }
+      return loginResponse;
+    } catch (e) {
+      throw AuthorizationError;
+    }
+  }
+
+  static async refreshCredential(opts: {
+    refreshToken: string;
+    url: string;
+  }): Promise<FamisOAuthCredential> {
+    try {
+      console.log(`Refreshing with token: ${opts.refreshToken}`);
+      const resp = await Axios.post(
+        `${opts.url}/MobileWebServices/api/refreshtoken`,
+        {
+          grant_type: 'bearer',
+          refresh_token: opts.refreshToken
+        },
+        {
+          validateStatus: s => true
+        }
+      );
+      const loginResponse = resp.data as LoginResponse;
+      console.log(`Refresh response: ${JSON.stringify(loginResponse)}`);
+      if (!loginResponse.Result) {
+        throw AuthorizationError;
+      }
+      return loginResponse.Item;
+    } catch (e) {
+      console.log(e);
+      throw AuthorizationError;
+    }
+  }
+
   constructor(
-    credentials: AuthCredential,
+    credentials: FamisOAuthCredential,
     host: string,
     autoRefresh: boolean,
     debug: boolean = false
@@ -68,15 +156,16 @@ export class FamisClient {
     this.host = host;
     this.http = axios.create({
       baseURL: host,
-      validateStatus: (status) => true,
+      validateStatus: status => true
     });
     this.debug = debug;
     this.autoRefresh = autoRefresh;
-    this.http.interceptors.request.use(async (config) => {
-      if (this.autoRefresh) {
-        this.credentials = await this.credentials.refresh();
+    this.http.interceptors.request.use(async config => {
+      if (this.autoRefresh && FamisClient.isCredentialExpired(this.credentials)) {
+        this.credentials = await this.refreshAuthCredential();
       }
-      config.headers.Authorization = this.credentials.accessToken;
+      config.headers.Authorization =
+        this.credentials.token_type + ' ' + this.credentials.access_token;
       config.transformRequest;
       return config;
     });
@@ -86,17 +175,20 @@ export class FamisClient {
     }
   }
 
-  async refreshCredentials(): Promise<[AuthCredential, AuthState]> {
-    const credTuple = await this.credentials.refreshIfNeeded();
-    if (credTuple[1] != AuthState.Expired) {
-      this.credentials = credTuple[0];
-    }
-    return credTuple;
+  async refreshAuthCredential(): Promise<FamisOAuthCredential> {
+    return FamisClient.refreshCredential({
+      refreshToken: this.credentials.refresh_token,
+      url: this.host
+    });
   }
 
-  async getCredentials(): Promise<AuthCredential> {
-    this.credentials = await this.credentials.refresh();
-    return this.credentials;
+  static isCredentialExpired(cred: FamisOAuthCredential): boolean {
+    const m = moment(cred['.expires']);
+    console.log(`Expiration date: ${m.toDate()}`);
+    const now = moment(Date.now()).subtract(10, 'seconds');
+    const expired = now.isAfter(m);
+    console.log(`Credential is expired ${expired}`);
+    return expired;
   }
 
   // Assets
@@ -193,6 +285,23 @@ export class FamisClient {
     return this.getAll(context, 'users');
   }
 
+  async getUserById(id: number, select: string[] = DefaultUserSelect): Promise<FamisUser | null> {
+    const res = await this.getUsers(
+      new QueryContext().setFilter(`Id eq ${id}`).setSelect(select.join(','))
+    );
+    return res.first;
+  }
+
+  async getUserByUsername(
+    username: string,
+    select: string[] = DefaultUserSelect
+  ): Promise<FamisUser | null> {
+    const res = await this.getUsers(
+      new QueryContext().setFilter(`UserName eq '${username}'`).setSelect(select.join(','))
+    );
+    return res.first;
+  }
+
   async getAllUsersBatch(
     context: QueryContext,
     callback: ResultCallback<FamisUser>
@@ -241,6 +350,76 @@ export class FamisClient {
 
   async getProperties(context: QueryContext): Promise<Result<Property>> {
     return this.getAll<Property>(context, 'properties');
+  }
+
+  async getProperty(id: number): Promise<Property | null> {
+    const res = await this.getProperties(new QueryContext().setFilter(`Id eq ${id}`));
+    return res.first;
+  }
+
+  async getDefaultUserProperty(userId: number): Promise<Property | null> {
+    const result = await this.getUserPropertyAssociations(
+      new QueryContext().setFilter(`UserId eq ${userId}`)
+    );
+
+    const defaultPropId = result.results.find(p => p.DefaultPropertyFlag);
+    if (!defaultPropId) {
+      return null;
+    }
+    return await this.getProperty(defaultPropId.PropertyId);
+  }
+
+  async getUserProperties(opts: {
+    userId: number;
+    select?: string[];
+    expand?: string[];
+  }): Promise<Property[]> {
+    const userRegions = await this.getUserRegionAssociations(
+      new QueryContext().setFilter(`UserId eq ${opts.userId}`)
+    );
+    const propertyIds: number[] = [];
+    for (const regAssocation of userRegions.results) {
+      const propertyRegionAss = await this.getPropertyRegionAssociations(
+        new QueryContext().setFilter(`RegionId eq ${regAssocation.RegionId}`)
+      );
+      for (const props of propertyRegionAss.results) {
+        propertyIds.push(props.PropertyId);
+      }
+    }
+    return this.getPropertiesByIds({ ids: propertyIds, select: opts.select, expand: opts.expand });
+  }
+
+  async getPropertiesByIds(opts: {
+    ids: number[];
+    select?: string[];
+    expand?: string[];
+  }): Promise<Property[]> {
+    const selects = opts.select?.join(',') ?? DefaultPropertySelect.join(',');
+    const expands = opts.expand?.join(',') ?? DefaultPropertyExpand.join(',');
+
+    const chunks = _.chunk(opts.ids, 5);
+    const promises = [];
+    const properties: Property[] = [];
+    for (const chunk of chunks) {
+      const filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
+      // let filterString = _.reduce<string>(chunkStr, (str, id) => {
+      //   if (!str) {
+      //     return `Id eq ${id}`
+      //   }
+      //   return str + ` and Id eq ${id}`
+      // })
+
+      const promise = this.getProperties(
+        new QueryContext()
+          .setFilter(filterString!)
+          .setSelect(selects)
+          .setExpand(expands)
+      ).then(res => properties.push(...res.results));
+      promises.push(promise);
+    }
+
+    await Promise.all(promises);
+    return properties;
   }
 
   async getAllPropertiesBatch(
@@ -311,6 +490,7 @@ export class FamisClient {
       return this.getAllPaged<T>(context, type);
     }
   }
+
   async getAllUsingLink<T>(startPath: string): Promise<Result<T>> {
     let fetchCount = 1;
     let durationMs = 0;
@@ -343,7 +523,7 @@ export class FamisClient {
       first: items.length > 0 ? items[0] : null,
       results: items,
       totalDuration: durationMs,
-      averageDuration: durationMs / fetchCount,
+      averageDuration: durationMs / fetchCount
     };
   }
 
@@ -365,7 +545,6 @@ export class FamisClient {
       callback(famisResp);
     }
     const totalCount = famisResp['@odata.count'] ?? 0;
-
     if (totalCount <= famisResp.value.length) {
       return;
     }
@@ -430,7 +609,7 @@ export class FamisClient {
       first: items.length > 0 ? items[0] : null,
       averageDuration: durationMs / fetchCount,
       results: items,
-      totalDuration: durationMs,
+      totalDuration: durationMs
     };
   }
 
@@ -448,8 +627,8 @@ export class FamisClient {
       params: params,
       responseType: 'json',
       headers: {
-        'Content-Type': 'application/json',
-      },
+        'Content-Type': 'application/json'
+      }
     });
     this.throwResponseError(resp);
     return resp.data as T;
@@ -476,6 +655,7 @@ export class FamisClient {
       throw new ApiError(resp);
     }
   }
+
   //
 }
 
@@ -494,4 +674,8 @@ function supportsNextLink(type: string): boolean {
     return false;
   }
   return true;
+}
+
+export function tokenExpiration(t: FamisOAuthCredential): Date {
+  return moment(t['.expires']).toDate();
 }
