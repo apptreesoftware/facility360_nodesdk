@@ -1,6 +1,6 @@
 import axios from 'axios';
-import Axios, { AxiosError, AxiosInstance, AxiosResponse, Method } from 'axios';
-import { ApiError, AuthorizationError } from './errors';
+import Axios, {AxiosError, AxiosInstance, AxiosResponse, Method} from 'axios';
+import {ApiError, AuthorizationError} from './errors';
 import {
   AccountSegment,
   ActivityGroup,
@@ -30,16 +30,16 @@ import {
   RequestSubType,
   RequestType, RequestTypeActivityGroupAssociations,
   Space,
-  SpaceClass,
+  SpaceClass, UserActivityGroupAssociations,
   UserPropertyAssociation,
   UserRegionAssociation,
   WorkOrder,
   WorkOrderComment,
   WorkType
 } from './model/famis_models';
-import { buildEntityUrl, QueryContext } from './model/request_context';
+import {buildEntityUrl, QueryContext} from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
-import { Result } from './model/common';
+import {Result} from './model/common';
 import {
   AssetCreateRequest,
   CreateCompanyRequest,
@@ -259,13 +259,13 @@ export class FamisClient {
     return this.getAll<CrewUserAssociation>(context, 'crewuserassociations');
   }
 
-  async getCrewsForUser(opts: {userId: number}): Promise<Crew[]> {
+  async getCrewsForUser(opts: { userId: number }): Promise<Crew[]> {
     const crewAssocs = await this.getCrewUserAssociations(new QueryContext().setFilter(`UserId eq ${opts.userId}`));
     const crewIds = crewAssocs.results.map(c => c.CrewId);
     return this.getCrewsByIds({ids: crewIds});
   }
 
-  async getCrewsByIds(opts: {ids: number[]}): Promise<Crew[]> {
+  async getCrewsByIds(opts: { ids: number[] }): Promise<Crew[]> {
     const chunks = _.chunk(opts.ids, 10);
     const promises = [];
     const crews: Crew[] = [];
@@ -337,6 +337,35 @@ export class FamisClient {
     context: QueryContext
   ): Promise<Result<UserPropertyAssociation>> {
     return this.getAll<UserPropertyAssociation>(context, 'userpropertyassociation');
+  }
+
+  async getUserActivityGroupAssociations(context: QueryContext): Promise<Result<UserActivityGroupAssociations>> {
+    return this.getAll<UserActivityGroupAssociations>(context, 'useractivitygroupassociations');
+  }
+
+  async getUsersForActivityGroup(opts: { activityGroupId: number, select?: string[], expand?: string[], includeInactive?: boolean }): Promise<FamisUser[]> {
+    const assocResult = await this.getUserActivityGroupAssociations(new QueryContext().setFilter(`ActivityGroupId eq ${opts.activityGroupId} and AllowAssignmentFlag eq false`));
+    const userIds = assocResult.results.map(a => a.UserId);
+    const select = opts.select ?? DefaultUserSelect;
+    const chunks = _.chunk(userIds, 10);
+    const promises = [];
+    const users: FamisUser[] = [];
+    for (const chunk of chunks) {
+      let filter = chunk.map(c => `Id eq ${c}`).join(' or ');
+      if (!opts.includeInactive) {
+        filter = `(${filter}) and ActiveFlag eq true`
+      }
+      const promise = this.getUsers(
+        new QueryContext()
+          .setSelect(select.join(','))
+          .setFilter(filter)
+          .setExpand(opts.expand ? opts.expand.join(',') : ''))
+        .then(res => users.push(...res.results)
+        );
+      promises.push(promise);
+    }
+    await Promise.all(promises);
+    return users;
   }
 
   //
@@ -411,7 +440,7 @@ export class FamisClient {
         propertyIds.push(props.PropertyId);
       }
     }
-    return this.getPropertiesByIds({ ids: propertyIds, select: opts.select, expand: opts.expand });
+    return this.getPropertiesByIds({ids: propertyIds, select: opts.select, expand: opts.expand});
   }
 
   async getPropertiesByIds(opts: {
@@ -668,7 +697,7 @@ export class FamisClient {
   // generic requests
 
   async rawRequest<T>(method: string, endpoint: string, params: any, payload: any): Promise<T> {
-    const uri = this.http.getUri({ url: buildEntityUrl(endpoint) });
+    const uri = this.http.getUri({url: buildEntityUrl(endpoint)});
 
     const resp = await this.http.request({
       method: method as Method,
