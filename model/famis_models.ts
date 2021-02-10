@@ -1132,3 +1132,17 @@ export interface RequestTypeActivityGroupAssociations {
   UpdatedByExternalId: string;
   ActivityGroup: ActivityGroup;
 }
+
+export interface UserActivityGroupAssociations {
+  Id: number;
+  UserId: number;
+  UserExternalId?: string;
+  ActivityGroupId: number;
+  ActivityGroupExternalId?: string;
+  TabOrder: number;
+  AllowAssignmentFlag: boolean;
+  UpdateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  GuestFlag: boolean;
+}
