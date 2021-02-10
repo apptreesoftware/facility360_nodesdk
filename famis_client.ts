@@ -28,7 +28,7 @@ import {
   RequestPriority,
   RequestStatus,
   RequestSubType,
-  RequestType,
+  RequestType, RequestTypeActivityGroupAssociations,
   Space,
   SpaceClass,
   UserPropertyAssociation,
@@ -439,6 +439,10 @@ export class FamisClient {
     context: QueryContext
   ): Promise<Result<PropertyRequestTypeAssociation>> {
     return this.getAll<PropertyRequestTypeAssociation>(context, 'propertyrequesttypeassociations');
+  }
+
+  async getRequestTypeActivityGroupAssociations(context: QueryContext): Promise<Result<RequestTypeActivityGroupAssociations>> {
+    return this.getAll<RequestTypeActivityGroupAssociations>(context, 'requesttypeactivitygroupassociations');
   }
 
   async getPropertyRegionAssociations(

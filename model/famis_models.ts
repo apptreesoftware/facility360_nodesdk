@@ -1119,3 +1119,16 @@ export interface Udf {
   AssetId?: number;
   FieldId?: number;
 }
+
+
+export interface RequestTypeActivityGroupAssociations {
+  Id: number;
+  ActivityGroupId: number;
+  ActivityGroupExternalId: string;
+  RequestTypeId: number;
+  RequestTypeExternalId: string;
+  UpdateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  ActivityGroup: ActivityGroup;
+}
