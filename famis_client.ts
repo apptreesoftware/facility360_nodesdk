@@ -467,6 +467,27 @@ export class FamisClient {
     return this.getAll<RequestType>(context, 'requesttypes');
   }
 
+  async getRequestTypesForActivityGroup(activityId: number): Promise<RequestType[]> {
+    const activityGroupResponse = await this.getRequestTypeActivityGroupAssociations(new QueryContext());
+    const requestIds = activityGroupResponse.results.map(a => a.RequestTypeId);
+    return await this.getRequestTypesByIds({ids: requestIds});
+  }
+
+  async getRequestTypesByIds(opts: {
+    ids: number[]
+  }): Promise<RequestType[]> {
+    const chunks = _.chunk(opts.ids, 15);
+    const promises = [];
+    const requestTypes: RequestType[] = [];
+    for (const chunk of chunks) {
+      const filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
+      const promise = this.getRequestTypes(new QueryContext().setFilter(filterString)).then(res => requestTypes.push(...res.results));
+      promises.push(promise);
+    }
+    await Promise.all(promises);
+    return requestTypes;
+  }
+
   async getRequestSubtypes(context: QueryContext): Promise<Result<RequestSubType>> {
     return this.getAll<RequestSubType>(context, 'requestsubtypes');
   }
