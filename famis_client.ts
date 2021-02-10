@@ -259,6 +259,25 @@ export class FamisClient {
     return this.getAll<CrewUserAssociation>(context, 'crewuserassociations');
   }
 
+  async getCrewsForUser(opts: {userId: number}): Promise<Crew[]> {
+    const crewAssocs = await this.getCrewUserAssociations(new QueryContext().setFilter(`UserId eq ${opts.userId}`));
+    const crewIds = crewAssocs.results.map(c => c.CrewId);
+    return this.getCrewsByIds({ids: crewIds});
+  }
+
+  async getCrewsByIds(opts: {ids: number[]}): Promise<Crew[]> {
+    const chunks = _.chunk(opts.ids, 10);
+    const promises = [];
+    const crews: Crew[] = [];
+    for (const chunk of chunks) {
+      const filterString = chunk.map(c => `Id eq ${c}`).join(' or ');
+      const promise = this.getCrews(new QueryContext().setFilter(filterString)).then(res => crews.push(...res.results));
+      promises.push(promise);
+    }
+    await Promise.all(promises);
+    return crews;
+  }
+
   //
 
   // companies
@@ -468,7 +487,7 @@ export class FamisClient {
   }
 
   async getRequestTypesForActivityGroup(activityId: number): Promise<RequestType[]> {
-    const activityGroupResponse = await this.getRequestTypeActivityGroupAssociations(new QueryContext());
+    const activityGroupResponse = await this.getRequestTypeActivityGroupAssociations(new QueryContext().setFilter(`ActivityGroupId eq ${activityId}`));
     const requestIds = activityGroupResponse.results.map(a => a.RequestTypeId);
     return await this.getRequestTypesByIds({ids: requestIds});
   }
@@ -476,7 +495,7 @@ export class FamisClient {
   async getRequestTypesByIds(opts: {
     ids: number[]
   }): Promise<RequestType[]> {
-    const chunks = _.chunk(opts.ids, 15);
+    const chunks = _.chunk(opts.ids, 10);
     const promises = [];
     const requestTypes: RequestType[] = [];
     for (const chunk of chunks) {
