@@ -67,6 +67,7 @@ export const DefaultPropertySelect = ['Id', 'Name', 'Addr1', 'City', 'StateId', 
 export const DefaultPropertyExpand = [
   'State($select=Id,CountryName,Name,Abbreviation,Description,StateCode)'
 ];
+export const DefaultSpaceSelect = ['Id', 'Name', 'LongDescription'];
 
 export class FamisClient {
   host: string;
@@ -352,12 +353,11 @@ export class FamisClient {
     return this.getAll<Property>(context, 'properties');
   }
 
-  async getProperty(id: number): Promise<Property | null> {
-    const res = await this.getProperties(new QueryContext().setFilter(`Id eq ${id}`));
-    return res.first;
-  }
-
-  async getDefaultUserProperty(userId: number): Promise<Property | null> {
+  async getDefaultUserProperty(
+    userId: number,
+    select: string[] = DefaultPropertySelect,
+    expand: string[] = DefaultPropertyExpand
+  ): Promise<Property | null> {
     const result = await this.getUserPropertyAssociations(
       new QueryContext().setFilter(`UserId eq ${userId}`)
     );
@@ -366,7 +366,13 @@ export class FamisClient {
     if (!defaultPropId) {
       return null;
     }
-    return await this.getProperty(defaultPropId.PropertyId);
+    const res = await this.getProperties(
+      new QueryContext()
+        .setFilter(`Id eq ${defaultPropId.PropertyId}`)
+        .setSelect(select.join(','))
+        .setExpand(expand.join(','))
+    );
+    return res.first;
   }
 
   async getUserProperties(opts: {
