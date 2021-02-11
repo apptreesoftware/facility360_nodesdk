@@ -28,7 +28,8 @@ import {
   RequestPriority,
   RequestStatus,
   RequestSubType,
-  RequestType, RequestTypeActivityGroupAssociations,
+  RequestType,
+  RequestTypeActivityGroupAssociations,
   Space,
   SpaceClass, UserActivityGroupAssociations,
   UserPropertyAssociation,
@@ -456,13 +457,6 @@ export class FamisClient {
     const properties: Property[] = [];
     for (const chunk of chunks) {
       const filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
-      // let filterString = _.reduce<string>(chunkStr, (str, id) => {
-      //   if (!str) {
-      //     return `Id eq ${id}`
-      //   }
-      //   return str + ` and Id eq ${id}`
-      // })
-
       const promise = this.getProperties(
         new QueryContext()
           .setFilter(filterString!)
@@ -489,8 +483,13 @@ export class FamisClient {
     return this.getAll<PropertyRequestTypeAssociation>(context, 'propertyrequesttypeassociations');
   }
 
-  async getRequestTypeActivityGroupAssociations(context: QueryContext): Promise<Result<RequestTypeActivityGroupAssociations>> {
-    return this.getAll<RequestTypeActivityGroupAssociations>(context, 'requesttypeactivitygroupassociations');
+  async getRequestTypeActivityGroupAssociations(
+    context: QueryContext
+  ): Promise<Result<RequestTypeActivityGroupAssociations>> {
+    return this.getAll<RequestTypeActivityGroupAssociations>(
+      context,
+      'requesttypeactivitygroupassociations'
+    );
   }
 
   async getPropertyRegionAssociations(
