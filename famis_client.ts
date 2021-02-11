@@ -343,9 +343,31 @@ export class FamisClient {
     return this.getAll<UserActivityGroupAssociations>(context, 'useractivitygroupassociations');
   }
 
-  async getUsersForActivityGroup(opts: { activityGroupId: number, select?: string[], expand?: string[], includeInactive?: boolean }): Promise<FamisUser[]> {
-    const assocResult = await this.getUserActivityGroupAssociations(new QueryContext().setFilter(`ActivityGroupId eq ${opts.activityGroupId} and AllowAssignmentFlag eq false`));
-    const userIds = assocResult.results.map(a => a.UserId);
+  async getUsersForRequestType(opts: { requestTypeId: number, select?: string[], expand?: string[], includeInactive?: boolean }): Promise<FamisUser[]> {
+    const assocs = await this.getRequestTypeActivityGroupAssociations(new QueryContext().setFilter(`RequestTypeId eq ${opts.requestTypeId}`));
+    const activityGroupIds = assocs.results.map(a => a.ActivityGroupId);
+    return this.getUsersForActivityGroups(
+      {
+        activityGroupIds: activityGroupIds,
+        select: opts.select,
+        expand: opts.expand,
+        includeInactive: opts.includeInactive
+      }
+    );
+  }
+
+  async getUsersForActivityGroups(opts: { activityGroupIds: number[], select?: string[], expand?: string[], includeInactive?: boolean }): Promise<FamisUser[]> {
+    const userActivityGroupAssocs: UserActivityGroupAssociations[] = [];
+    const assocPromises = [];
+    for (const activityId of opts.activityGroupIds) {
+      const promise = this.getUserActivityGroupAssociations(
+        new QueryContext()
+          .setFilter(`AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`)
+      ).then(res => userActivityGroupAssocs.push(...res.results));
+      assocPromises.push(promise);
+    }
+    await Promise.all(assocPromises);
+    const userIds = [...new Set(userActivityGroupAssocs.map(a => a.UserId))];
     const select = opts.select ?? DefaultUserSelect;
     const chunks = _.chunk(userIds, 10);
     const promises = [];
