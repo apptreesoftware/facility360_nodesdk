@@ -31,7 +31,7 @@ import {
   RequestType,
   RequestTypeActivityGroupAssociations,
   Space,
-  SpaceClass, UserActivityGroupAssociations,
+  SpaceClass, UdfField, UserActivityGroupAssociations,
   UserPropertyAssociation,
   UserRegionAssociation,
   WorkOrder,
@@ -384,7 +384,13 @@ export class FamisClient {
           .setFilter(filter)
           .setExpand(opts.expand ? opts.expand.join(',') : ''))
         .then(res => users.push(...res.results)
-        );
+        )
+        .catch(error => {
+          if (error.response) {
+            console.log(`call failed with error ${JSON.stringify(error.response.data)}`);
+          }
+          console.log(`call failed with error ${error.toString()}`);
+        });
       promises.push(promise);
     }
     await Promise.all(promises);
@@ -579,6 +585,22 @@ export class FamisClient {
 
   async getDepartments(context: QueryContext): Promise<Result<Department>> {
     return this.getAll<Department>(context, 'departments');
+  }
+
+  async getUdfField(name: string, context: QueryContext): Promise<UdfField | undefined> {
+    context.setFilter(`DisplayName eq '${name}'`);
+    const fieldResp = await this.getUdfFields(context);
+    return fieldResp.results.find(f => f.DisplayName === name);
+  }
+
+  async getUdfFields(context: QueryContext): Promise<Result<UdfField>> {
+    return this.getAll<UdfField>(context, 'udffields');
+  }
+
+  async getUdfFieldsForNames(names: string[]): Promise<UdfField[]> {
+    const filterString = names.map(name => `DisplayName eq '${name}'`).join(' or ');
+    const res = await this.getUdfFields(new QueryContext().setFilter(filterString));
+    return res.results;
   }
 
   // generic get methods

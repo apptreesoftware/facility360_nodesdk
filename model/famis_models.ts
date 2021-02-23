@@ -1146,3 +1146,57 @@ export interface UserActivityGroupAssociations {
   UpdatedByExternalId: string;
   GuestFlag: boolean;
 }
+
+export interface DataType {
+  Id: number;
+  Description: string;
+  Code: number;
+}
+
+export interface Grouping {
+  Id: number;
+  Description: string;
+  ApplicationName: string;
+  TabOrder: number;
+  Active: boolean;
+  UpdateDate: Date;
+  UpdatedById: number;
+}
+
+export interface ListBox {
+  Id: number;
+  FieldId: number;
+  Description: string;
+  Value: string;
+  Active: boolean;
+}
+
+export interface UdfField {
+  Id: number;
+  DisplayName: string;
+  ListBoxFlag: boolean;
+  DataTypeId: number;
+  MaxLength: number;
+  TabOrder: number;
+  Active: boolean;
+  ApplicationName: string;
+  RequiredFlag: boolean;
+  GroupingId: number;
+  UpdateDate: Date;
+  UpdatedById: number;
+  CompanyTypeId: number;
+  CompanyDocumentTypeId: number;
+  ResourceTypeId: number;
+  ResourceId: number;
+  ObjectTypeId: number;
+  SpaceClassId: number;
+  FloorClassId: number;
+  UtilityId: number;
+  MeterSiteTypeId: number;
+  RegionType: string;
+  PositionId: number;
+  AllocationLayerMethod: number;
+  DataType: DataType;
+  Grouping: Grouping;
+  ListBoxes: ListBox[];
+}
