@@ -512,30 +512,6 @@ export interface WorkOrder {
   Attachments?: FamisAttachment[];
 }
 
-export interface WorkOrderCreate {
-  StatementOfWork: string;
-  SpaceId: number;
-  SubSpaceId?: number;
-  AssetId?: number;
-  RequestPriorityId: number;
-  RequestTypeId: number;
-  RequestSubTypeId: number;
-  RequestorId: number;
-  AssignedToId: number;
-  ProcedureId: number;
-  CrewId: number;
-  DepartmentId: number;
-  RequestorFirstName: string;
-  RequestorLastName: string;
-  RequestorEmail: string;
-  RequestorPhone: string;
-  CompleteByDate: Date;
-  ExternalId: string;
-  Crew: Crew;
-  ParentWOId: number;
-  AccountInfo: AccountInfo;
-}
-
 export interface AssetClass {
   Id: number;
   Description: string;
@@ -1199,4 +1175,25 @@ export interface UdfField {
   DataType: DataType;
   Grouping: Grouping;
   ListBoxes: ListBox[];
+}
+
+export interface ChargeType {
+  Id: number;
+  Name: string;
+  Description: string;
+  TabOrder: number;
+  ActiveFlag: boolean;
+  UpdateDate: Date;
+  UpdatedByName: string;
+}
+
+export interface BillCode {
+  Id: number;
+  Description: string;
+  UpdateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  Active: boolean;
+  BillTypeId: number;
+  GlIncomeAccount: string;
 }
