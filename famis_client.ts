@@ -31,7 +31,7 @@ import {
   RequestType,
   RequestTypeActivityGroupAssociations,
   Space,
-  SpaceClass, UdfField, UserActivityGroupAssociations,
+  SpaceClass, Udf, UdfField, UserActivityGroupAssociations,
   UserPropertyAssociation,
   UserRegionAssociation,
   WorkOrder,
@@ -47,7 +47,7 @@ import {
   FamisOAuthCredential,
   LoginResponse,
   PatchCompanyRequest,
-  PatchWorkOrderRequest
+  PatchWorkOrderRequest, PostAttachmentRequest, PostUdfForWoRequest, PostWorkOrderRequest
 } from './model/request_models';
 import _ from 'lodash';
 import moment = require('moment');
@@ -405,14 +405,26 @@ export class FamisClient {
     return this.getAll<WorkOrder>(context, 'workorders');
   }
 
+  async postWorkOrder(workOrder: PostWorkOrderRequest): Promise<WorkOrder> {
+    return this.createObject<PostWorkOrderRequest, WorkOrder>(workOrder, 'workorders');
+  }
+
   async patchWorkOrder(workOrderId: string, workOrder: PatchWorkOrderRequest): Promise<WorkOrder> {
     return this.patchObject<PatchWorkOrderRequest, WorkOrder>(workOrder, 'workorders', workOrderId);
   }
 
   //
+
+  //#region attachments
   async getAttachments(context: QueryContext): Promise<Result<FamisAttachment>> {
     return this.getAll<FamisAttachment>(context, 'attachments');
   }
+
+  async createAttachment(attachment: PostAttachmentRequest): Promise<FamisAttachment> {
+    return this.createObject<PostAttachmentRequest, FamisAttachment>(attachment, 'attachments');
+  }
+
+  //#endregion
 
   async getAccountSegments(context: QueryContext): Promise<Result<AccountSegment>> {
     return this.getAll<AccountSegment>(context, 'accountsegmentnpfa');
@@ -542,21 +554,22 @@ export class FamisClient {
     return this.getAll<RequestType>(context, 'requesttypes');
   }
 
-  async getRequestTypesForActivityGroup(activityId: number): Promise<RequestType[]> {
+  async getRequestTypesForActivityGroup(activityId: number, context: QueryContext): Promise<RequestType[]> {
     const activityGroupResponse = await this.getRequestTypeActivityGroupAssociations(new QueryContext().setFilter(`ActivityGroupId eq ${activityId}`));
     const requestIds = activityGroupResponse.results.map(a => a.RequestTypeId);
-    return await this.getRequestTypesByIds({ids: requestIds});
+    return await this.getRequestTypesByIds({ids: requestIds}, context);
   }
 
   async getRequestTypesByIds(opts: {
     ids: number[]
-  }): Promise<RequestType[]> {
+  }, context: QueryContext): Promise<RequestType[]> {
     const chunks = _.chunk(opts.ids, 10);
     const promises = [];
     const requestTypes: RequestType[] = [];
     for (const chunk of chunks) {
-      const filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
-      const promise = this.getRequestTypes(new QueryContext().setFilter(filterString)).then(res => requestTypes.push(...res.results));
+      let filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
+      context.setFilter(context.filter ? `(${filterString}) and ${context.filter}` : filterString);
+      const promise = this.getRequestTypes(context).then(res => requestTypes.push(...res.results));
       promises.push(promise);
     }
     await Promise.all(promises);
@@ -587,6 +600,8 @@ export class FamisClient {
     return this.getAll<Department>(context, 'departments');
   }
 
+  //#region Udfs
+
   async getUdfField(name: string, context: QueryContext): Promise<UdfField | undefined> {
     context.setFilter(`DisplayName eq '${name}'`);
     const fieldResp = await this.getUdfFields(context);
@@ -602,6 +617,12 @@ export class FamisClient {
     const res = await this.getUdfFields(new QueryContext().setFilter(filterString));
     return res.results;
   }
+
+  async setUdfForWorkOrder(woId: number, udf: PostUdfForWoRequest): Promise<Udf> {
+    return await this.createObject<PostUdfForWoRequest, Udf>(udf, `workorders(${woId})/UdfUpdate`);
+  }
+
+  //#endregion
 
   // generic get methods
 
