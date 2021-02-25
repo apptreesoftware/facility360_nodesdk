@@ -567,9 +567,10 @@ export class FamisClient {
     const promises = [];
     const requestTypes: RequestType[] = [];
     for (const chunk of chunks) {
+      const subContext = new QueryContext();
       let filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
-      context.setFilter(context.filter ? `(${filterString}) and ${context.filter}` : filterString);
-      const promise = this.getRequestTypes(context).then(res => requestTypes.push(...res.results));
+      subContext.setFilter(context.filter ? `(${filterString}) and ${context.filter}` : filterString);
+      const promise = this.getRequestTypes(subContext).then(res => requestTypes.push(...res.results));
       promises.push(promise);
     }
     await Promise.all(promises);
