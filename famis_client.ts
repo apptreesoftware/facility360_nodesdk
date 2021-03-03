@@ -424,6 +424,10 @@ export class FamisClient {
     return this.createObject<PostAttachmentRequest, FamisAttachment>(attachment, 'attachments');
   }
 
+  getAttachmentStreamUrl(context: QueryContext): string {
+    return `${this.host}${context.buildUrl('attachmentstream')}`;
+  }
+
   //#endregion
 
   async getAccountSegments(context: QueryContext): Promise<Result<AccountSegment>> {
