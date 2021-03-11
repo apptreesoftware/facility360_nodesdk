@@ -22,7 +22,7 @@ import {
   FamisResponse,
   FamisUser,
   Floor,
-  Property,
+  Property, PropertyBillCodeAssociations,
   PropertyRegionAssociation,
   PropertyRequestTypeAssociation,
   RequestPriority,
@@ -429,6 +429,12 @@ export class FamisClient {
   }
 
   //#endregion
+
+  //#region property bill code assocations
+  async getPropertyBillCodeAssociations(context: QueryContext): Promise<Result<PropertyBillCodeAssociations>> {
+    return this.getAll<PropertyBillCodeAssociations>(context,'propertybillcodeassociations');
+  }
+  //$endregion
 
   async getAccountSegments(context: QueryContext): Promise<Result<AccountSegment>> {
     return this.getAll<AccountSegment>(context, 'accountsegmentnpfa');
