@@ -277,6 +277,7 @@ export interface RequestSubType {
   ProcedureExternalId?: string;
   DefaultLaborActivityExternalId?: string;
   UpdatedByExternalId?: string;
+  PropertyBillCodeAssociations?: PropertyBillCodeAssociations[];
 }
 
 export interface WorkOrderComment {
@@ -1196,4 +1197,34 @@ export interface BillCode {
   Active: boolean;
   BillTypeId: number;
   GlIncomeAccount: string;
+}
+
+export interface PropertyBillCodeAssociations {
+  PropertyExternalId: string;
+  RequestSubTypeExternalId: string;
+  UpdatedByExternalId: string;
+  EscalateToExternalId: string;
+  ProcedureExternalId: string;
+  DefaultPriorityExternalId: string;
+  Id: number;
+  PropertyId: number;
+  RequestSubTypeId: number;
+  BillCodeId: number;
+  UpdateDate: Date;
+  UpdatedById: number;
+  ActiveFlag: boolean;
+  GlAccountNumber: string;
+  BillableFlag: boolean;
+  EscalateToId: number;
+  DefaultFollowUpAlert: number;
+  ProcedureId: number;
+  DefaultSlaResponseTime: number;
+  DefaultSlaCompletionTime: number;
+  FullUsersFlag: boolean;
+  ApAccountNumber: string;
+  GlAccountContraLabor: string;
+  DefaultPriorityId: number;
+  TaxableFlag: boolean;
+  WoPrintId: number;
+  NTE: number;
 }
