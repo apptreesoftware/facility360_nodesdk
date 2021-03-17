@@ -537,3 +537,9 @@ export interface PostUdfForWoRequest {
   FieldName: string;
   Value: string;
 }
+
+export interface SearchUsersRequest {
+  activityGroupId?: number;
+  requestTypeId?: number;
+  propertyId?: number;
+}
