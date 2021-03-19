@@ -21,7 +21,7 @@ import {
   FamisAttachment,
   FamisResponse,
   FamisUser,
-  Floor,
+  Floor, LogbookConfiguration,
   Property, PropertyBillCodeAssociations,
   PropertyRegionAssociation,
   PropertyRequestTypeAssociation,
@@ -33,7 +33,7 @@ import {
   Space,
   SpaceClass, Udf, UdfField, UserActivityGroupAssociations,
   UserPropertyAssociation,
-  UserRegionAssociation,
+  UserRegionAssociation, UserType,
   WorkOrder,
   WorkOrderComment,
   WorkType
@@ -298,6 +298,12 @@ export class FamisClient {
     );
   }
 
+  //
+
+  // user types
+  async getUserTypes(context: QueryContext): Promise<Result<UserType>> {
+    return this.getAll(context, 'usertypes');
+  }
   //
 
   // users
@@ -677,6 +683,14 @@ export class FamisClient {
   async getDepartments(context: QueryContext): Promise<Result<Department>> {
     return this.getAll<Department>(context, 'departments');
   }
+
+  //#region Logbook
+  async getLogbookConfigurations(context: QueryContext): Promise<LogbookConfiguration[]> {
+    const url = context.buildApiUrl('LogbookConfiguration');
+    const resp = await this.http.get<LogbookConfiguration[]>(url);
+    return resp.data;
+  }
+  //#enregion
 
   //#region Udfs
 

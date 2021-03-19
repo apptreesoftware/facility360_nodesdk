@@ -36,12 +36,41 @@ export class QueryContext {
         return this;
     }
 
+    buildApiUrl(entity: string) {
+        let urlPath = `MobileWebServices/api/${entity}`;
+        return this.addFiltersToUrl(urlPath);
+    }
+
     buildUrl(entity: string) {
-        let urlPath = `${basePath}/${entity}`;
+        return this.addFiltersToUrl(`${basePath}/${entity}`);
+    }
+
+    buildPagedUrl(entity: string, top: number, skip: number, count: boolean = false) {
+        let urlPath = `${basePath}/${entity}?$top=${top}&$skip=${skip}`;
+        if (this.filter) {
+            urlPath += `&$filter=${this.filter}`;
+        }
+        if (this.expand) {
+            urlPath += `&$expand=${this.expand}`;
+        }
+        if (this.select) {
+            urlPath += `&$select=${this.select}`;
+        }
+        if (this.orderBy) {
+            urlPath += `&$orderby=${this.orderBy}`;
+        }
+        if (count) {
+            urlPath += "&$count=true"
+        }
+        return urlPath;
+    }
+
+    addFiltersToUrl(path: string) {
+        let urlPath = path;
         let hasQuery = false;
         if (this.filter) {
-           urlPath += `${hasQuery ? '&' : '?'}$filter=${this.filter}`;
-           hasQuery = true
+            urlPath += `${hasQuery ? '&' : '?'}$filter=${this.filter}`;
+            hasQuery = true
         }
         if (this.expand) {
             urlPath += `${hasQuery ? '&' : '?'}$expand=${this.expand}`;
@@ -63,26 +92,7 @@ export class QueryContext {
             urlPath += `${hasQuery ? '&' : '?'}$orderby=${this.orderBy}`;
         }
         return urlPath;
-    }
 
-    buildPagedUrl(entity: string, top: number, skip: number, count: boolean = false) {
-        let urlPath = `${basePath}/${entity}?$top=${top}&$skip=${skip}`;
-        if (this.filter) {
-            urlPath += `&$filter=${this.filter}`;
-        }
-        if (this.expand) {
-            urlPath += `&$expand=${this.expand}`;
-        }
-        if (this.select) {
-            urlPath += `&$select=${this.select}`;
-        }
-        if (this.orderBy) {
-            urlPath += `&$orderby=${this.orderBy}`;
-        }
-        if (count) {
-            urlPath += "&$count=true"
-        }
-        return urlPath;
     }
 }
 
