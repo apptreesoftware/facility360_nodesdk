@@ -21,7 +21,7 @@ import {
   FamisAttachment,
   FamisResponse,
   FamisUser,
-  Floor,
+  Floor, LogbookConfiguration,
   Property, PropertyBillCodeAssociations,
   PropertyRegionAssociation,
   PropertyRequestTypeAssociation,
@@ -33,7 +33,7 @@ import {
   Space,
   SpaceClass, Udf, UdfField, UserActivityGroupAssociations,
   UserPropertyAssociation,
-  UserRegionAssociation,
+  UserRegionAssociation, UserType,
   WorkOrder,
   WorkOrderComment,
   WorkType
@@ -47,7 +47,7 @@ import {
   FamisOAuthCredential,
   LoginResponse,
   PatchCompanyRequest,
-  PatchWorkOrderRequest, PostAttachmentRequest, PostUdfForWoRequest, PostWorkOrderRequest
+  PatchWorkOrderRequest, PostAttachmentRequest, PostUdfForWoRequest, PostWorkOrderRequest, SearchUsersRequest
 } from './model/request_models';
 import _ from 'lodash';
 import moment = require('moment');
@@ -300,6 +300,12 @@ export class FamisClient {
 
   //
 
+  // user types
+  async getUserTypes(context: QueryContext): Promise<Result<UserType>> {
+    return this.getAll(context, 'usertypes');
+  }
+  //
+
   // users
 
   async getUsers(context: QueryContext): Promise<Result<FamisUser>> {
@@ -342,6 +348,72 @@ export class FamisClient {
 
   async getUserActivityGroupAssociations(context: QueryContext): Promise<Result<UserActivityGroupAssociations>> {
     return this.getAll<UserActivityGroupAssociations>(context, 'useractivitygroupassociations');
+  }
+
+  async searchUsers(searchParams: SearchUsersRequest, context: QueryContext): Promise<FamisUser[]> {
+    if (!searchParams.propertyId && !searchParams.activityGroupId && !searchParams.requestTypeId) {
+      return [];
+    }
+    let requestTypeActivityIds: number[] = [];
+    let activityUserIds: number[] = [];
+    let propertyUserIds: number[] = [];
+    if (searchParams.requestTypeId) {
+      const assocs = await this.getRequestTypeActivityGroupAssociations(new QueryContext().setFilter(`RequestTypeId eq ${searchParams.requestTypeId}`));
+      requestTypeActivityIds = assocs.results.map(a => a.ActivityGroupId);
+    }
+    if (searchParams.activityGroupId || requestTypeActivityIds.length > 0) {
+      const activityIds = [searchParams.activityGroupId] ?? requestTypeActivityIds;
+      const assocPromises = [];
+      const userActivityGroupAssocs: UserActivityGroupAssociations[] = [];
+      for (const activityId of activityIds) {
+        const promise = this.getUserActivityGroupAssociations(
+          new QueryContext()
+            .setFilter(`AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`)
+        ).then(res => userActivityGroupAssocs.push(...res.results));
+        assocPromises.push(promise);
+      }
+      await Promise.all(assocPromises);
+      activityUserIds = [...new Set(userActivityGroupAssocs.map(a => a.UserId))];
+    }
+    if (searchParams.propertyId) {
+      const regionAssocs = await this.getPropertyRegionAssociations(new QueryContext().setFilter(`PropertyId eq ${searchParams.propertyId}`));
+      const regionIdString = regionAssocs.results.map(r => `RegionId eq ${r.RegionId}`).join(' or ');
+      const regionUserAssocs = await this.getUserRegionAssociations(new QueryContext().setFilter(regionIdString));
+      propertyUserIds = regionUserAssocs.results.map(a => a.UserId);
+    }
+    let userIds = searchParams.propertyId && (searchParams.requestTypeId || searchParams.activityGroupId) ?
+      activityUserIds.filter(a => propertyUserIds.includes(a)) :
+      searchParams.requestTypeId || searchParams.activityGroupId ?
+        activityUserIds : propertyUserIds;
+    return this.getUsersForIds({userIds: userIds}, context);
+  }
+
+  async getUsersForIds(opts: { userIds: number[] }, context: QueryContext): Promise<FamisUser[]> {
+    const chunks = _.chunk(opts.userIds, 10);
+    const promises = [];
+    const users: FamisUser[] = [];
+    for (const chunk of chunks) {
+      let filter = `(${chunk.map(c => `Id eq ${c}`).join(' or ')}) and ActiveFlag eq true`;
+      if (context.filter && context.filter.length > 0) {
+        filter += ` and ${context.filter}`;
+      }
+      const promise = this.getUsers(
+        new QueryContext()
+          .setSelect(context.select ?? DefaultUserSelect.join(','))
+          .setFilter(filter)
+          .setExpand(context.expand ?? ''))
+        .then(res => users.push(...res.results)
+        )
+        .catch(error => {
+          if (error.response) {
+            console.log(`call failed with error ${JSON.stringify(error.response.data)}`);
+          }
+          console.log(`call failed with error ${error.toString()}`);
+        });
+      promises.push(promise);
+    }
+    await Promise.all(promises);
+    return users;
   }
 
   async getUsersForRequestType(opts: { requestTypeId: number, select?: string[], expand?: string[], includeInactive?: boolean }): Promise<FamisUser[]> {
@@ -432,8 +504,9 @@ export class FamisClient {
 
   //#region property bill code assocations
   async getPropertyBillCodeAssociations(context: QueryContext): Promise<Result<PropertyBillCodeAssociations>> {
-    return this.getAll<PropertyBillCodeAssociations>(context,'propertybillcodeassociations');
+    return this.getAll<PropertyBillCodeAssociations>(context, 'propertybillcodeassociations');
   }
+
   //$endregion
 
   async getAccountSegments(context: QueryContext): Promise<Result<AccountSegment>> {
@@ -610,6 +683,14 @@ export class FamisClient {
   async getDepartments(context: QueryContext): Promise<Result<Department>> {
     return this.getAll<Department>(context, 'departments');
   }
+
+  //#region Logbook
+  async getLogbookConfigurations(context: QueryContext): Promise<LogbookConfiguration[]> {
+    const url = context.buildApiUrl('LogbookConfiguration');
+    const resp = await this.http.get<LogbookConfiguration[]>(url);
+    return resp.data;
+  }
+  //#enregion
 
   //#region Udfs
 
