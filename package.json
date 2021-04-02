@@ -1,6 +1,6 @@
 {
   "name": "facility360",
-  "version": "1.0.0-beta40",
+  "version": "1.0.0-beta41",
   "description": "A Node based 360Facility client SDK",
   "main": "dist/index.js",
   "scripts": {
