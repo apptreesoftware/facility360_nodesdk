@@ -304,6 +304,7 @@ export class FamisClient {
   async getUserTypes(context: QueryContext): Promise<Result<UserType>> {
     return this.getAll(context, 'usertypes');
   }
+
   //
 
   // users
@@ -671,7 +672,6 @@ export class FamisClient {
     for (const chunk of chunks) {
       const subContext = new QueryContext().copyFromOther(context);
       let filterString = chunk.map(id => `Id eq ${id}`).join(' or ');
-      console.log(`searching for requestSubtypes ${filterString}`);
       subContext.setFilter(context.filter ? `(${filterString}) and ${context.filter}` : filterString);
       const promise = this.getRequestSubtypes(subContext).then(res => subTypes.push(...res.results));
       promises.push(promise);
@@ -706,6 +706,7 @@ export class FamisClient {
     const resp = await this.http.get<LogbookConfiguration[]>(url);
     return resp.data;
   }
+
   //#enregion
 
   //#region Udfs
