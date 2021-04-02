@@ -267,7 +267,7 @@ export class FamisClient {
   }
 
   async getCrewsByIds(opts: { ids: number[] }): Promise<Crew[]> {
-    const chunks = _.chunk(opts.ids, 10);
+    const chunks = _.chunk(opts.ids, 6);
     const promises = [];
     const crews: Crew[] = [];
     for (const chunk of chunks) {
@@ -389,7 +389,7 @@ export class FamisClient {
   }
 
   async getUsersForIds(opts: { userIds: number[] }, context: QueryContext): Promise<FamisUser[]> {
-    const chunks = _.chunk(opts.userIds, 10);
+    const chunks = _.chunk(opts.userIds, 6);
     const promises = [];
     const users: FamisUser[] = [];
     for (const chunk of chunks) {
@@ -442,7 +442,7 @@ export class FamisClient {
     await Promise.all(assocPromises);
     const userIds = [...new Set(userActivityGroupAssocs.map(a => a.UserId))];
     const select = opts.select ?? DefaultUserSelect;
-    const chunks = _.chunk(userIds, 10);
+    const chunks = _.chunk(userIds, 6);
     const promises = [];
     const users: FamisUser[] = [];
     for (const chunk of chunks) {
@@ -575,7 +575,7 @@ export class FamisClient {
     const selects = opts.select?.join(',') ?? DefaultPropertySelect.join(',');
     const expands = opts.expand?.join(',') ?? DefaultPropertyExpand.join(',');
 
-    const chunks = _.chunk(opts.ids, 5);
+    const chunks = _.chunk(opts.ids, 6);
     const promises = [];
     const properties: Property[] = [];
     for (const chunk of chunks) {
@@ -646,11 +646,11 @@ export class FamisClient {
   async getRequestTypesByIds(opts: {
     ids: number[]
   }, context: QueryContext): Promise<RequestType[]> {
-    const chunks = _.chunk(opts.ids, 10);
+    const chunks = _.chunk(opts.ids, 6);
     const promises = [];
     const requestTypes: RequestType[] = [];
     for (const chunk of chunks) {
-      const subContext = new QueryContext();
+      const subContext = new QueryContext().copyFromOther(context);
       let filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
       subContext.setFilter(context.filter ? `(${filterString}) and ${context.filter}` : filterString);
       const promise = this.getRequestTypes(subContext).then(res => requestTypes.push(...res.results));
@@ -662,6 +662,22 @@ export class FamisClient {
 
   async getRequestSubtypes(context: QueryContext): Promise<Result<RequestSubType>> {
     return this.getAll<RequestSubType>(context, 'requestsubtypes');
+  }
+
+  async getRequestSubtypesByIds(ids: number[], context: QueryContext): Promise<RequestSubType[]> {
+    const chunks = _.chunk(ids, 6);
+    const promises = [];
+    const subTypes: RequestSubType[] = [];
+    for (const chunk of chunks) {
+      const subContext = new QueryContext().copyFromOther(context);
+      let filterString = chunk.map(id => `Id eq ${id}`).join(' or ');
+      console.log(`searching for requestSubtypes ${filterString}`);
+      subContext.setFilter(context.filter ? `(${filterString}) and ${context.filter}` : filterString);
+      const promise = this.getRequestSubtypes(subContext).then(res => subTypes.push(...res.results));
+      promises.push(promise);
+    }
+    await Promise.all(promises);
+    return subTypes;
   }
 
   async getRequestPriorities(context: QueryContext): Promise<Result<RequestPriority>> {

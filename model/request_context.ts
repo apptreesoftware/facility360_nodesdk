@@ -94,6 +94,16 @@ export class QueryContext {
         return urlPath;
 
     }
+
+    copyFromOther(other: QueryContext): QueryContext {
+        this.expand = other.expand;
+        this.orderBy = other.orderBy;
+        this.select = other.select;
+        this.filter = other.filter;
+        this.top = other.top;
+        this.skip = other.skip;
+        return this;
+    }
 }
 
 export function buildEntityUrl(entity: string): string {
