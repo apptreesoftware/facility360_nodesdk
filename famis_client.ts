@@ -46,7 +46,7 @@ import {
   CreateCompanyRequest,
   FamisOAuthCredential,
   LoginResponse,
-  PatchCompanyRequest,
+  PatchCompanyRequest, PatchUserRequest,
   PatchWorkOrderRequest, PostAttachmentRequest, PostUdfForWoRequest, PostWorkOrderRequest, SearchUsersRequest
 } from './model/request_models';
 import _ from 'lodash';
@@ -468,6 +468,10 @@ export class FamisClient {
     }
     await Promise.all(promises);
     return users;
+  }
+
+  async patchUser(user: PatchUserRequest): Promise<FamisUser> {
+    return this.patchObject<PatchUserRequest, FamisUser>(user, 'users', user.Id.toString());
   }
 
   //
