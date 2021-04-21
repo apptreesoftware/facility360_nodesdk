@@ -358,7 +358,7 @@ export class FamisClient {
     let requestTypeActivityIds: number[] = [];
     let activityUserIds: number[] = [];
     let propertyUserIds: number[] = [];
-    if (searchParams.requestTypeId) {
+    if (searchParams.requestTypeId && !searchParams.activityGroupId) {
       const assocs = await this.getRequestTypeActivityGroupAssociations(new QueryContext().setFilter(`RequestTypeId eq ${searchParams.requestTypeId}`));
       requestTypeActivityIds = assocs.results.map(a => a.ActivityGroupId);
     }
@@ -927,6 +927,8 @@ function supportsNextLink(type: string): boolean {
   } else if (type === 'userpropertyassociation') {
     return false;
   } else if (type === 'assets') {
+    return false;
+  } else if (type === 'useractivitygroupassociations') {
     return false;
   }
   return true;
