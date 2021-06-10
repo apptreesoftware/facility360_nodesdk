@@ -511,6 +511,7 @@ export interface WorkOrder {
   RequestSubType?: RequestSubType;
   WorkOrderComment?: WorkOrderComment;
   Attachments?: FamisAttachment[];
+  Udfs?: Udf[];
 }
 
 export interface AssetClass {
@@ -1095,6 +1096,15 @@ export interface Udf {
   AssetClassId?: number;
   AssetId?: number;
   FieldId?: number;
+  GroupDescription?: string;
+  ApplicationName?: string;
+  TabOrder?: number;
+  Required?: boolean;
+  GroupTabOrder?: number;
+  GroupId?: number;
+  AllocationHeaderId?: number;
+  AllocationLayerId?: number;
+  RequestId?: number;
 }
 
 
