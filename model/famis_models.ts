@@ -1327,3 +1327,8 @@ export interface LogbookConfiguration {
   DefaultHierarchy: boolean;
   PopulateLocationForFindContact: boolean;
 }
+
+export interface DefaultPropertyAndSpace {
+  property?: Property;
+  space?: Space;
+}
