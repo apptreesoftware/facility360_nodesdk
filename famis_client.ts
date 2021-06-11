@@ -16,7 +16,7 @@ import {
   CreateAssetMake,
   CreateAssetModel,
   Crew,
-  CrewUserAssociation,
+  CrewUserAssociation, DefaultPropertyAndSpace,
   Department,
   FamisAttachment,
   FamisResponse,
@@ -550,6 +550,37 @@ export class FamisClient {
         .setExpand(expand.join(','))
     );
     return res.first;
+  }
+
+  async getDefaultUserPropertyAndSpace(userId: number,
+                                       select: string[] = DefaultPropertySelect,
+                                       expand: string[] = DefaultPropertyExpand): Promise<DefaultPropertyAndSpace> {
+    const result = await this.getUserPropertyAssociations(
+      new QueryContext().setFilter(`UserId eq ${userId}`)
+    );
+
+    const defaultPropId = result.results.find(p => p.DefaultPropertyFlag);
+    if (!defaultPropId) {
+      return {};
+    }
+
+    const res = await this.getProperties(
+      new QueryContext()
+        .setFilter(`Id eq ${defaultPropId.PropertyId}`)
+        .setSelect(select.join(','))
+        .setExpand(expand.join(','))
+    );
+    const defaults: DefaultPropertyAndSpace = {
+      property: res.first ?? undefined
+    }
+    if (defaults.property && defaultPropId.DefaultSpaceId) {
+      const spaceResponse = await this.getSpaces(
+        new QueryContext()
+          .setFilter(`Id eq ${defaultPropId.DefaultSpaceId}`)
+      );
+      defaults.space = spaceResponse.first ?? undefined;
+    }
+    return defaults;
   }
 
   async getUserProperties(opts: {
