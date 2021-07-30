@@ -1,6 +1,6 @@
 import axios from 'axios';
-import Axios, {AxiosError, AxiosInstance, AxiosResponse, Method} from 'axios';
-import {ApiError, AuthorizationError} from './errors';
+import Axios, { AxiosError, AxiosInstance, AxiosResponse, Method } from 'axios';
+import { ApiError, AuthorizationError } from './errors';
 import {
   AccountSegment,
   ActivityGroup,
@@ -16,13 +16,16 @@ import {
   CreateAssetMake,
   CreateAssetModel,
   Crew,
-  CrewUserAssociation, DefaultPropertyAndSpace,
+  CrewUserAssociation,
+  DefaultPropertyAndSpace,
   Department,
   FamisAttachment,
   FamisResponse,
   FamisUser,
-  Floor, LogbookConfiguration,
-  Property, PropertyBillCodeAssociations,
+  Floor,
+  LogbookConfiguration,
+  Property,
+  PropertyBillCodeAssociations,
   PropertyRegionAssociation,
   PropertyRequestTypeAssociation,
   RequestPriority,
@@ -31,23 +34,32 @@ import {
   RequestType,
   RequestTypeActivityGroupAssociations,
   Space,
-  SpaceClass, Udf, UdfField, UserActivityGroupAssociations,
+  SpaceClass,
+  Udf,
+  UdfField,
+  UserActivityGroupAssociations,
   UserPropertyAssociation,
-  UserRegionAssociation, UserType,
+  UserRegionAssociation,
+  UserType,
   WorkOrder,
   WorkOrderComment,
-  WorkType
+  WorkType,
 } from './model/famis_models';
-import {buildEntityUrl, QueryContext} from './model/request_context';
+import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
-import {Result} from './model/common';
+import { Result } from './model/common';
 import {
   AssetCreateRequest,
   CreateCompanyRequest,
   FamisOAuthCredential,
   LoginResponse,
-  PatchCompanyRequest, PatchUserRequest,
-  PatchWorkOrderRequest, PostAttachmentRequest, PostUdfForWoRequest, PostWorkOrderRequest, SearchUsersRequest
+  PatchCompanyRequest,
+  PatchUserRequest,
+  PatchWorkOrderRequest,
+  PostAttachmentRequest,
+  PostUdfForWoRequest,
+  PostWorkOrderRequest,
+  SearchUsersRequest,
 } from './model/request_models';
 import _ from 'lodash';
 import moment = require('moment');
@@ -62,11 +74,11 @@ export const DefaultUserSelect = [
   'BusPhone',
   'UserName',
   'Name',
-  'Email'
+  'Email',
 ];
 export const DefaultPropertySelect = ['Id', 'Name', 'Addr1', 'City', 'StateId', 'Zip'];
 export const DefaultPropertyExpand = [
-  'State($select=Id,CountryName,Name,Abbreviation,Description,StateCode)'
+  'State($select=Id,CountryName,Name,Abbreviation,Description,StateCode)',
 ];
 export const DefaultSpaceSelect = ['Id', 'Name', 'LongDescription'];
 
@@ -87,7 +99,7 @@ export class FamisClient {
     const cred = await this.login({
       username: opts.username,
       password: opts.password,
-      url: opts.host
+      url: opts.host,
     });
     if (opts.debug) {
       console.log(`Logged in with ${JSON.stringify(cred)}`);
@@ -102,12 +114,12 @@ export class FamisClient {
     url: string;
   }): Promise<LoginResponse> {
     const http = axios.create({
-      baseURL: opts.url
+      baseURL: opts.url,
     });
     console.log(`Logging into ${opts.url}. ${(opts.username, opts.password)}`);
     const resp = await http.post('MobileWebServices/api/Login', {
       username: opts.username,
-      password: opts.password
+      password: opts.password,
     });
     try {
       const loginResponse = resp.data as LoginResponse;
@@ -130,10 +142,10 @@ export class FamisClient {
         `${opts.url}/MobileWebServices/api/refreshtoken`,
         {
           grant_type: 'bearer',
-          refresh_token: opts.refreshToken
+          refresh_token: opts.refreshToken,
         },
         {
-          validateStatus: s => true
+          validateStatus: (s) => true,
         }
       );
       const loginResponse = resp.data as LoginResponse;
@@ -158,11 +170,11 @@ export class FamisClient {
     this.host = host;
     this.http = axios.create({
       baseURL: host,
-      validateStatus: status => true
+      validateStatus: (status) => true,
     });
     this.debug = debug;
     this.autoRefresh = autoRefresh;
-    this.http.interceptors.request.use(async config => {
+    this.http.interceptors.request.use(async (config) => {
       if (this.autoRefresh && FamisClient.isCredentialExpired(this.credentials)) {
         this.credentials = await this.refreshAuthCredential();
       }
@@ -180,14 +192,14 @@ export class FamisClient {
   async refreshAuthCredential(): Promise<FamisOAuthCredential> {
     return FamisClient.refreshCredential({
       refreshToken: this.credentials.refresh_token,
-      url: this.host
+      url: this.host,
     });
   }
 
   static isCredentialExpired(cred: FamisOAuthCredential): boolean {
     const m = moment(cred['.expires']);
     console.log(`Expiration date: ${m.toDate()}`);
-    const now = moment(Date.now()).subtract(10, 'seconds');
+    const now = moment(Date.now()).subtract(30, 'seconds');
     const expired = now.isAfter(m);
     console.log(`Credential is expired ${expired}`);
     return expired;
@@ -261,9 +273,11 @@ export class FamisClient {
   }
 
   async getCrewsForUser(opts: { userId: number }): Promise<Crew[]> {
-    const crewAssocs = await this.getCrewUserAssociations(new QueryContext().setFilter(`UserId eq ${opts.userId}`));
-    const crewIds = crewAssocs.results.map(c => c.CrewId);
-    return this.getCrewsByIds({ids: crewIds});
+    const crewAssocs = await this.getCrewUserAssociations(
+      new QueryContext().setFilter(`UserId eq ${opts.userId}`)
+    );
+    const crewIds = crewAssocs.results.map((c) => c.CrewId);
+    return this.getCrewsByIds({ ids: crewIds });
   }
 
   async getCrewsByIds(opts: { ids: number[] }): Promise<Crew[]> {
@@ -271,8 +285,10 @@ export class FamisClient {
     const promises = [];
     const crews: Crew[] = [];
     for (const chunk of chunks) {
-      const filterString = chunk.map(c => `Id eq ${c}`).join(' or ');
-      const promise = this.getCrews(new QueryContext().setFilter(filterString)).then(res => crews.push(...res.results));
+      const filterString = chunk.map((c) => `Id eq ${c}`).join(' or ');
+      const promise = this.getCrews(new QueryContext().setFilter(filterString)).then((res) =>
+        crews.push(...res.results)
+      );
       promises.push(promise);
     }
     await Promise.all(promises);
@@ -347,7 +363,9 @@ export class FamisClient {
     return this.getAll<UserPropertyAssociation>(context, 'userpropertyassociation');
   }
 
-  async getUserActivityGroupAssociations(context: QueryContext): Promise<Result<UserActivityGroupAssociations>> {
+  async getUserActivityGroupAssociations(
+    context: QueryContext
+  ): Promise<Result<UserActivityGroupAssociations>> {
     return this.getAll<UserActivityGroupAssociations>(context, 'useractivitygroupassociations');
   }
 
@@ -359,8 +377,10 @@ export class FamisClient {
     let activityUserIds: number[] = [];
     let propertyUserIds: number[] = [];
     if (searchParams.requestTypeId && !searchParams.activityGroupId) {
-      const assocs = await this.getRequestTypeActivityGroupAssociations(new QueryContext().setFilter(`RequestTypeId eq ${searchParams.requestTypeId}`));
-      requestTypeActivityIds = assocs.results.map(a => a.ActivityGroupId);
+      const assocs = await this.getRequestTypeActivityGroupAssociations(
+        new QueryContext().setFilter(`RequestTypeId eq ${searchParams.requestTypeId}`)
+      );
+      requestTypeActivityIds = assocs.results.map((a) => a.ActivityGroupId);
     }
     if (searchParams.activityGroupId || requestTypeActivityIds.length > 0) {
       const activityIds = [searchParams.activityGroupId] ?? requestTypeActivityIds;
@@ -368,25 +388,34 @@ export class FamisClient {
       const userActivityGroupAssocs: UserActivityGroupAssociations[] = [];
       for (const activityId of activityIds) {
         const promise = this.getUserActivityGroupAssociations(
-          new QueryContext()
-            .setFilter(`AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`)
-        ).then(res => userActivityGroupAssocs.push(...res.results));
+          new QueryContext().setFilter(
+            `AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`
+          )
+        ).then((res) => userActivityGroupAssocs.push(...res.results));
         assocPromises.push(promise);
       }
       await Promise.all(assocPromises);
-      activityUserIds = [...new Set(userActivityGroupAssocs.map(a => a.UserId))];
+      activityUserIds = [...new Set(userActivityGroupAssocs.map((a) => a.UserId))];
     }
     if (searchParams.propertyId) {
-      const regionAssocs = await this.getPropertyRegionAssociations(new QueryContext().setFilter(`PropertyId eq ${searchParams.propertyId}`));
-      const regionIdString = regionAssocs.results.map(r => `RegionId eq ${r.RegionId}`).join(' or ');
-      const regionUserAssocs = await this.getUserRegionAssociations(new QueryContext().setFilter(regionIdString));
-      propertyUserIds = regionUserAssocs.results.map(a => a.UserId);
+      const regionAssocs = await this.getPropertyRegionAssociations(
+        new QueryContext().setFilter(`PropertyId eq ${searchParams.propertyId}`)
+      );
+      const regionIdString = regionAssocs.results
+        .map((r) => `RegionId eq ${r.RegionId}`)
+        .join(' or ');
+      const regionUserAssocs = await this.getUserRegionAssociations(
+        new QueryContext().setFilter(regionIdString)
+      );
+      propertyUserIds = regionUserAssocs.results.map((a) => a.UserId);
     }
-    let userIds = searchParams.propertyId && (searchParams.requestTypeId || searchParams.activityGroupId) ?
-      activityUserIds.filter(a => propertyUserIds.includes(a)) :
-      searchParams.requestTypeId || searchParams.activityGroupId ?
-        activityUserIds : propertyUserIds;
-    return this.getUsersForIds({userIds: userIds}, context);
+    let userIds =
+      searchParams.propertyId && (searchParams.requestTypeId || searchParams.activityGroupId)
+        ? activityUserIds.filter((a) => propertyUserIds.includes(a))
+        : searchParams.requestTypeId || searchParams.activityGroupId
+        ? activityUserIds
+        : propertyUserIds;
+    return this.getUsersForIds({ userIds: userIds }, context);
   }
 
   async getUsersForIds(opts: { userIds: number[] }, context: QueryContext): Promise<FamisUser[]> {
@@ -394,7 +423,7 @@ export class FamisClient {
     const promises = [];
     const users: FamisUser[] = [];
     for (const chunk of chunks) {
-      let filter = `(${chunk.map(c => `Id eq ${c}`).join(' or ')}) and ActiveFlag eq true`;
+      let filter = `(${chunk.map((c) => `Id eq ${c}`).join(' or ')}) and ActiveFlag eq true`;
       if (context.filter && context.filter.length > 0) {
         filter += ` and ${context.filter}`;
       }
@@ -402,10 +431,10 @@ export class FamisClient {
         new QueryContext()
           .setSelect(context.select ?? DefaultUserSelect.join(','))
           .setFilter(filter)
-          .setExpand(context.expand ?? ''))
-        .then(res => users.push(...res.results)
-        )
-        .catch(error => {
+          .setExpand(context.expand ?? '')
+      )
+        .then((res) => users.push(...res.results))
+        .catch((error) => {
           if (error.response) {
             console.log(`call failed with error ${JSON.stringify(error.response.data)}`);
           }
@@ -417,48 +446,59 @@ export class FamisClient {
     return users;
   }
 
-  async getUsersForRequestType(opts: { requestTypeId: number, select?: string[], expand?: string[], includeInactive?: boolean }): Promise<FamisUser[]> {
-    const assocs = await this.getRequestTypeActivityGroupAssociations(new QueryContext().setFilter(`RequestTypeId eq ${opts.requestTypeId}`));
-    const activityGroupIds = assocs.results.map(a => a.ActivityGroupId);
-    return this.getUsersForActivityGroups(
-      {
-        activityGroupIds: activityGroupIds,
-        select: opts.select,
-        expand: opts.expand,
-        includeInactive: opts.includeInactive
-      }
+  async getUsersForRequestType(opts: {
+    requestTypeId: number;
+    select?: string[];
+    expand?: string[];
+    includeInactive?: boolean;
+  }): Promise<FamisUser[]> {
+    const assocs = await this.getRequestTypeActivityGroupAssociations(
+      new QueryContext().setFilter(`RequestTypeId eq ${opts.requestTypeId}`)
     );
+    const activityGroupIds = assocs.results.map((a) => a.ActivityGroupId);
+    return this.getUsersForActivityGroups({
+      activityGroupIds: activityGroupIds,
+      select: opts.select,
+      expand: opts.expand,
+      includeInactive: opts.includeInactive,
+    });
   }
 
-  async getUsersForActivityGroups(opts: { activityGroupIds: number[], select?: string[], expand?: string[], includeInactive?: boolean }): Promise<FamisUser[]> {
+  async getUsersForActivityGroups(opts: {
+    activityGroupIds: number[];
+    select?: string[];
+    expand?: string[];
+    includeInactive?: boolean;
+  }): Promise<FamisUser[]> {
     const userActivityGroupAssocs: UserActivityGroupAssociations[] = [];
     const assocPromises = [];
     for (const activityId of opts.activityGroupIds) {
       const promise = this.getUserActivityGroupAssociations(
-        new QueryContext()
-          .setFilter(`AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`)
-      ).then(res => userActivityGroupAssocs.push(...res.results));
+        new QueryContext().setFilter(
+          `AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`
+        )
+      ).then((res) => userActivityGroupAssocs.push(...res.results));
       assocPromises.push(promise);
     }
     await Promise.all(assocPromises);
-    const userIds = [...new Set(userActivityGroupAssocs.map(a => a.UserId))];
+    const userIds = [...new Set(userActivityGroupAssocs.map((a) => a.UserId))];
     const select = opts.select ?? DefaultUserSelect;
     const chunks = _.chunk(userIds, 6);
     const promises = [];
     const users: FamisUser[] = [];
     for (const chunk of chunks) {
-      let filter = chunk.map(c => `Id eq ${c}`).join(' or ');
+      let filter = chunk.map((c) => `Id eq ${c}`).join(' or ');
       if (!opts.includeInactive) {
-        filter = `(${filter}) and ActiveFlag eq true`
+        filter = `(${filter}) and ActiveFlag eq true`;
       }
       const promise = this.getUsers(
         new QueryContext()
           .setSelect(select.join(','))
           .setFilter(filter)
-          .setExpand(opts.expand ? opts.expand.join(',') : ''))
-        .then(res => users.push(...res.results)
-        )
-        .catch(error => {
+          .setExpand(opts.expand ? opts.expand.join(',') : '')
+      )
+        .then((res) => users.push(...res.results))
+        .catch((error) => {
           if (error.response) {
             console.log(`call failed with error ${JSON.stringify(error.response.data)}`);
           }
@@ -508,7 +548,9 @@ export class FamisClient {
   //#endregion
 
   //#region property bill code assocations
-  async getPropertyBillCodeAssociations(context: QueryContext): Promise<Result<PropertyBillCodeAssociations>> {
+  async getPropertyBillCodeAssociations(
+    context: QueryContext
+  ): Promise<Result<PropertyBillCodeAssociations>> {
     return this.getAll<PropertyBillCodeAssociations>(context, 'propertybillcodeassociations');
   }
 
@@ -539,7 +581,7 @@ export class FamisClient {
       new QueryContext().setFilter(`UserId eq ${userId}`)
     );
 
-    const defaultPropId = result.results.find(p => p.DefaultPropertyFlag);
+    const defaultPropId = result.results.find((p) => p.DefaultPropertyFlag);
     if (!defaultPropId) {
       return null;
     }
@@ -552,14 +594,16 @@ export class FamisClient {
     return res.first;
   }
 
-  async getDefaultUserPropertyAndSpace(userId: number,
-                                       select: string[] = DefaultPropertySelect,
-                                       expand: string[] = DefaultPropertyExpand): Promise<DefaultPropertyAndSpace> {
+  async getDefaultUserPropertyAndSpace(
+    userId: number,
+    select: string[] = DefaultPropertySelect,
+    expand: string[] = DefaultPropertyExpand
+  ): Promise<DefaultPropertyAndSpace> {
     const result = await this.getUserPropertyAssociations(
       new QueryContext().setFilter(`UserId eq ${userId}`)
     );
 
-    const defaultPropId = result.results.find(p => p.DefaultPropertyFlag);
+    const defaultPropId = result.results.find((p) => p.DefaultPropertyFlag);
     if (!defaultPropId) {
       return {};
     }
@@ -571,12 +615,11 @@ export class FamisClient {
         .setExpand(expand.join(','))
     );
     const defaults: DefaultPropertyAndSpace = {
-      property: res.first ?? undefined
-    }
+      property: res.first ?? undefined,
+    };
     if (defaults.property && defaultPropId.DefaultSpaceId) {
       const spaceResponse = await this.getSpaces(
-        new QueryContext()
-          .setFilter(`Id eq ${defaultPropId.DefaultSpaceId}`)
+        new QueryContext().setFilter(`Id eq ${defaultPropId.DefaultSpaceId}`)
       );
       defaults.space = spaceResponse.first ?? undefined;
     }
@@ -600,7 +643,7 @@ export class FamisClient {
         propertyIds.push(props.PropertyId);
       }
     }
-    return this.getPropertiesByIds({ids: propertyIds, select: opts.select, expand: opts.expand});
+    return this.getPropertiesByIds({ ids: propertyIds, select: opts.select, expand: opts.expand });
   }
 
   async getPropertiesByIds(opts: {
@@ -615,13 +658,10 @@ export class FamisClient {
     const promises = [];
     const properties: Property[] = [];
     for (const chunk of chunks) {
-      const filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
+      const filterString = chunk.map((n) => `Id eq ${n}`).join(' or ');
       const promise = this.getProperties(
-        new QueryContext()
-          .setFilter(filterString!)
-          .setSelect(selects)
-          .setExpand(expands)
-      ).then(res => properties.push(...res.results));
+        new QueryContext().setFilter(filterString!).setSelect(selects).setExpand(expands)
+      ).then((res) => properties.push(...res.results));
       promises.push(promise);
     }
 
@@ -673,23 +713,35 @@ export class FamisClient {
     return this.getAll<RequestType>(context, 'requesttypes');
   }
 
-  async getRequestTypesForActivityGroup(activityId: number, context: QueryContext): Promise<RequestType[]> {
-    const activityGroupResponse = await this.getRequestTypeActivityGroupAssociations(new QueryContext().setFilter(`ActivityGroupId eq ${activityId}`));
-    const requestIds = activityGroupResponse.results.map(a => a.RequestTypeId);
-    return await this.getRequestTypesByIds({ids: requestIds}, context);
+  async getRequestTypesForActivityGroup(
+    activityId: number,
+    context: QueryContext
+  ): Promise<RequestType[]> {
+    const activityGroupResponse = await this.getRequestTypeActivityGroupAssociations(
+      new QueryContext().setFilter(`ActivityGroupId eq ${activityId}`)
+    );
+    const requestIds = activityGroupResponse.results.map((a) => a.RequestTypeId);
+    return await this.getRequestTypesByIds({ ids: requestIds }, context);
   }
 
-  async getRequestTypesByIds(opts: {
-    ids: number[]
-  }, context: QueryContext): Promise<RequestType[]> {
+  async getRequestTypesByIds(
+    opts: {
+      ids: number[];
+    },
+    context: QueryContext
+  ): Promise<RequestType[]> {
     const chunks = _.chunk(opts.ids, 6);
     const promises = [];
     const requestTypes: RequestType[] = [];
     for (const chunk of chunks) {
       const subContext = new QueryContext().copyFromOther(context);
-      let filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
-      subContext.setFilter(context.filter ? `(${filterString}) and ${context.filter}` : filterString);
-      const promise = this.getRequestTypes(subContext).then(res => requestTypes.push(...res.results));
+      let filterString = chunk.map((n) => `Id eq ${n}`).join(' or ');
+      subContext.setFilter(
+        context.filter ? `(${filterString}) and ${context.filter}` : filterString
+      );
+      const promise = this.getRequestTypes(subContext).then((res) =>
+        requestTypes.push(...res.results)
+      );
       promises.push(promise);
     }
     await Promise.all(promises);
@@ -706,9 +758,13 @@ export class FamisClient {
     const subTypes: RequestSubType[] = [];
     for (const chunk of chunks) {
       const subContext = new QueryContext().copyFromOther(context);
-      let filterString = chunk.map(id => `Id eq ${id}`).join(' or ');
-      subContext.setFilter(context.filter ? `(${filterString}) and ${context.filter}` : filterString);
-      const promise = this.getRequestSubtypes(subContext).then(res => subTypes.push(...res.results));
+      let filterString = chunk.map((id) => `Id eq ${id}`).join(' or ');
+      subContext.setFilter(
+        context.filter ? `(${filterString}) and ${context.filter}` : filterString
+      );
+      const promise = this.getRequestSubtypes(subContext).then((res) =>
+        subTypes.push(...res.results)
+      );
       promises.push(promise);
     }
     await Promise.all(promises);
@@ -749,7 +805,7 @@ export class FamisClient {
   async getUdfField(name: string, context: QueryContext): Promise<UdfField | undefined> {
     context.setFilter(`DisplayName eq '${name}'`);
     const fieldResp = await this.getUdfFields(context);
-    return fieldResp.results.find(f => f.DisplayName === name);
+    return fieldResp.results.find((f) => f.DisplayName === name);
   }
 
   async getUdfFields(context: QueryContext): Promise<Result<UdfField>> {
@@ -757,7 +813,7 @@ export class FamisClient {
   }
 
   async getUdfFieldsForNames(names: string[]): Promise<UdfField[]> {
-    const filterString = names.map(name => `DisplayName eq '${name}'`).join(' or ');
+    const filterString = names.map((name) => `DisplayName eq '${name}'`).join(' or ');
     const res = await this.getUdfFields(new QueryContext().setFilter(filterString));
     return res.results;
   }
@@ -810,7 +866,7 @@ export class FamisClient {
       first: items.length > 0 ? items[0] : null,
       results: items,
       totalDuration: durationMs,
-      averageDuration: durationMs / fetchCount
+      averageDuration: durationMs / fetchCount,
     };
   }
 
@@ -896,7 +952,7 @@ export class FamisClient {
       first: items.length > 0 ? items[0] : null,
       averageDuration: durationMs / fetchCount,
       results: items,
-      totalDuration: durationMs
+      totalDuration: durationMs,
     };
   }
 
@@ -905,7 +961,7 @@ export class FamisClient {
   // generic requests
 
   async rawRequest<T>(method: string, endpoint: string, params: any, payload: any): Promise<T> {
-    const uri = this.http.getUri({url: buildEntityUrl(endpoint)});
+    const uri = this.http.getUri({ url: buildEntityUrl(endpoint) });
 
     const resp = await this.http.request({
       method: method as Method,
@@ -914,8 +970,8 @@ export class FamisClient {
       params: params,
       responseType: 'json',
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
     this.throwResponseError(resp);
     return resp.data as T;
