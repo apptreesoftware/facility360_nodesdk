@@ -199,7 +199,7 @@ export class FamisClient {
   static isCredentialExpired(cred: FamisOAuthCredential): boolean {
     const m = moment(cred['.expires']);
     console.log(`Expiration date: ${m.toDate()}`);
-    const now = moment(Date.now()).subtract(30, 'seconds');
+    const now = moment(Date.now()).add(30, 'seconds');
     const expired = now.isAfter(m);
     console.log(`Credential is expired ${expired}`);
     return expired;
