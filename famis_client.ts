@@ -32,7 +32,7 @@ import {
   RequestStatus,
   RequestSubType,
   RequestType,
-  RequestTypeActivityGroupAssociations,
+  RequestTypeActivityGroupAssociations, ServiceType,
   Space,
   SpaceClass,
   Udf,
@@ -554,7 +554,13 @@ export class FamisClient {
     return this.getAll<PropertyBillCodeAssociations>(context, 'propertybillcodeassociations');
   }
 
-  //$endregion
+  //#endregion
+
+  //#region service types
+  async getServiceTypes(context: QueryContext): Promise<Result<ServiceType>> {
+    return this.getAll<ServiceType>(context, 'servicetypes');
+  }
+  //#endregion
 
   async getAccountSegments(context: QueryContext): Promise<Result<AccountSegment>> {
     return this.getAll<AccountSegment>(context, 'accountsegmentnpfa');
