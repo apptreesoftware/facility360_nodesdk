@@ -1332,3 +1332,12 @@ export interface DefaultPropertyAndSpace {
   property?: Property;
   space?: Space;
 }
+
+export interface ServiceType {
+  Id: number;
+  Description: string;
+  UpdateDate: string;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  GroupDescription: string;
+}
