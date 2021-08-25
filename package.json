@@ -1,6 +1,6 @@
 {
   "name": "facility360",
-  "version": "1.0.0-beta54",
+  "version": "1.0.0-beta55",
   "description": "A Node based 360Facility client SDK",
   "main": "dist/index.js",
   "scripts": {
@@ -16,8 +16,9 @@
   "author": "AppTree Software",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "axios-logger": "^2.3.1",
+    "axios-retry": "^3.1.9",
     "dotenv": "^8.2.0",
     "moment": "^2.24.0",
     "lodash": "^4.17.20"

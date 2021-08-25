@@ -64,6 +64,7 @@ import {
 } from './model/request_models';
 import _ from 'lodash';
 import moment = require('moment');
+import axiosRetry from 'axios-retry';
 
 type ResultCallback<T> = (results: FamisResponse<T>) => void;
 
@@ -96,6 +97,7 @@ export class FamisClient {
     host: string;
     autoRefresh?: boolean;
     debug?: boolean;
+    autoRetry?: boolean;
   }) {
     const cred = await this.login({
       username: opts.username,
@@ -106,7 +108,13 @@ export class FamisClient {
       console.log(`Logged in with ${JSON.stringify(cred)}`);
     }
     console.log();
-    return new FamisClient(cred.Item, opts.host, opts.autoRefresh ?? false, opts.debug ?? false);
+    return new FamisClient(
+      cred.Item,
+      opts.host,
+      opts.autoRefresh ?? false,
+      opts.debug ?? false,
+      opts.autoRetry ?? false
+    );
   }
 
   static async login(opts: {
@@ -165,7 +173,8 @@ export class FamisClient {
     credentials: FamisOAuthCredential,
     host: string,
     autoRefresh: boolean,
-    debug: boolean = false
+    debug: boolean = false,
+    autoRetry: boolean = false
   ) {
     this.credentials = credentials;
     this.host = host;
@@ -173,6 +182,13 @@ export class FamisClient {
       baseURL: host,
       validateStatus: (status) => true,
     });
+    if (autoRetry) {
+      axiosRetry(this.http, {
+        retries: 2,
+        retryDelay: () => 2,
+      });
+    }
+
     this.debug = debug;
     this.autoRefresh = autoRefresh;
     this.http.interceptors.request.use(async (config) => {
