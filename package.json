@@ -1,6 +1,6 @@
 {
   "name": "facility360",
-  "version": "1.0.0-beta55",
+  "version": "1.0.0-beta56",
   "description": "A Node based 360Facility client SDK",
   "main": "dist/index.js",
   "scripts": {
@@ -21,7 +21,8 @@
     "axios-retry": "^3.1.9",
     "dotenv": "^8.2.0",
     "moment": "^2.24.0",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "bottleneck": "^2.19.5"
   },
   "prettier": {
     "singleQuote": true,

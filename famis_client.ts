@@ -65,6 +65,7 @@ import {
 import _ from 'lodash';
 import moment = require('moment');
 import axiosRetry from 'axios-retry';
+import Bottleneck from 'bottleneck';
 
 type ResultCallback<T> = (results: FamisResponse<T>) => void;
 
@@ -914,10 +915,12 @@ export class FamisClient {
     }
     const pageCount = Math.ceil(totalCount / top);
     const promises = [];
+    const limiter = new Bottleneck({ maxConcurrent: 4 });
     for (let i = 1; i < pageCount; i++) {
       const url = context.buildPagedUrl(type, top, i * top);
-      const req = this.http
-        .get(url)
+
+      const req = limiter
+        .schedule(() => this.http.get(url))
         .then((resp: AxiosResponse<FamisResponse<T>>) => {
           this.throwResponseError(resp);
           if (this.debug) {
