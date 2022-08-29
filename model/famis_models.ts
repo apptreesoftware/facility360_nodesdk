@@ -498,6 +498,8 @@ export interface WorkOrder {
   CrewExternalId: string;
   GeneralComments?: string;
   InternalComments?: string;
+  WoAuthFlag?: boolean;
+  WoAuthComments?: string;
   NotifyRequestorFlag: boolean;
   AppendToStatementOfWorkFlag: boolean;
   AccountInfo: AccountInfo;
