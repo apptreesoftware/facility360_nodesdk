@@ -23,7 +23,10 @@ import {
   FamisResponse,
   FamisUser,
   Floor,
+  LaborCost,
   LogbookConfiguration,
+  MaterialCost,
+  OtherCost,
   Property,
   PropertyBillCodeAssociations,
   PropertyRegionAssociation,
@@ -58,6 +61,9 @@ import {
   PatchUserRequest,
   PatchWorkOrderRequest,
   PostAttachmentRequest,
+  PostLaborCostRequest,
+  PostMaterialCostRequest,
+  PostOtherCostRequest,
   PostUdfForWoRequest,
   PostWorkOrderRequest,
   SearchUsersRequest,
@@ -844,6 +850,36 @@ export class FamisClient {
     return await this.createObject<PostUdfForWoRequest, Udf>(udf, `workorders(${woId})/UdfUpdate`);
   }
 
+  //#endregion
+
+  //#region laborcosts
+  async getLaborCosts(context: QueryContext): Promise<Result<LaborCost>> {
+    return this.getAll<LaborCost>(context, 'laborcosts');
+  }
+
+  async createLaborCost(laborCost: PostLaborCostRequest): Promise<LaborCost> {
+    return this.createObject<PostLaborCostRequest, LaborCost>(laborCost, 'laborcosts');
+  }
+  //#endregion
+
+  //#region materialcosts
+  async getMaterialCosts(context: QueryContext): Promise<Result<MaterialCost>> {
+    return this.getAll<MaterialCost>(context, 'workordermaterialcosts');
+  }
+
+  async createMaterialCost(materialCost: PostMaterialCostRequest): Promise<MaterialCost> {
+    return this.createObject<PostMaterialCostRequest, MaterialCost>(materialCost, 'workordermaterialcosts');
+  }
+  //#endregion
+
+  //#region othercosts
+  async getOtherCosts(context: QueryContext): Promise<Result<OtherCost>> {
+    return this.getAll<OtherCost>(context, 'othercosts');
+  }
+
+  async createOtherCost(otherCost: PostOtherCostRequest): Promise<OtherCost> {
+    return this.createObject<PostOtherCostRequest, OtherCost>(otherCost, 'othercosts');
+  }
   //#endregion
 
   // generic get methods
