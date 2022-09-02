@@ -1343,3 +1343,167 @@ export interface ServiceType {
   UpdatedByExternalId: string;
   GroupDescription: string;
 }
+
+export interface LaborCost {
+  EmployeeId?:                    number;
+  ExternalEmployeeId?:            string;
+  TimeStarted?:                   string;
+  TimeFinished?:                  string;
+  Rate?:                          number;
+  Hours?:                         number;
+  RateTypeId?:                    number;
+  RequestTypeActivityId?:         number;
+  ExternalRequestTypeActivityId?: string;
+  ApInvoiceNumber?:               string;
+  ApAccountNumber?:               string;
+  LienWaiverAmount?:              number;
+  LienWaiverComments?:            string;
+  PaymentComments?:               string;
+  ApInvoiceAmount?:               number;
+  ApPostDate?:                    Date;
+  ApDueDate?:                     Date;
+  ApTaxAmount?:                   number;
+  ApShippingHandlingAmount?:      number;
+  ApInvoiceStatusId?:             number;
+  ApInvoiceDate?:                 Date;
+  CoaAccountId?:                  number;
+  Payee?:                         string;
+  TaxAmount?:                     number;
+  BudgetYear?:                    number;
+  VendorCode?:                    string;
+  VendorCompanyExternalId?:       string;
+  CrewId?:                        number;
+  Id?:                            number;
+  InstallId?:                     number;
+  RequestId?:                     number;
+  RequestExternalId?:             string;
+  Date?:                          Date;
+  Description?:                   string;
+  VendorCompanyId?:               number;
+  TotalAmount?:                   number;
+  MarkupFlag?:                    boolean;
+  TotalMarkup?:                   number;
+  AccountId?:                     number;
+  UpdateDate?:                    Date;
+  RecurrenceId?:                  number;
+  UpdatedById?:                   number;
+  AccountsPayableFlag?:           boolean;
+  ApExportFlag?:                  boolean;
+  TaxableFlag?:                   boolean;
+  CurrencySign?:                  string;
+  CurrencyCode?:                  string;
+  LineItemNumber?:                number;
+  ExternalId?:                    string;
+  TaxRate?:                       number;
+  ExternalUpdatedById?:           string;
+  ExternalRecurrenceId?:          string;
+  InvoiceNumber?:                 string;
+  InvoiceDate?:                   Date;
+}
+
+export interface OtherCost {
+  OtherCostTypeId?:          number;
+  OtherCostType?:            OtherCostType;
+  Quantity?:                 number;
+  UnitCost?:                 number;
+  ShippingAndHandlingCost?:  number;
+  Account?:                  Account;
+  ReceivedById?:             number;
+  ApInvoiceNumber?:          string;
+  ApAccountNumber?:          string;
+  LienWaiverAmount?:         number;
+  LienWaiverComments?:       string;
+  PaymentComments?:          string;
+  ApInvoiceAmount?:          number;
+  ApPostDate?:               Date;
+  ApDueDate?:                Date;
+  ApTaxAmount?:              number;
+  ApShippingHandlingAmount?: number;
+  ApInvoiceStatusId?:        number;
+  ApInvoiceDate?:            Date;
+  CoaAccountId?:             number;
+  Payee?:                    string;
+  TaxAmount?:                number;
+  BudgetYear?:               number;
+  VendorCode?:               string;
+  VendorCompanyExternalId?:  string;
+  Id?:                       number;
+  InstallId?:                number;
+  RequestId?:                number;
+  RequestExternalId?:        string;
+  Date?:                     Date;
+  Description?:              string;
+  VendorCompanyId?:          number;
+  TotalAmount?:              number;
+  MarkupFlag?:               boolean;
+  TotalMarkup?:              number;
+  AccountId?:                number;
+  UpdateDate?:               Date;
+  RecurrenceId?:             number;
+  UpdatedById?:              number;
+  AccountsPayableFlag?:      boolean;
+  ApExportFlag?:             boolean;
+  TaxableFlag?:              boolean;
+  CurrencySign?:             string;
+  CurrencyCode?:             string;
+  LineItemNumber?:           number;
+  ExternalId?:               string;
+  TaxRate?:                  number;
+  ExternalUpdatedById?:      string;
+  ExternalRecurrenceId?:     string;
+  InvoiceNumber?:            string;
+  InvoiceDate?:              Date;
+}
+
+export interface Account {
+  Id?:                number;
+  RequestId?:         number;
+  RequestExternalId?: string;
+  Description?:       string;
+  Number?:            string;
+  IsDefault?:         boolean;
+}
+
+export interface OtherCostType {
+  Id?:                   number;
+  Name?:                 string;
+  Active?:               boolean;
+  TaxableFlag?:          boolean;
+  IncomeCategory?:       string;
+  ContraAccountNumber?:  string;
+  OtherCostGLAccount?:   string;
+  GLAccountId?:          number;
+  GLAccountIdForMarkup?: number;
+  StandardChargeAmount?: number;
+  DiscountedFlag?:       boolean;
+}
+
+export interface MaterialCost {
+  Id?:                    number;
+  RequestId?:             number;
+  ItemName?:              string;
+  Description?:           string;
+  ChargeToAccountNumber?: string;
+  ChargeToAccount?:       string;
+  Quantity?:              number;
+  UnitCost?:              number;
+  TaxCost?:               number;
+  SHCost?:                number;
+  TotalCost?:             number;
+  Date?:                  Date;
+  LineNumber?:            number;
+  EmployeeId?:            number;
+  Markup?:                boolean;
+  UpdateDate?:            Date;
+  TotalMarkup?:           number;
+  ItemId?:                number;
+  AccountId?:             number;
+  TaxRate?:               number;
+  MarkupPercentage?:      number;
+  WarehouseMaterialId?:   number;
+  BudgetYear?:            number;
+  Taxable?:               boolean;
+  BinId?:                 number;
+  PoDetailId?:            number;
+  UpdatedByExternalId?:   string;
+}
