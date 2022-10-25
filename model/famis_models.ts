@@ -216,7 +216,7 @@ export interface Space {
   Floor?: Floor;
   Udfs?: Udf[];
   SpaceCategorization?: SpaceCategorization;
-  SpaceArea?: SpaceArea | SpaceArea[];
+  SpaceArea?: SpaceArea[];
 }
 
 export interface Floor {
