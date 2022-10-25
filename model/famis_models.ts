@@ -74,6 +74,36 @@ export interface SpaceSubCategory {
   SpaceTypes?:                SpaceType[];
 }
 
+export interface SpaceArea {
+  Id?:             number;
+  SpaceId?:        number;
+  TotalArea1SqFt?: number;
+  TotalArea2SqFt?: number;
+  TotalArea1SqM?:  number;
+  TotalArea2SqM?:  number;
+  OtherArea1SqFt?: number;
+  OtherArea2SqFt?: number;
+  OtherArea3SqFt?: number;
+  OtherArea4SqFt?: number;
+  OtherArea5SqFt?: number;
+  OtherArea1SqM?:  number;
+  OtherArea2SqM?:  number;
+  OtherArea3SqM?:  number;
+  OtherArea4SqM?:  number;
+  OtherArea5SqM?:  number;
+  IncludeEG?:      number;
+  IncludeIG?:      number;
+  IncludeRPC?:     number;
+  IncludeBR?:      number;
+  IncludeUA?:      number;
+  IncludeIPA?:     number;
+  IncludeAA?:      number;
+  IncludeNAA?:     number;
+  IncludeNMP?:     number;
+  Force100?:       boolean;
+}
+
+
 export interface SpaceType {
   Id?:            number;
   Name?:          string;
@@ -186,6 +216,7 @@ export interface Space {
   Floor?: Floor;
   Udfs?: Udf[];
   SpaceCategorization?: SpaceCategorization;
+  SpaceArea?: SpaceArea;
 }
 
 export interface Floor {
