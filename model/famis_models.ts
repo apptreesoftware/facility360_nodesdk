@@ -20,6 +20,74 @@ export interface SpaceClass {
   UpdatedByName?: string;
 }
 
+export interface SpaceCategorization {
+  Id?:                        number;
+  SpaceId?:                   number;
+  SubSpaceId?:                number;
+  AllocIndividualId?:         number;
+  AllocOrgId?:                number;
+  OwningOrgId?:               number;
+  BillingOrgId?:              number;
+  OwnershipStatusId?:         number;
+  FunctionalStatusId?:        number;
+  FunctionalCatId?:           number;
+  FunctionalSubCatId?:        number;
+  SpaceCategoryId?:           number;
+  SpaceSubCategoryId?:        number;
+  SpaceTypeId?:               number;
+  SpaceStandardId?:           number;
+  SpaceStandardApprovalFlag?: boolean;
+}
+
+export interface SpaceCategory {
+  Id?:                         number;
+  Name?:                       string;
+  Description?:                string;
+  ActiveFlag?:                 boolean;
+  TabOrder?:                   number;
+  UpdateDate?:                 Date;
+  UpdatedByName?:              string;
+  ExteriorGrossFlag?:          boolean;
+  InteriorGrossFlag?:          boolean;
+  RentablePerContractFlag?:    boolean;
+  BuildingRentableFlag?:       boolean;
+  UsableAreaFlag?:             boolean;
+  InteriorPlanningAreaFlag?:   boolean;
+  AssignableAreaFlag?:         boolean;
+  NonAssignableAreaFlag?:      boolean;
+  NonMeasurablePortfolioFlag?: boolean;
+  Number?:                     string;
+  SpaceSubCategories?:         SpaceSubCategory[];
+}
+
+export interface SpaceSubCategory {
+  Id?:                        number;
+  Name?:                      string;
+  Description?:               string;
+  ActiveFlag?:                boolean;
+  TabOrder?:                  number;
+  UpdateDate?:                Date;
+  UpdatedByName?:             string;
+  CategoryId?:                number;
+  SpaceStandardDefinitionId?: number;
+  Number?:                    string;
+  SpaceTypes?:                SpaceType[];
+}
+
+export interface SpaceType {
+  Id?:            number;
+  Name?:          string;
+  Number?:        string;
+  Description?:   string;
+  ActiveFlag?:    boolean;
+  TabOrder?:      number;
+  UpdateDate?:    Date;
+  UpdatedByName?: string;
+  SubCategoryId?: number;
+}
+
+
+
 export interface Department {
   Id?: number;
   Number?: string;
@@ -117,6 +185,7 @@ export interface Space {
   RequestPriorityListId?: number;
   Floor?: Floor;
   Udfs?: Udf[];
+  SpaceCategorization?: SpaceCategorization;
 }
 
 export interface Floor {

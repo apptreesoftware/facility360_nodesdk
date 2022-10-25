@@ -38,7 +38,9 @@ import {
   RequestTypeActivityGroupAssociations,
   ServiceType,
   Space,
+  SpaceCategory,
   SpaceClass,
+  SpaceSubCategory,
   Udf,
   UdfField,
   UserActivityGroupAssociations,
@@ -731,6 +733,14 @@ export class FamisClient {
 
   async getSpaceClasses(context: QueryContext): Promise<Result<SpaceClass>> {
     return this.getAll<SpaceClass>(context, 'spaceclasses');
+  }
+
+  async getSpaceCategories(context: QueryContext): Promise<Result<SpaceCategory>> {
+    return this.getAll<SpaceCategory>(context, 'spacecategories');
+  }
+
+  async getSpaceSubCategories(context: QueryContext): Promise<Result<SpaceSubCategory>> {
+    return this.getAll<SpaceSubCategory>(context, 'spacesubcategories');
   }
 
   async getFloors(context: QueryContext): Promise<Result<Floor>> {
