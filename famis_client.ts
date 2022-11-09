@@ -38,6 +38,7 @@ import {
   RequestTypeActivityGroupAssociations,
   ServiceType,
   Space,
+  SpaceArea,
   SpaceCategory,
   SpaceClass,
   SpaceSubCategory,
@@ -60,6 +61,7 @@ import {
   FamisOAuthCredential,
   LoginResponse,
   PatchCompanyRequest,
+  PatchSpaceAreaRequest,
   PatchUserRequest,
   PatchWorkOrderRequest,
   PostAttachmentRequest,
@@ -741,6 +743,13 @@ export class FamisClient {
 
   async getSpaceSubCategories(context: QueryContext): Promise<Result<SpaceSubCategory>> {
     return this.getAll<SpaceSubCategory>(context, 'spacesubcategories');
+  }
+
+  async patchSpaceArea(spaceAreaId: string, spaceArea: PatchSpaceAreaRequest): Promise<SpaceArea> {
+    let url = buildEntityUrl('spaceareas');
+    url += `(${spaceAreaId})`;
+    const resp = await this.http.patch(url, spaceArea);
+    return resp.data;
   }
 
   async getFloors(context: QueryContext): Promise<Result<Floor>> {
