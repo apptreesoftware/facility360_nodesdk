@@ -88,6 +88,7 @@ export const DefaultUserSelect = [
   'UserName',
   'Name',
   'Email',
+  'ActiveFlag'
 ];
 export const DefaultPropertySelect = ['Id', 'Name', 'Addr1', 'City', 'StateId', 'Zip'];
 export const DefaultPropertyExpand = [
