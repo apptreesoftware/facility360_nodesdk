@@ -23,6 +23,7 @@ import {
   FamisResponse,
   FamisUser,
   Floor,
+  InstallationConfig,
   LaborCost,
   LogbookConfiguration,
   MaterialCost,
@@ -839,6 +840,12 @@ export class FamisClient {
     return this.getAll<Department>(context, 'departments');
   }
 
+  async getInstallationConfigurations(context: QueryContext): Promise<InstallationConfig[]> {
+    const url = context.buildApiUrl('installationconfigurations');
+    const resp = await this.http.get<InstallationConfig[]>(url);
+    return resp.data;
+  }
+
   //#region Logbook
   async getLogbookConfigurations(context: QueryContext): Promise<LogbookConfiguration[]> {
     const url = context.buildApiUrl('LogbookConfiguration');
@@ -846,7 +853,7 @@ export class FamisClient {
     return resp.data;
   }
 
-  //#enregion
+  //#endregion
 
   //#region Udfs
 
