@@ -27,11 +27,11 @@ import {
   LaborCost,
   LogbookConfiguration,
   MaterialCost,
-  OtherCost,
+  OtherCost, PriorityTypeSLADetails,
   Property,
   PropertyBillCodeAssociations,
   PropertyRegionAssociation,
-  PropertyRequestTypeAssociation,
+  PropertyRequestTypeAssociation, Region,
   RequestPriority,
   RequestStatus,
   RequestSubType,
@@ -127,6 +127,32 @@ export class FamisClient {
       opts.autoRefresh ?? false,
       opts.debug ?? false,
       opts.autoRetry ?? false
+    );
+  }
+
+  static withAccessToken(opts: {
+    token: string;
+    host: string;
+    debug?: boolean;
+    autoRetry?: boolean;
+  }): FamisClient {
+    return new FamisClient(
+        {
+          ".expires": "",
+          ".issued": "",
+          installation_id: "",
+          installation_name: "",
+          token_type: "Bearer",
+          user_id: "",
+          access_token: opts.token,
+          refresh_token: "",
+          expires_in: 0,
+          first_name: "",
+          last_name: ""
+        },
+        opts.host,
+        false,
+        opts.debug
     );
   }
 
@@ -383,6 +409,10 @@ export class FamisClient {
 
   async getUserRegionAssociations(context: QueryContext): Promise<Result<UserRegionAssociation>> {
     return this.getAll<UserRegionAssociation>(context, 'userregionassociations');
+  }
+
+  async getRegions(context: QueryContext) : Promise<Result<Region>> {
+      return this.getAll<Region>(context, 'regions');
   }
 
   async getUserPropertyAssociations(
@@ -745,6 +775,10 @@ export class FamisClient {
 
   async getSpaceSubCategories(context: QueryContext): Promise<Result<SpaceSubCategory>> {
     return this.getAll<SpaceSubCategory>(context, 'spacesubcategories');
+  }
+
+  async getPriorityTypeSLADetails(context: QueryContext) : Promise<Result<PriorityTypeSLADetails>> {
+    return this.getAll<PriorityTypeSLADetails>(context, 'prioritytypesladetails');
   }
 
   async patchSpaceArea(spaceAreaId: string, spaceArea: PatchSpaceAreaRequest): Promise<SpaceArea> {

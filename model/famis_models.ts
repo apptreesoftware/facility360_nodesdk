@@ -1074,6 +1074,21 @@ export interface PropertyRegionAssociation {
   RegionExternalId: string;
 }
 
+export interface Region {
+  Id:                number;
+  Name:              string;
+  CompanyId:         number;
+  ParentId?:          number;
+  UpdateDate:        Date;
+  ParentFlag:        boolean;
+  Sqft:              number;
+  ExternalId?:        string;
+  Description:       string;
+  Type:              string;
+  CompanyExternalId?: string;
+  ParentExternalId?:  string;
+}
+
 export interface FamisUser {
   Id: number;
   CompanyId: number;
@@ -1757,4 +1772,26 @@ export interface InstallationConfig {
   AlsPasswordLockedTextMobile?:            string;
   AlsForcePasswordChangeText?:             string;
   AlsForcePasswordChangeTextMobile?:       string;
+}
+
+export interface PriorityTypeSLADetails {
+  Id: number;
+  RequestPriorityId: number;
+  RequestTypeId: number;
+  Active: boolean;
+  DefaultFollowupAlert: number;
+  EscalateToId: number;
+  DefaultSlaResponseTime: number;
+  DefaultSlaCompletionTime: number;
+  SlaOverdueAlert: number;
+  SlaEscalateToId: number;
+  SlaSendNotificationsFlag: boolean;
+  UpdateDate: Date;
+  UpdatedById: number;
+  Sla247OverrideFlag: boolean;
+  RequestSubTypeId: number;
+  DefaultPriorityFlag: boolean;
+  SlaCompletionInHours: boolean;
+  SlaResponseInHours: boolean;
+  UpdatedByExternalId: string;
 }
