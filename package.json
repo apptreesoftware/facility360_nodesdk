@@ -19,10 +19,10 @@
     "axios": "^0.21.1",
     "axios-logger": "^2.3.1",
     "axios-retry": "^3.1.9",
+    "bottleneck": "^2.19.5",
     "dotenv": "^8.2.0",
-    "moment": "^2.24.0",
     "lodash": "^4.17.20",
-    "bottleneck": "^2.19.5"
+    "moment": "^2.24.0"
   },
   "prettier": {
     "singleQuote": true,
@@ -30,8 +30,8 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
-    "@types/node": "^12.12.11",
     "@types/lodash": "^4.14.168",
+    "@types/node": "^12.12.11",
     "jest": "^24.9.0",
     "ts-jest": "^24.1.0",
     "typescript": "^3.7.4"
