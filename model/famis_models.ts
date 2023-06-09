@@ -348,6 +348,33 @@ export interface RequestPriority {
   EmergencyEscalation: boolean;
 }
 
+export interface Procedure {
+  Id: number;
+  Name: string;
+  ExternalId: string;
+  AssetClassId: number;
+  PropertyId: number;
+  PropertyExternalId: string;
+  RegionId: number;
+  RegionExternalId: string;
+  InspectionClassId: number;
+  InspectionTypeId: number;
+  Owner: string;
+  ActiveFlag: boolean;
+  PriorityId: number;
+  DefaultRecurrencePattern: string;
+  DefaultFrequency: string;
+  TypeId: number;
+  EstimatedLaborHours: number;
+  CreatedByName: string;
+  CreateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: null;
+  UpdateDate: Date;
+  ProcedureText: string;
+  ExternalSystemId: string;
+}
+
 export interface RequestSubType {
   Id: number;
   Description: string;

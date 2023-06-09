@@ -27,7 +27,7 @@ import {
   LaborCost,
   LogbookConfiguration,
   MaterialCost,
-  OtherCost, PriorityTypeSLADetails,
+  OtherCost, PriorityTypeSLADetails, Procedure,
   Property,
   PropertyBillCodeAssociations,
   PropertyRegionAssociation,
@@ -856,6 +856,10 @@ export class FamisClient {
 
   async getRequestPriorities(context: QueryContext): Promise<Result<RequestPriority>> {
     return this.getAll<RequestPriority>(context, 'requestpriorities');
+  }
+
+  async getProcedures(context: QueryContext): Promise<Result<Procedure>> {
+    return this.getAll<Procedure>(context, 'procedures');
   }
 
   async getWorkOrderComments(context: QueryContext): Promise<Result<WorkOrderComment>> {
