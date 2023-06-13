@@ -347,6 +347,86 @@ export interface RequestPriority {
   Level?: string;
   EmergencyEscalation: boolean;
 }
+export interface Procedure {
+  Id: number;
+  Name: string;
+  ExternalId: string;
+  AssetClassId: number;
+  PropertyId: number;
+  PropertyExternalId: string;
+  RegionId: number;
+  RegionExternalId: string;
+  InspectionClassId: number;
+  InspectionTypeId: number;
+  Owner: string;
+  ActiveFlag: boolean;
+  PriorityId: number;
+  DefaultRecurrencePattern: string;
+  DefaultFrequency: string;
+  TypeId: number;
+  EstimatedLaborHours: number;
+  CreatedByName: string;
+  CreateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: null;
+  UpdateDate: Date;
+  ProcedureText: string;
+  ExternalSystemId: string;
+}
+
+export interface FailureCode {
+  Id: number;
+  Name: string;
+  Active: boolean;
+  FailureCodeEnum: string;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  UpdateDate: Date;
+}
+
+export interface BillingTypeNPFA {
+  Id: number;
+  Description: string;
+  Default: boolean;
+  LaborCode: string;
+  LaborMarkup: number;
+  MaterialCode: string;
+  MaterialMarkup: number;
+  OtherCostCode: string;
+  UpdatedByName: string;
+  UpdateDate: Date;
+}
+
+export interface InspectionClass {
+  Id: number;
+  Description: string;
+  ScoringTypeId: number;
+  Active: boolean;
+  SurveyFlag: boolean;
+  Benchmark: number;
+  RequestTypeId: number;
+  RequestSubTypeId: number;
+  WoSendThreshold: number;
+  NotifyAssignedToFlag: number;
+  LcamFlag: boolean;
+  AssessmentFlag: boolean;
+  CalculateScoreFlag: boolean;
+  AllowDeleteFlag: boolean;
+  RequestTypeExternalId: string;
+  RequestSubTypeExternalId: string;
+}
+
+export interface InspectionType {
+  Id: number;
+  Description: string;
+  Active: boolean;
+  InspectionClassId: number;
+  AssetReadingFlag: boolean;
+  DefaultInitialScoreFlag: boolean;
+  RequiredInspectionFlag: boolean;
+  DisplayScoreFlag: boolean;
+  TabOrder: number;
+}
 
 export interface RequestSubType {
   Id: number;

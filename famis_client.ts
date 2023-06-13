@@ -1,6 +1,6 @@
 import axios from 'axios';
-import Axios, { AxiosError, AxiosInstance, AxiosResponse, Method } from 'axios';
-import { ApiError, AuthorizationError } from './errors';
+import Axios, {AxiosError, AxiosInstance, AxiosResponse, Method} from 'axios';
+import {ApiError, AuthorizationError} from './errors';
 import {
   AccountSegment,
   ActivityGroup,
@@ -10,7 +10,7 @@ import {
   AssetMake,
   AssetModel,
   AssetStatus,
-  AssetType,
+  AssetType, BillingTypeNPFA,
   Company,
   CreateAssetAttachment,
   CreateAssetMake,
@@ -18,16 +18,16 @@ import {
   Crew,
   CrewUserAssociation,
   DefaultPropertyAndSpace,
-  Department,
+  Department, FailureCode,
   FamisAttachment,
   FamisResponse,
   FamisUser,
-  Floor,
+  Floor, InspectionClass, InspectionType,
   InstallationConfig,
   LaborCost,
   LogbookConfiguration,
   MaterialCost,
-  OtherCost, PriorityTypeSLADetails,
+  OtherCost, PriorityTypeSLADetails, Procedure,
   Property,
   PropertyBillCodeAssociations,
   PropertyRegionAssociation,
@@ -53,9 +53,9 @@ import {
   WorkOrderComment,
   WorkType,
 } from './model/famis_models';
-import { buildEntityUrl, QueryContext } from './model/request_context';
+import {buildEntityUrl, QueryContext} from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
-import { Result } from './model/common';
+import {Result} from './model/common';
 import {
   AssetCreateRequest,
   CreateCompanyRequest,
@@ -137,22 +137,22 @@ export class FamisClient {
     autoRetry?: boolean;
   }): FamisClient {
     return new FamisClient(
-        {
-          ".expires": "",
-          ".issued": "",
-          installation_id: "",
-          installation_name: "",
-          token_type: "Bearer",
-          user_id: "",
-          access_token: opts.token,
-          refresh_token: "",
-          expires_in: 0,
-          first_name: "",
-          last_name: ""
-        },
-        opts.host,
-        false,
-        opts.debug
+      {
+        ".expires": "",
+        ".issued": "",
+        installation_id: "",
+        installation_name: "",
+        token_type: "Bearer",
+        user_id: "",
+        access_token: opts.token,
+        refresh_token: "",
+        expires_in: 0,
+        first_name: "",
+        last_name: ""
+      },
+      opts.host,
+      false,
+      opts.debug
     );
   }
 
@@ -331,7 +331,7 @@ export class FamisClient {
       new QueryContext().setFilter(`UserId eq ${opts.userId}`)
     );
     const crewIds = crewAssocs.results.map((c) => c.CrewId);
-    return this.getCrewsByIds({ ids: crewIds });
+    return this.getCrewsByIds({ids: crewIds});
   }
 
   async getCrewsByIds(opts: { ids: number[] }): Promise<Crew[]> {
@@ -411,8 +411,8 @@ export class FamisClient {
     return this.getAll<UserRegionAssociation>(context, 'userregionassociations');
   }
 
-  async getRegions(context: QueryContext) : Promise<Result<Region>> {
-      return this.getAll<Region>(context, 'regions');
+  async getRegions(context: QueryContext): Promise<Result<Region>> {
+    return this.getAll<Region>(context, 'regions');
   }
 
   async getUserPropertyAssociations(
@@ -471,9 +471,9 @@ export class FamisClient {
       searchParams.propertyId && (searchParams.requestTypeId || searchParams.activityGroupId)
         ? activityUserIds.filter((a) => propertyUserIds.includes(a))
         : searchParams.requestTypeId || searchParams.activityGroupId
-        ? activityUserIds
-        : propertyUserIds;
-    return this.getUsersForIds({ userIds: userIds }, context);
+          ? activityUserIds
+          : propertyUserIds;
+    return this.getUsersForIds({userIds: userIds}, context);
   }
 
   async getUsersForIds(opts: { userIds: number[] }, context: QueryContext): Promise<FamisUser[]> {
@@ -618,6 +618,7 @@ export class FamisClient {
   async getServiceTypes(context: QueryContext): Promise<Result<ServiceType>> {
     return this.getAll<ServiceType>(context, 'servicetypes');
   }
+
   //#endregion
 
   async getAccountSegments(context: QueryContext): Promise<Result<AccountSegment>> {
@@ -707,7 +708,7 @@ export class FamisClient {
         propertyIds.push(props.PropertyId);
       }
     }
-    return this.getPropertiesByIds({ ids: propertyIds, select: opts.select, expand: opts.expand });
+    return this.getPropertiesByIds({ids: propertyIds, select: opts.select, expand: opts.expand});
   }
 
   async getPropertiesByIds(opts: {
@@ -777,7 +778,7 @@ export class FamisClient {
     return this.getAll<SpaceSubCategory>(context, 'spacesubcategories');
   }
 
-  async getPriorityTypeSLADetails(context: QueryContext) : Promise<Result<PriorityTypeSLADetails>> {
+  async getPriorityTypeSLADetails(context: QueryContext): Promise<Result<PriorityTypeSLADetails>> {
     return this.getAll<PriorityTypeSLADetails>(context, 'prioritytypesladetails');
   }
 
@@ -804,7 +805,7 @@ export class FamisClient {
       new QueryContext().setFilter(`ActivityGroupId eq ${activityId}`)
     );
     const requestIds = activityGroupResponse.results.map((a) => a.RequestTypeId);
-    return await this.getRequestTypesByIds({ ids: requestIds }, context);
+    return await this.getRequestTypesByIds({ids: requestIds}, context);
   }
 
   async getRequestTypesByIds(
@@ -856,6 +857,26 @@ export class FamisClient {
 
   async getRequestPriorities(context: QueryContext): Promise<Result<RequestPriority>> {
     return this.getAll<RequestPriority>(context, 'requestpriorities');
+  }
+
+  async getProcedures(context: QueryContext): Promise<Result<Procedure>> {
+    return this.getAll<Procedure>(context, 'procedures');
+  }
+
+  async getFailureCodes(context: QueryContext): Promise<Result<FailureCode>> {
+    return this.getAll<FailureCode>(context, 'failurecodes');
+  }
+
+  async getBillingTypeNPFA(context: QueryContext): Promise<Result<BillingTypeNPFA>> {
+    return this.getAll<BillingTypeNPFA>(context, 'billingtypenpfa');
+  }
+
+  async getInspectionTypes(context: QueryContext): Promise<Result<InspectionType>> {
+    return this.getAll<InspectionType>(context, 'inspectiontypes');
+  }
+
+  async getInspectionClasses(context: QueryContext): Promise<Result<InspectionClass>> {
+    return this.getAll<InspectionClass>(context, 'inspectionclasses');
   }
 
   async getWorkOrderComments(context: QueryContext): Promise<Result<WorkOrderComment>> {
@@ -921,6 +942,7 @@ export class FamisClient {
   async createLaborCost(laborCost: PostLaborCostRequest): Promise<LaborCost> {
     return this.createObject<PostLaborCostRequest, LaborCost>(laborCost, 'laborcosts');
   }
+
   //#endregion
 
   //#region materialcosts
@@ -931,6 +953,7 @@ export class FamisClient {
   async createMaterialCost(materialCost: PostMaterialCostRequest): Promise<MaterialCost> {
     return this.createObject<PostMaterialCostRequest, MaterialCost>(materialCost, 'workordermaterialcosts');
   }
+
   //#endregion
 
   //#region othercosts
@@ -941,6 +964,7 @@ export class FamisClient {
   async createOtherCost(otherCost: PostOtherCostRequest): Promise<OtherCost> {
     return this.createObject<PostOtherCostRequest, OtherCost>(otherCost, 'othercosts');
   }
+
   //#endregion
 
   // generic get methods
@@ -1012,7 +1036,7 @@ export class FamisClient {
     }
     const pageCount = Math.ceil(totalCount / top);
     const promises = [];
-    const limiter = new Bottleneck({ maxConcurrent: 4 });
+    const limiter = new Bottleneck({maxConcurrent: 4});
     for (let i = 1; i < pageCount; i++) {
       const url = context.buildPagedUrl(type, top, i * top);
 
@@ -1082,7 +1106,7 @@ export class FamisClient {
   // generic requests
 
   async rawRequest<T>(method: string, endpoint: string, params: any, payload: any): Promise<T> {
-    const uri = this.http.getUri({ url: buildEntityUrl(endpoint) });
+    const uri = this.http.getUri({url: buildEntityUrl(endpoint)});
 
     const resp = await this.http.request({
       method: method as Method,
