@@ -1,6 +1,6 @@
 import axios from 'axios';
-import Axios, {AxiosError, AxiosInstance, AxiosResponse, Method} from 'axios';
-import {ApiError, AuthorizationError} from './errors';
+import Axios, { AxiosError, AxiosInstance, AxiosResponse, Method } from 'axios';
+import { ApiError, AuthorizationError } from './errors';
 import {
   AccountSegment,
   ActivityGroup,
@@ -10,7 +10,8 @@ import {
   AssetMake,
   AssetModel,
   AssetStatus,
-  AssetType, BillingTypeNPFA,
+  AssetType,
+  BillingTypeNPFA,
   Company,
   CreateAssetAttachment,
   CreateAssetMake,
@@ -18,20 +19,26 @@ import {
   Crew,
   CrewUserAssociation,
   DefaultPropertyAndSpace,
-  Department, FailureCode,
+  Department,
+  FailureCode,
   FamisAttachment,
   FamisResponse,
   FamisUser,
-  Floor, InspectionClass, InspectionType,
+  Floor,
+  InspectionClass,
+  InspectionType,
   InstallationConfig,
   LaborCost,
   LogbookConfiguration,
   MaterialCost,
-  OtherCost, PriorityTypeSLADetails, Procedure,
+  OtherCost,
+  PriorityTypeSLADetails,
+  Procedure,
   Property,
   PropertyBillCodeAssociations,
   PropertyRegionAssociation,
-  PropertyRequestTypeAssociation, Region,
+  PropertyRequestTypeAssociation,
+  Region,
   RequestPriority,
   RequestStatus,
   RequestSubType,
@@ -53,9 +60,9 @@ import {
   WorkOrderComment,
   WorkType,
 } from './model/famis_models';
-import {buildEntityUrl, QueryContext} from './model/request_context';
+import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
-import {Result} from './model/common';
+import { Result } from './model/common';
 import {
   AssetCreateRequest,
   CreateCompanyRequest,
@@ -89,7 +96,7 @@ export const DefaultUserSelect = [
   'UserName',
   'Name',
   'Email',
-  'ActiveFlag'
+  'ActiveFlag',
 ];
 export const DefaultPropertySelect = ['Id', 'Name', 'Addr1', 'City', 'StateId', 'Zip'];
 export const DefaultPropertyExpand = [
@@ -138,17 +145,17 @@ export class FamisClient {
   }): FamisClient {
     return new FamisClient(
       {
-        ".expires": "",
-        ".issued": "",
-        installation_id: "",
-        installation_name: "",
-        token_type: "Bearer",
-        user_id: "",
+        '.expires': '',
+        '.issued': '',
+        installation_id: '',
+        installation_name: '',
+        token_type: 'Bearer',
+        user_id: '',
         access_token: opts.token,
-        refresh_token: "",
+        refresh_token: '',
         expires_in: 0,
-        first_name: "",
-        last_name: ""
+        first_name: '',
+        last_name: '',
       },
       opts.host,
       false,
@@ -331,7 +338,7 @@ export class FamisClient {
       new QueryContext().setFilter(`UserId eq ${opts.userId}`)
     );
     const crewIds = crewAssocs.results.map((c) => c.CrewId);
-    return this.getCrewsByIds({ids: crewIds});
+    return this.getCrewsByIds({ ids: crewIds });
   }
 
   async getCrewsByIds(opts: { ids: number[] }): Promise<Crew[]> {
@@ -471,9 +478,9 @@ export class FamisClient {
       searchParams.propertyId && (searchParams.requestTypeId || searchParams.activityGroupId)
         ? activityUserIds.filter((a) => propertyUserIds.includes(a))
         : searchParams.requestTypeId || searchParams.activityGroupId
-          ? activityUserIds
-          : propertyUserIds;
-    return this.getUsersForIds({userIds: userIds}, context);
+        ? activityUserIds
+        : propertyUserIds;
+    return this.getUsersForIds({ userIds: userIds }, context);
   }
 
   async getUsersForIds(opts: { userIds: number[] }, context: QueryContext): Promise<FamisUser[]> {
@@ -708,7 +715,7 @@ export class FamisClient {
         propertyIds.push(props.PropertyId);
       }
     }
-    return this.getPropertiesByIds({ids: propertyIds, select: opts.select, expand: opts.expand});
+    return this.getPropertiesByIds({ ids: propertyIds, select: opts.select, expand: opts.expand });
   }
 
   async getPropertiesByIds(opts: {
@@ -805,7 +812,7 @@ export class FamisClient {
       new QueryContext().setFilter(`ActivityGroupId eq ${activityId}`)
     );
     const requestIds = activityGroupResponse.results.map((a) => a.RequestTypeId);
-    return await this.getRequestTypesByIds({ids: requestIds}, context);
+    return await this.getRequestTypesByIds({ ids: requestIds }, context);
   }
 
   async getRequestTypesByIds(
@@ -951,7 +958,10 @@ export class FamisClient {
   }
 
   async createMaterialCost(materialCost: PostMaterialCostRequest): Promise<MaterialCost> {
-    return this.createObject<PostMaterialCostRequest, MaterialCost>(materialCost, 'workordermaterialcosts');
+    return this.createObject<PostMaterialCostRequest, MaterialCost>(
+      materialCost,
+      'workordermaterialcosts'
+    );
   }
 
   //#endregion
@@ -1036,7 +1046,7 @@ export class FamisClient {
     }
     const pageCount = Math.ceil(totalCount / top);
     const promises = [];
-    const limiter = new Bottleneck({maxConcurrent: 4});
+    const limiter = new Bottleneck({ maxConcurrent: 4 });
     for (let i = 1; i < pageCount; i++) {
       const url = context.buildPagedUrl(type, top, i * top);
 
@@ -1106,7 +1116,7 @@ export class FamisClient {
   // generic requests
 
   async rawRequest<T>(method: string, endpoint: string, params: any, payload: any): Promise<T> {
-    const uri = this.http.getUri({url: buildEntityUrl(endpoint)});
+    const uri = this.http.getUri({ url: buildEntityUrl(endpoint) });
 
     const resp = await this.http.request({
       method: method as Method,
