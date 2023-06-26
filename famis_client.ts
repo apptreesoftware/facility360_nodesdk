@@ -3,9 +3,12 @@ import Axios, { AxiosError, AxiosInstance, AxiosResponse, Method } from 'axios';
 import { ApiError, AuthorizationError } from './errors';
 import {
   AccountSegment,
+  AccountSegmentValue,
+  ChartOfAccount,
   ActivityGroup,
   Asset,
   AssetClass,
+  AssetRank,
   AssetKeyword,
   AssetMake,
   AssetModel,
@@ -29,6 +32,7 @@ import {
   InspectionType,
   InstallationConfig,
   LaborCost,
+  LaborRateType,
   LogbookConfiguration,
   MaterialCost,
   OtherCost,
@@ -43,6 +47,7 @@ import {
   RequestStatus,
   RequestSubType,
   RequestType,
+  RequestTypeActivity,
   RequestTypeActivityGroupAssociations,
   ServiceType,
   Space,
@@ -58,7 +63,7 @@ import {
   UserType,
   WorkOrder,
   WorkOrderComment,
-  WorkType,
+  WorkType
 } from './model/famis_models';
 import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
@@ -78,7 +83,7 @@ import {
   PostOtherCostRequest,
   PostUdfForWoRequest,
   PostWorkOrderRequest,
-  SearchUsersRequest,
+  SearchUsersRequest
 } from './model/request_models';
 import _ from 'lodash';
 import moment = require('moment');
@@ -96,11 +101,11 @@ export const DefaultUserSelect = [
   'UserName',
   'Name',
   'Email',
-  'ActiveFlag',
+  'ActiveFlag'
 ];
 export const DefaultPropertySelect = ['Id', 'Name', 'Addr1', 'City', 'StateId', 'Zip'];
 export const DefaultPropertyExpand = [
-  'State($select=Id,CountryName,Name,Abbreviation,Description,StateCode)',
+  'State($select=Id,CountryName,Name,Abbreviation,Description,StateCode)'
 ];
 export const DefaultSpaceSelect = ['Id', 'Name', 'LongDescription'];
 
@@ -122,7 +127,7 @@ export class FamisClient {
     const cred = await this.login({
       username: opts.username,
       password: opts.password,
-      url: opts.host,
+      url: opts.host
     });
     if (opts.debug) {
       console.log(`Logged in with ${JSON.stringify(cred)}`);
@@ -155,7 +160,7 @@ export class FamisClient {
         refresh_token: '',
         expires_in: 0,
         first_name: '',
-        last_name: '',
+        last_name: ''
       },
       opts.host,
       false,
@@ -169,12 +174,12 @@ export class FamisClient {
     url: string;
   }): Promise<LoginResponse> {
     const http = axios.create({
-      baseURL: opts.url,
+      baseURL: opts.url
     });
     console.log(`Logging into ${opts.url}. ${(opts.username, opts.password)}`);
     const resp = await http.post('MobileWebServices/api/Login', {
       username: opts.username,
-      password: opts.password,
+      password: opts.password
     });
     try {
       const loginResponse = resp.data as LoginResponse;
@@ -197,10 +202,10 @@ export class FamisClient {
         `${opts.url}/MobileWebServices/api/refreshtoken`,
         {
           grant_type: 'bearer',
-          refresh_token: opts.refreshToken,
+          refresh_token: opts.refreshToken
         },
         {
-          validateStatus: (s) => true,
+          validateStatus: (s) => true
         }
       );
       const loginResponse = resp.data as LoginResponse;
@@ -226,12 +231,12 @@ export class FamisClient {
     this.host = host;
     this.http = axios.create({
       baseURL: host,
-      validateStatus: (status) => true,
+      validateStatus: (status) => true
     });
     if (autoRetry) {
       axiosRetry(this.http, {
         retries: 2,
-        retryDelay: () => 2,
+        retryDelay: () => 2
       });
     }
 
@@ -255,7 +260,7 @@ export class FamisClient {
   async refreshAuthCredential(): Promise<FamisOAuthCredential> {
     return FamisClient.refreshCredential({
       refreshToken: this.credentials.refresh_token,
-      url: this.host,
+      url: this.host
     });
   }
 
@@ -269,6 +274,10 @@ export class FamisClient {
   // Assets
   async getAssetClasses(context: QueryContext): Promise<Result<AssetClass>> {
     return this.getAll<AssetClass>(context, 'assetclasses');
+  }
+
+  async getAssetRanks(context: QueryContext): Promise<Result<AssetRank>> {
+    return this.getAll<AssetRank>(context, 'assetranks');
   }
 
   async getAssetKeywords(context: QueryContext): Promise<Result<AssetKeyword>> {
@@ -478,8 +487,8 @@ export class FamisClient {
       searchParams.propertyId && (searchParams.requestTypeId || searchParams.activityGroupId)
         ? activityUserIds.filter((a) => propertyUserIds.includes(a))
         : searchParams.requestTypeId || searchParams.activityGroupId
-        ? activityUserIds
-        : propertyUserIds;
+          ? activityUserIds
+          : propertyUserIds;
     return this.getUsersForIds({ userIds: userIds }, context);
   }
 
@@ -525,7 +534,7 @@ export class FamisClient {
       activityGroupIds: activityGroupIds,
       select: opts.select,
       expand: opts.expand,
-      includeInactive: opts.includeInactive,
+      includeInactive: opts.includeInactive
     });
   }
 
@@ -632,6 +641,22 @@ export class FamisClient {
     return this.getAll<AccountSegment>(context, 'accountsegmentnpfa');
   }
 
+  async getAccountSegmentValues(context: QueryContext): Promise<Result<AccountSegmentValue>> {
+    return this.getAll<AccountSegmentValue>(context, 'accountsegmentvaluenpfa');
+  }
+
+  async getChartOfAccounts(context: QueryContext): Promise<Result<ChartOfAccount>> {
+    return this.getAll<ChartOfAccount>(context, 'chartofaccountsnpfa');
+  }
+
+  async getLaborRateTypes(context: QueryContext): Promise<Result<LaborRateType>> {
+    return this.getAll<LaborRateType>(context, 'laborratetypes');
+  }
+
+  async getRequestTypeActivities(context: QueryContext): Promise<Result<RequestTypeActivity>> {
+    return this.getAll<RequestTypeActivity>(context, 'requesttypeactivities');
+  }
+
   async getActivityGroups(context: QueryContext): Promise<Result<ActivityGroup>> {
     return this.getAll<ActivityGroup>(context, 'activitygroups');
   }
@@ -687,7 +712,7 @@ export class FamisClient {
         .setExpand(expand.join(','))
     );
     const defaults: DefaultPropertyAndSpace = {
-      property: res.first ?? undefined,
+      property: res.first ?? undefined
     };
     if (defaults.property && defaultPropId.DefaultSpaceId) {
       const spaceResponse = await this.getSpaces(
@@ -1019,7 +1044,7 @@ export class FamisClient {
       first: items.length > 0 ? items[0] : null,
       results: items,
       totalDuration: durationMs,
-      averageDuration: durationMs / fetchCount,
+      averageDuration: durationMs / fetchCount
     };
   }
 
@@ -1107,7 +1132,7 @@ export class FamisClient {
       first: items.length > 0 ? items[0] : null,
       averageDuration: durationMs / fetchCount,
       results: items,
-      totalDuration: durationMs,
+      totalDuration: durationMs
     };
   }
 
@@ -1125,8 +1150,8 @@ export class FamisClient {
       params: params,
       responseType: 'json',
       headers: {
-        'Content-Type': 'application/json',
-      },
+        'Content-Type': 'application/json'
+      }
     });
     this.throwResponseError(resp);
     return resp.data as T;

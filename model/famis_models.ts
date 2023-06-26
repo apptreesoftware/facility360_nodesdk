@@ -154,6 +154,64 @@ export interface AccountSegment {
   ExternalId: string;
 }
 
+export interface AccountSegmentValue {
+  Id: number;
+  SegmentValue: string;
+  Active: boolean;
+  SegmentId: number;
+  ExternalId?: null;
+  SegmentExternalId?: null;
+  SegmentValueDescription: string;
+  ValidFromDate?: null;
+  ValidToDate?: null;
+  UserId?: null;
+  UserExternalId?: null;
+  SpaceFunctionalCategoryId?: null;
+}
+
+export interface ChartOfAccount {
+  Id: number;
+  Name: string;
+  ValidFrom: string;
+  ValidTo: string;
+  MaxSegments: number;
+  Active: boolean;
+  ExternalId: string;
+}
+
+export interface RequestTypeActivity {
+  RequestTypeActivityId: number;
+  RequestTypeActivityName: string;
+  RequestTypeId: number;
+  UpdateDate: string;
+  UpdatedById: number;
+  Active: boolean;
+  TabOrder: number;
+  ExtraColumn: boolean;
+  ChartOfAccountId?: null;
+  ChartOfAccountMarkupId?: null;
+  TeOnly: boolean;
+  Taxable: boolean;
+  ChartOfAccountTaxId?: null;
+  ChargeTypeCode: string;
+  TravelTime: number;
+  IncomeCategory: string;
+  UnappliedLabor: boolean;
+  RequestTypeActivityUpdatedByExternalId?: null;
+  RequestTypeActivityExternalId: string;
+}
+
+export interface LaborRateType {
+  Id: number;
+  Name: string;
+  Abbreviation: string;
+  PaidLaborFlag: boolean;
+  RegularRateFlag: boolean;
+  OvertimeRateFlag: boolean;
+  DoubleTimeRateFlag: boolean;
+  Active: boolean;
+}
+
 export interface FamisAttachment {
   Id: number;
   RequestId: number;
@@ -344,6 +402,7 @@ export interface RequestPriority {
   Level?: string;
   EmergencyEscalation: boolean;
 }
+
 export interface Procedure {
   Id: number;
   Name: string;
@@ -868,11 +927,15 @@ export interface Asset {
 }
 
 export interface AssetRank {
+  Id?: number;
   Description?: string;
   Value?: number;
-  Id?: number;
-  UpdateDate?: Date;
+  UpdateDate?: string;
+  UpdatedById?: number;
+  UpdatedByExternalId?: string;
   Active?: boolean;
+  TabOrder?: number;
+  RestrictedFlag?: boolean;
 }
 
 export interface Crew {
