@@ -21,102 +21,99 @@ export interface SpaceClass {
 }
 
 export interface SpaceCategorization {
-  Id?:                        number;
-  SpaceId?:                   number;
-  SubSpaceId?:                number;
-  AllocIndividualId?:         number;
-  AllocOrgId?:                number;
-  OwningOrgId?:               number;
-  BillingOrgId?:              number;
-  OwnershipStatusId?:         number;
-  FunctionalStatusId?:        number;
-  FunctionalCatId?:           number;
-  FunctionalSubCatId?:        number;
-  SpaceCategoryId?:           number;
-  SpaceSubCategoryId?:        number;
-  SpaceTypeId?:               number;
-  SpaceStandardId?:           number;
+  Id?: number;
+  SpaceId?: number;
+  SubSpaceId?: number;
+  AllocIndividualId?: number;
+  AllocOrgId?: number;
+  OwningOrgId?: number;
+  BillingOrgId?: number;
+  OwnershipStatusId?: number;
+  FunctionalStatusId?: number;
+  FunctionalCatId?: number;
+  FunctionalSubCatId?: number;
+  SpaceCategoryId?: number;
+  SpaceSubCategoryId?: number;
+  SpaceTypeId?: number;
+  SpaceStandardId?: number;
   SpaceStandardApprovalFlag?: boolean;
 }
 
 export interface SpaceCategory {
-  Id?:                         number;
-  Name?:                       string;
-  Description?:                string;
-  ActiveFlag?:                 boolean;
-  TabOrder?:                   number;
-  UpdateDate?:                 Date;
-  UpdatedByName?:              string;
-  ExteriorGrossFlag?:          boolean;
-  InteriorGrossFlag?:          boolean;
-  RentablePerContractFlag?:    boolean;
-  BuildingRentableFlag?:       boolean;
-  UsableAreaFlag?:             boolean;
-  InteriorPlanningAreaFlag?:   boolean;
-  AssignableAreaFlag?:         boolean;
-  NonAssignableAreaFlag?:      boolean;
+  Id?: number;
+  Name?: string;
+  Description?: string;
+  ActiveFlag?: boolean;
+  TabOrder?: number;
+  UpdateDate?: Date;
+  UpdatedByName?: string;
+  ExteriorGrossFlag?: boolean;
+  InteriorGrossFlag?: boolean;
+  RentablePerContractFlag?: boolean;
+  BuildingRentableFlag?: boolean;
+  UsableAreaFlag?: boolean;
+  InteriorPlanningAreaFlag?: boolean;
+  AssignableAreaFlag?: boolean;
+  NonAssignableAreaFlag?: boolean;
   NonMeasurablePortfolioFlag?: boolean;
-  Number?:                     string;
-  SpaceSubCategories?:         SpaceSubCategory[];
+  Number?: string;
+  SpaceSubCategories?: SpaceSubCategory[];
 }
 
 export interface SpaceSubCategory {
-  Id?:                        number;
-  Name?:                      string;
-  Description?:               string;
-  ActiveFlag?:                boolean;
-  TabOrder?:                  number;
-  UpdateDate?:                Date;
-  UpdatedByName?:             string;
-  CategoryId?:                number;
+  Id?: number;
+  Name?: string;
+  Description?: string;
+  ActiveFlag?: boolean;
+  TabOrder?: number;
+  UpdateDate?: Date;
+  UpdatedByName?: string;
+  CategoryId?: number;
   SpaceStandardDefinitionId?: number;
-  Number?:                    string;
-  SpaceTypes?:                SpaceType[];
+  Number?: string;
+  SpaceTypes?: SpaceType[];
 }
 
 export interface SpaceArea {
-  Id?:             number;
-  SpaceId?:        number;
+  Id?: number;
+  SpaceId?: number;
   TotalArea1SqFt?: number;
   TotalArea2SqFt?: number;
-  TotalArea1SqM?:  number;
-  TotalArea2SqM?:  number;
+  TotalArea1SqM?: number;
+  TotalArea2SqM?: number;
   OtherArea1SqFt?: number;
   OtherArea2SqFt?: number;
   OtherArea3SqFt?: number;
   OtherArea4SqFt?: number;
   OtherArea5SqFt?: number;
-  OtherArea1SqM?:  number;
-  OtherArea2SqM?:  number;
-  OtherArea3SqM?:  number;
-  OtherArea4SqM?:  number;
-  OtherArea5SqM?:  number;
-  IncludeEG?:      number;
-  IncludeIG?:      number;
-  IncludeRPC?:     number;
-  IncludeBR?:      number;
-  IncludeUA?:      number;
-  IncludeIPA?:     number;
-  IncludeAA?:      number;
-  IncludeNAA?:     number;
-  IncludeNMP?:     number;
-  Force100?:       boolean;
+  OtherArea1SqM?: number;
+  OtherArea2SqM?: number;
+  OtherArea3SqM?: number;
+  OtherArea4SqM?: number;
+  OtherArea5SqM?: number;
+  IncludeEG?: number;
+  IncludeIG?: number;
+  IncludeRPC?: number;
+  IncludeBR?: number;
+  IncludeUA?: number;
+  IncludeIPA?: number;
+  IncludeAA?: number;
+  IncludeNAA?: number;
+  IncludeNMP?: number;
+  Force100?: boolean;
 }
 
-
 export interface SpaceType {
-  Id?:            number;
-  Name?:          string;
-  Number?:        string;
-  Description?:   string;
-  ActiveFlag?:    boolean;
-  TabOrder?:      number;
-  UpdateDate?:    Date;
+  Id?: number;
+  Name?: string;
+  Number?: string;
+  Description?: string;
+  ActiveFlag?: boolean;
+  TabOrder?: number;
+  UpdateDate?: Date;
   UpdatedByName?: string;
   SubCategoryId?: number;
 }
-
-
 
 export interface Department {
   Id?: number;
@@ -155,6 +152,64 @@ export interface AccountSegment {
   CharacterLimit: number;
   CaseRestriction: number;
   ExternalId: string;
+}
+
+export interface AccountSegmentValue {
+  Id: number;
+  SegmentValue: string;
+  Active: boolean;
+  SegmentId: number;
+  ExternalId?: null;
+  SegmentExternalId?: null;
+  SegmentValueDescription: string;
+  ValidFromDate?: null;
+  ValidToDate?: null;
+  UserId?: null;
+  UserExternalId?: null;
+  SpaceFunctionalCategoryId?: null;
+}
+
+export interface ChartOfAccount {
+  Id: number;
+  Name: string;
+  ValidFrom: string;
+  ValidTo: string;
+  MaxSegments: number;
+  Active: boolean;
+  ExternalId: string;
+}
+
+export interface RequestTypeActivity {
+  RequestTypeActivityId: number;
+  RequestTypeActivityName: string;
+  RequestTypeId: number;
+  UpdateDate: string;
+  UpdatedById: number;
+  Active: boolean;
+  TabOrder: number;
+  ExtraColumn: boolean;
+  ChartOfAccountId?: null;
+  ChartOfAccountMarkupId?: null;
+  TeOnly: boolean;
+  Taxable: boolean;
+  ChartOfAccountTaxId?: null;
+  ChargeTypeCode: string;
+  TravelTime: number;
+  IncomeCategory: string;
+  UnappliedLabor: boolean;
+  RequestTypeActivityUpdatedByExternalId?: null;
+  RequestTypeActivityExternalId: string;
+}
+
+export interface LaborRateType {
+  Id: number;
+  Name: string;
+  Abbreviation: string;
+  PaidLaborFlag: boolean;
+  RegularRateFlag: boolean;
+  OvertimeRateFlag: boolean;
+  DoubleTimeRateFlag: boolean;
+  Active: boolean;
 }
 
 export interface FamisAttachment {
@@ -346,6 +401,87 @@ export interface RequestPriority {
   UpdatedById: number;
   Level?: string;
   EmergencyEscalation: boolean;
+}
+
+export interface Procedure {
+  Id: number;
+  Name: string;
+  ExternalId: string;
+  AssetClassId: number;
+  PropertyId: number;
+  PropertyExternalId: string;
+  RegionId: number;
+  RegionExternalId: string;
+  InspectionClassId: number;
+  InspectionTypeId: number;
+  Owner: string;
+  ActiveFlag: boolean;
+  PriorityId: number;
+  DefaultRecurrencePattern: string;
+  DefaultFrequency: string;
+  TypeId: number;
+  EstimatedLaborHours: number;
+  CreatedByName: string;
+  CreateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: null;
+  UpdateDate: Date;
+  ProcedureText: string;
+  ExternalSystemId: string;
+}
+
+export interface FailureCode {
+  Id: number;
+  Name: string;
+  Active: boolean;
+  FailureCodeEnum: string;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  UpdateDate: Date;
+}
+
+export interface BillingTypeNPFA {
+  Id: number;
+  Description: string;
+  Default: boolean;
+  LaborCode: string;
+  LaborMarkup: number;
+  MaterialCode: string;
+  MaterialMarkup: number;
+  OtherCostCode: string;
+  UpdatedByName: string;
+  UpdateDate: Date;
+}
+
+export interface InspectionClass {
+  Id: number;
+  Description: string;
+  ScoringTypeId: number;
+  Active: boolean;
+  SurveyFlag: boolean;
+  Benchmark: number;
+  RequestTypeId: number;
+  RequestSubTypeId: number;
+  WoSendThreshold: number;
+  NotifyAssignedToFlag: number;
+  LcamFlag: boolean;
+  AssessmentFlag: boolean;
+  CalculateScoreFlag: boolean;
+  AllowDeleteFlag: boolean;
+  RequestTypeExternalId: string;
+  RequestSubTypeExternalId: string;
+}
+
+export interface InspectionType {
+  Id: number;
+  Description: string;
+  Active: boolean;
+  InspectionClassId: number;
+  AssetReadingFlag: boolean;
+  DefaultInitialScoreFlag: boolean;
+  RequiredInspectionFlag: boolean;
+  DisplayScoreFlag: boolean;
+  TabOrder: number;
 }
 
 export interface RequestSubType {
@@ -791,11 +927,15 @@ export interface Asset {
 }
 
 export interface AssetRank {
+  Id?: number;
   Description?: string;
   Value?: number;
-  Id?: number;
-  UpdateDate?: Date;
+  UpdateDate?: string;
+  UpdatedById?: number;
+  UpdatedByExternalId?: string;
   Active?: boolean;
+  TabOrder?: number;
+  RestrictedFlag?: boolean;
 }
 
 export interface Crew {
@@ -1075,18 +1215,18 @@ export interface PropertyRegionAssociation {
 }
 
 export interface Region {
-  Id:                number;
-  Name:              string;
-  CompanyId:         number;
-  ParentId?:          number;
-  UpdateDate:        Date;
-  ParentFlag:        boolean;
-  Sqft:              number;
-  ExternalId?:        string;
-  Description:       string;
-  Type:              string;
+  Id: number;
+  Name: string;
+  CompanyId: number;
+  ParentId?: number;
+  UpdateDate: Date;
+  ParentFlag: boolean;
+  Sqft: number;
+  ExternalId?: string;
+  Description: string;
+  Type: string;
   CompanyExternalId?: string;
-  ParentExternalId?:  string;
+  ParentExternalId?: string;
 }
 
 export interface FamisUser {
@@ -1223,7 +1363,6 @@ export interface Udf {
   AllocationLayerId?: number;
   RequestId?: number;
 }
-
 
 export interface RequestTypeActivityGroupAssociations {
   Id: number;
@@ -1460,318 +1599,318 @@ export interface ServiceType {
 }
 
 export interface LaborCost {
-  EmployeeId?:                    number;
-  ExternalEmployeeId?:            string;
-  TimeStarted?:                   string;
-  TimeFinished?:                  string;
-  Rate?:                          number;
-  Hours?:                         number;
-  RateTypeId?:                    number;
-  RequestTypeActivityId?:         number;
+  EmployeeId?: number;
+  ExternalEmployeeId?: string;
+  TimeStarted?: string;
+  TimeFinished?: string;
+  Rate?: number;
+  Hours?: number;
+  RateTypeId?: number;
+  RequestTypeActivityId?: number;
   ExternalRequestTypeActivityId?: string;
-  ApInvoiceNumber?:               string;
-  ApAccountNumber?:               string;
-  LienWaiverAmount?:              number;
-  LienWaiverComments?:            string;
-  PaymentComments?:               string;
-  ApInvoiceAmount?:               number;
-  ApPostDate?:                    Date;
-  ApDueDate?:                     Date;
-  ApTaxAmount?:                   number;
-  ApShippingHandlingAmount?:      number;
-  ApInvoiceStatusId?:             number;
-  ApInvoiceDate?:                 Date;
-  CoaAccountId?:                  number;
-  Payee?:                         string;
-  TaxAmount?:                     number;
-  BudgetYear?:                    number;
-  VendorCode?:                    string;
-  VendorCompanyExternalId?:       string;
-  CrewId?:                        number;
-  Id?:                            number;
-  InstallId?:                     number;
-  RequestId?:                     number;
-  RequestExternalId?:             string;
-  Date?:                          Date;
-  Description?:                   string;
-  VendorCompanyId?:               number;
-  TotalAmount?:                   number;
-  MarkupFlag?:                    boolean;
-  TotalMarkup?:                   number;
-  AccountId?:                     number;
-  UpdateDate?:                    Date;
-  RecurrenceId?:                  number;
-  UpdatedById?:                   number;
-  AccountsPayableFlag?:           boolean;
-  ApExportFlag?:                  boolean;
-  TaxableFlag?:                   boolean;
-  CurrencySign?:                  string;
-  CurrencyCode?:                  string;
-  LineItemNumber?:                number;
-  ExternalId?:                    string;
-  TaxRate?:                       number;
-  ExternalUpdatedById?:           string;
-  ExternalRecurrenceId?:          string;
-  InvoiceNumber?:                 string;
-  InvoiceDate?:                   Date;
+  ApInvoiceNumber?: string;
+  ApAccountNumber?: string;
+  LienWaiverAmount?: number;
+  LienWaiverComments?: string;
+  PaymentComments?: string;
+  ApInvoiceAmount?: number;
+  ApPostDate?: Date;
+  ApDueDate?: Date;
+  ApTaxAmount?: number;
+  ApShippingHandlingAmount?: number;
+  ApInvoiceStatusId?: number;
+  ApInvoiceDate?: Date;
+  CoaAccountId?: number;
+  Payee?: string;
+  TaxAmount?: number;
+  BudgetYear?: number;
+  VendorCode?: string;
+  VendorCompanyExternalId?: string;
+  CrewId?: number;
+  Id?: number;
+  InstallId?: number;
+  RequestId?: number;
+  RequestExternalId?: string;
+  Date?: Date;
+  Description?: string;
+  VendorCompanyId?: number;
+  TotalAmount?: number;
+  MarkupFlag?: boolean;
+  TotalMarkup?: number;
+  AccountId?: number;
+  UpdateDate?: Date;
+  RecurrenceId?: number;
+  UpdatedById?: number;
+  AccountsPayableFlag?: boolean;
+  ApExportFlag?: boolean;
+  TaxableFlag?: boolean;
+  CurrencySign?: string;
+  CurrencyCode?: string;
+  LineItemNumber?: number;
+  ExternalId?: string;
+  TaxRate?: number;
+  ExternalUpdatedById?: string;
+  ExternalRecurrenceId?: string;
+  InvoiceNumber?: string;
+  InvoiceDate?: Date;
 }
 
 export interface OtherCost {
-  OtherCostTypeId?:          number;
-  OtherCostType?:            OtherCostType;
-  Quantity?:                 number;
-  UnitCost?:                 number;
-  ShippingAndHandlingCost?:  number;
-  Account?:                  Account;
-  ReceivedById?:             number;
-  ApInvoiceNumber?:          string;
-  ApAccountNumber?:          string;
-  LienWaiverAmount?:         number;
-  LienWaiverComments?:       string;
-  PaymentComments?:          string;
-  ApInvoiceAmount?:          number;
-  ApPostDate?:               Date;
-  ApDueDate?:                Date;
-  ApTaxAmount?:              number;
+  OtherCostTypeId?: number;
+  OtherCostType?: OtherCostType;
+  Quantity?: number;
+  UnitCost?: number;
+  ShippingAndHandlingCost?: number;
+  Account?: Account;
+  ReceivedById?: number;
+  ApInvoiceNumber?: string;
+  ApAccountNumber?: string;
+  LienWaiverAmount?: number;
+  LienWaiverComments?: string;
+  PaymentComments?: string;
+  ApInvoiceAmount?: number;
+  ApPostDate?: Date;
+  ApDueDate?: Date;
+  ApTaxAmount?: number;
   ApShippingHandlingAmount?: number;
-  ApInvoiceStatusId?:        number;
-  ApInvoiceDate?:            Date;
-  CoaAccountId?:             number;
-  Payee?:                    string;
-  TaxAmount?:                number;
-  BudgetYear?:               number;
-  VendorCode?:               string;
-  VendorCompanyExternalId?:  string;
-  Id?:                       number;
-  InstallId?:                number;
-  RequestId?:                number;
-  RequestExternalId?:        string;
-  Date?:                     Date;
-  Description?:              string;
-  VendorCompanyId?:          number;
-  TotalAmount?:              number;
-  MarkupFlag?:               boolean;
-  TotalMarkup?:              number;
-  AccountId?:                number;
-  UpdateDate?:               Date;
-  RecurrenceId?:             number;
-  UpdatedById?:              number;
-  AccountsPayableFlag?:      boolean;
-  ApExportFlag?:             boolean;
-  TaxableFlag?:              boolean;
-  CurrencySign?:             string;
-  CurrencyCode?:             string;
-  LineItemNumber?:           number;
-  ExternalId?:               string;
-  TaxRate?:                  number;
-  ExternalUpdatedById?:      string;
-  ExternalRecurrenceId?:     string;
-  InvoiceNumber?:            string;
-  InvoiceDate?:              Date;
+  ApInvoiceStatusId?: number;
+  ApInvoiceDate?: Date;
+  CoaAccountId?: number;
+  Payee?: string;
+  TaxAmount?: number;
+  BudgetYear?: number;
+  VendorCode?: string;
+  VendorCompanyExternalId?: string;
+  Id?: number;
+  InstallId?: number;
+  RequestId?: number;
+  RequestExternalId?: string;
+  Date?: Date;
+  Description?: string;
+  VendorCompanyId?: number;
+  TotalAmount?: number;
+  MarkupFlag?: boolean;
+  TotalMarkup?: number;
+  AccountId?: number;
+  UpdateDate?: Date;
+  RecurrenceId?: number;
+  UpdatedById?: number;
+  AccountsPayableFlag?: boolean;
+  ApExportFlag?: boolean;
+  TaxableFlag?: boolean;
+  CurrencySign?: string;
+  CurrencyCode?: string;
+  LineItemNumber?: number;
+  ExternalId?: string;
+  TaxRate?: number;
+  ExternalUpdatedById?: string;
+  ExternalRecurrenceId?: string;
+  InvoiceNumber?: string;
+  InvoiceDate?: Date;
 }
 
 export interface Account {
-  Id?:                number;
-  RequestId?:         number;
+  Id?: number;
+  RequestId?: number;
   RequestExternalId?: string;
-  Description?:       string;
-  Number?:            string;
-  IsDefault?:         boolean;
+  Description?: string;
+  Number?: string;
+  IsDefault?: boolean;
 }
 
 export interface OtherCostType {
-  Id?:                   number;
-  Name?:                 string;
-  Active?:               boolean;
-  TaxableFlag?:          boolean;
-  IncomeCategory?:       string;
-  ContraAccountNumber?:  string;
-  OtherCostGLAccount?:   string;
-  GLAccountId?:          number;
+  Id?: number;
+  Name?: string;
+  Active?: boolean;
+  TaxableFlag?: boolean;
+  IncomeCategory?: string;
+  ContraAccountNumber?: string;
+  OtherCostGLAccount?: string;
+  GLAccountId?: number;
   GLAccountIdForMarkup?: number;
   StandardChargeAmount?: number;
-  DiscountedFlag?:       boolean;
+  DiscountedFlag?: boolean;
 }
 
 export interface MaterialCost {
-  Id?:                    number;
-  RequestId?:             number;
-  ItemName?:              string;
-  Description?:           string;
+  Id?: number;
+  RequestId?: number;
+  ItemName?: string;
+  Description?: string;
   ChargeToAccountNumber?: string;
-  ChargeToAccount?:       string;
-  Quantity?:              number;
-  UnitCost?:              number;
-  TaxCost?:               number;
-  SHCost?:                number;
-  TotalCost?:             number;
-  Date?:                  Date;
-  LineNumber?:            number;
-  EmployeeId?:            number;
-  Markup?:                boolean;
-  UpdateDate?:            Date;
-  TotalMarkup?:           number;
-  ItemId?:                number;
-  AccountId?:             number;
-  TaxRate?:               number;
-  MarkupPercentage?:      number;
-  WarehouseMaterialId?:   number;
-  BudgetYear?:            number;
-  Taxable?:               boolean;
-  BinId?:                 number;
-  PoDetailId?:            number;
-  UpdatedByExternalId?:   string;
+  ChargeToAccount?: string;
+  Quantity?: number;
+  UnitCost?: number;
+  TaxCost?: number;
+  SHCost?: number;
+  TotalCost?: number;
+  Date?: Date;
+  LineNumber?: number;
+  EmployeeId?: number;
+  Markup?: boolean;
+  UpdateDate?: Date;
+  TotalMarkup?: number;
+  ItemId?: number;
+  AccountId?: number;
+  TaxRate?: number;
+  MarkupPercentage?: number;
+  WarehouseMaterialId?: number;
+  BudgetYear?: number;
+  Taxable?: boolean;
+  BinId?: number;
+  PoDetailId?: number;
+  UpdatedByExternalId?: string;
 }
 
 export interface InstallationConfig {
-  Id?:                                     number;
-  IntegrationSecurity?:                    boolean;
-  HealthCareModule?:                       boolean;
-  GuestUserEmailRequired?:                 boolean;
-  AssetModule?:                            boolean;
-  AssetHierarchyModule?:                   boolean;
-  WorkOrderEstimates?:                     boolean;
-  AdvancedInventoryModule?:                boolean;
-  Crews?:                                  boolean;
-  ApprovalModule?:                         boolean;
-  WsResponseEnabled?:                      boolean;
-  MobileApis?:                             boolean;
-  LogbookModule?:                          boolean;
-  WorkOrderModule?:                        boolean;
-  InspectionModule?:                       boolean;
-  VisitorModule?:                          boolean;
-  IncidentModule?:                         boolean;
-  TimecardTeModule?:                       boolean;
-  ProjectModule?:                          boolean;
-  InventoryModule?:                        boolean;
-  InventoryBillOfMaterialsModule?:         boolean;
-  ProvisioningModule?:                     boolean;
-  EmergencyPlanningModule?:                boolean;
-  PurchasingModule?:                       boolean;
-  EventModule?:                            boolean;
-  PropertyModule?:                         boolean;
-  PropertyBillingModule?:                  boolean;
-  ReservationModule?:                      boolean;
-  WorkOrderForms?:                         boolean;
-  AssessmentsModule?:                      boolean;
-  LeaseAdminModule?:                       boolean;
-  UtilityModule?:                          boolean;
-  SpaceModule?:                            boolean;
-  VisualMapModule?:                        boolean;
-  MaintenanceProjects?:                    boolean;
-  SpaceSurveyModule?:                      boolean;
-  TowerWingsOn?:                           boolean;
-  FloorsOn?:                               boolean;
-  SubspacesOn?:                            boolean;
-  TowerWingAutoCreated?:                   boolean;
-  TowerWingRequired?:                      boolean;
-  TimeCardV2Module?:                       boolean;
-  ApiDocs?:                                boolean;
-  KeysModule?:                             boolean;
-  AccruentAnalyticsModule?:                boolean;
-  HelpLinkUrl?:                            string;
-  NpfaAccess?:                             boolean;
-  FavoritesFlag?:                          boolean;
-  Description?:                            string;
-  InstallUrl?:                             string;
-  CustomerDocumentExternalPath?:           string;
-  NavigationFooterLogoFile?:               string;
-  NavigationFooterLogoUrl?:                string;
-  NavigationHeaderLogoFile?:               string;
-  NavigationHeaderLogoUrl?:                string;
-  NavigationFooterText?:                   string;
-  NavigationHeaderColor?:                  string;
-  AssetIntegration?:                       boolean;
-  InvoiceIntegration?:                     boolean;
-  ProjectIntegration?:                     boolean;
-  PropertyIntegration?:                    boolean;
-  PurchaseOrderIntegration?:               boolean;
-  RegionIntegration?:                      boolean;
-  UserIntegration?:                        boolean;
-  WorkOrderIntegration?:                   boolean;
-  WorkOrderFinancialIntegration?:          boolean;
-  SpaceFloorSelectorAssetForOn?:           boolean;
-  AllowDateFormatUserOverride?:            boolean;
-  DateFormatId?:                           number;
-  DateFormat?:                             string;
-  CreateRequestReactParentChild?:          boolean;
+  Id?: number;
+  IntegrationSecurity?: boolean;
+  HealthCareModule?: boolean;
+  GuestUserEmailRequired?: boolean;
+  AssetModule?: boolean;
+  AssetHierarchyModule?: boolean;
+  WorkOrderEstimates?: boolean;
+  AdvancedInventoryModule?: boolean;
+  Crews?: boolean;
+  ApprovalModule?: boolean;
+  WsResponseEnabled?: boolean;
+  MobileApis?: boolean;
+  LogbookModule?: boolean;
+  WorkOrderModule?: boolean;
+  InspectionModule?: boolean;
+  VisitorModule?: boolean;
+  IncidentModule?: boolean;
+  TimecardTeModule?: boolean;
+  ProjectModule?: boolean;
+  InventoryModule?: boolean;
+  InventoryBillOfMaterialsModule?: boolean;
+  ProvisioningModule?: boolean;
+  EmergencyPlanningModule?: boolean;
+  PurchasingModule?: boolean;
+  EventModule?: boolean;
+  PropertyModule?: boolean;
+  PropertyBillingModule?: boolean;
+  ReservationModule?: boolean;
+  WorkOrderForms?: boolean;
+  AssessmentsModule?: boolean;
+  LeaseAdminModule?: boolean;
+  UtilityModule?: boolean;
+  SpaceModule?: boolean;
+  VisualMapModule?: boolean;
+  MaintenanceProjects?: boolean;
+  SpaceSurveyModule?: boolean;
+  TowerWingsOn?: boolean;
+  FloorsOn?: boolean;
+  SubspacesOn?: boolean;
+  TowerWingAutoCreated?: boolean;
+  TowerWingRequired?: boolean;
+  TimeCardV2Module?: boolean;
+  ApiDocs?: boolean;
+  KeysModule?: boolean;
+  AccruentAnalyticsModule?: boolean;
+  HelpLinkUrl?: string;
+  NpfaAccess?: boolean;
+  FavoritesFlag?: boolean;
+  Description?: string;
+  InstallUrl?: string;
+  CustomerDocumentExternalPath?: string;
+  NavigationFooterLogoFile?: string;
+  NavigationFooterLogoUrl?: string;
+  NavigationHeaderLogoFile?: string;
+  NavigationHeaderLogoUrl?: string;
+  NavigationFooterText?: string;
+  NavigationHeaderColor?: string;
+  AssetIntegration?: boolean;
+  InvoiceIntegration?: boolean;
+  ProjectIntegration?: boolean;
+  PropertyIntegration?: boolean;
+  PurchaseOrderIntegration?: boolean;
+  RegionIntegration?: boolean;
+  UserIntegration?: boolean;
+  WorkOrderIntegration?: boolean;
+  WorkOrderFinancialIntegration?: boolean;
+  SpaceFloorSelectorAssetForOn?: boolean;
+  AllowDateFormatUserOverride?: boolean;
+  DateFormatId?: number;
+  DateFormat?: string;
+  CreateRequestReactParentChild?: boolean;
   ExternalEmployeeId2RequiredForFullUser?: boolean;
-  SocSoxCompliance?:                       boolean;
-  MaxHumanUserAdmins?:                     number;
-  FromEmailName?:                          string;
-  FromEmailAddr?:                          string;
-  SessionTimeoutMinutes?:                  number;
-  SecureSite?:                             boolean;
-  MobileDateFormat?:                       string;
-  MobileDateFormatId?:                     number;
-  SsoEnabledFlag?:                         boolean;
-  IntegrationApiEnabled?:                  boolean;
-  WoFinancialsV2?:                         boolean;
-  Mobile?:                                 boolean;
-  BlanketPo?:                              boolean;
-  BulkUploaderFlag?:                       boolean;
-  PurchasingV2?:                           boolean;
-  Timesheet?:                              boolean;
-  Timecard?:                               boolean;
-  ProjectManagement?:                      boolean;
-  CompanyDocumentEmailService?:            boolean;
-  MultipleCurrencyInstallation?:           boolean;
-  ImageViewer?:                            boolean;
-  RequestHub?:                             boolean;
-  RouteBasedTaskSchedule?:                 boolean;
-  ViewAssessmentDetailsExtProjectInfo?:    boolean;
-  FileSignatureValidation?:                boolean;
-  ReactNavigation?:                        boolean;
-  CreateRequestReact?:                     boolean;
-  CreateRequestReactFullUser?:             boolean;
-  LoginPageText?:                          string;
-  LoginPageLegalText?:                     string;
-  ShowPrivacyPolicy?:                      boolean;
-  DefaultMessageBody?:                     string;
-  DefaultMessageSubject?:                  string;
-  DefaultMobileBody?:                      string;
-  DefaultMobileSubject?:                   string;
-  FollowupMessagePrefix?:                  string;
-  FollowupMobilePrefix?:                   string;
-  CloseNotificationBody?:                  string;
-  CloseNotificationSubject?:               string;
-  RequestCloseNotification?:               boolean;
-  UpdateNotificationBody?:                 string;
-  UpdateNotificationBodyMobile?:           string;
-  UpdateNotificationSubject?:              string;
-  UpdateNotificationSubjectMobile?:        string;
-  SchedNotificationBody?:                  string;
-  SchedNotificationBodyMobile?:            string;
-  SchedNotificationSubject?:               string;
-  SchedNotificationSubjectMobile?:         string;
-  DefaultRequestConfirmationMsg?:          string;
-  SurveyLink?:                             string;
-  SurveyConfirmationText?:                 string;
-  SurveyText?:                             string;
-  SurveyApprovalFlag?:                     boolean;
-  ServiceProviderUrl?:                     string;
-  ServiceConsumerUrl?:                     string;
-  SsoSamlValidationTypeEnum?:              string;
-  SamlDebugMode?:                          boolean;
-  CustomLoginErrorMessage?:                string;
-  PasswordMinLength?:                      number;
-  PasswordRequirements?:                   string;
-  PasswordExpirationDays?:                 number;
-  AlsAdvancedLoginSecurity?:               boolean;
-  FCA?:                                    boolean;
-  EmployeeDashboard?:                      boolean;
-  LogbookGeographicInformationSystem?:     boolean;
-  Bi?:                                     boolean;
-  BiProvider?:                             string;
-  AdvancedValidate?:                       boolean;
-  InsecureValues?:                         string;
-  ForgotPasswordFlag?:                     boolean;
-  AlsPasswordFreezeHours?:                 number;
-  AlsNumberUnusableOldPasswords?:          number;
-  AlsMaxFailedLogins?:                     number;
-  AlsPasswordLockedTextMobile?:            string;
-  AlsForcePasswordChangeText?:             string;
-  AlsForcePasswordChangeTextMobile?:       string;
+  SocSoxCompliance?: boolean;
+  MaxHumanUserAdmins?: number;
+  FromEmailName?: string;
+  FromEmailAddr?: string;
+  SessionTimeoutMinutes?: number;
+  SecureSite?: boolean;
+  MobileDateFormat?: string;
+  MobileDateFormatId?: number;
+  SsoEnabledFlag?: boolean;
+  IntegrationApiEnabled?: boolean;
+  WoFinancialsV2?: boolean;
+  Mobile?: boolean;
+  BlanketPo?: boolean;
+  BulkUploaderFlag?: boolean;
+  PurchasingV2?: boolean;
+  Timesheet?: boolean;
+  Timecard?: boolean;
+  ProjectManagement?: boolean;
+  CompanyDocumentEmailService?: boolean;
+  MultipleCurrencyInstallation?: boolean;
+  ImageViewer?: boolean;
+  RequestHub?: boolean;
+  RouteBasedTaskSchedule?: boolean;
+  ViewAssessmentDetailsExtProjectInfo?: boolean;
+  FileSignatureValidation?: boolean;
+  ReactNavigation?: boolean;
+  CreateRequestReact?: boolean;
+  CreateRequestReactFullUser?: boolean;
+  LoginPageText?: string;
+  LoginPageLegalText?: string;
+  ShowPrivacyPolicy?: boolean;
+  DefaultMessageBody?: string;
+  DefaultMessageSubject?: string;
+  DefaultMobileBody?: string;
+  DefaultMobileSubject?: string;
+  FollowupMessagePrefix?: string;
+  FollowupMobilePrefix?: string;
+  CloseNotificationBody?: string;
+  CloseNotificationSubject?: string;
+  RequestCloseNotification?: boolean;
+  UpdateNotificationBody?: string;
+  UpdateNotificationBodyMobile?: string;
+  UpdateNotificationSubject?: string;
+  UpdateNotificationSubjectMobile?: string;
+  SchedNotificationBody?: string;
+  SchedNotificationBodyMobile?: string;
+  SchedNotificationSubject?: string;
+  SchedNotificationSubjectMobile?: string;
+  DefaultRequestConfirmationMsg?: string;
+  SurveyLink?: string;
+  SurveyConfirmationText?: string;
+  SurveyText?: string;
+  SurveyApprovalFlag?: boolean;
+  ServiceProviderUrl?: string;
+  ServiceConsumerUrl?: string;
+  SsoSamlValidationTypeEnum?: string;
+  SamlDebugMode?: boolean;
+  CustomLoginErrorMessage?: string;
+  PasswordMinLength?: number;
+  PasswordRequirements?: string;
+  PasswordExpirationDays?: number;
+  AlsAdvancedLoginSecurity?: boolean;
+  FCA?: boolean;
+  EmployeeDashboard?: boolean;
+  LogbookGeographicInformationSystem?: boolean;
+  Bi?: boolean;
+  BiProvider?: string;
+  AdvancedValidate?: boolean;
+  InsecureValues?: string;
+  ForgotPasswordFlag?: boolean;
+  AlsPasswordFreezeHours?: number;
+  AlsNumberUnusableOldPasswords?: number;
+  AlsMaxFailedLogins?: number;
+  AlsPasswordLockedTextMobile?: string;
+  AlsForcePasswordChangeText?: string;
+  AlsForcePasswordChangeTextMobile?: string;
 }
 
 export interface PriorityTypeSLADetails {
