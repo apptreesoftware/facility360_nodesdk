@@ -274,6 +274,23 @@ export interface Space {
   SpaceArea?: SpaceArea[];
 }
 
+export interface SubSpace {
+  Id: number;
+  Description: string;
+  SpaceId: number;
+  SubSpaceExternalId: string;
+  DefaultFlag: boolean;
+  TabOrder: number;
+  UpdatedByName: string;
+  UpdateDate: string;
+  ActiveFlag: boolean;
+  AreaPercentage: number;
+  LongDescription: string;
+  Telephone: string;
+  OccupancyStatusId: number;
+  SpaceExternalId: string;
+}
+
 export interface Floor {
   FloorId: number;
   Description: string;
@@ -440,6 +457,16 @@ export interface FailureCode {
   UpdateDate: Date;
 }
 
+export interface FcaRank {
+  Id: number;
+  Active: boolean;
+  UpdatedByName: string;
+  UpdateDate: string;
+  ExternalId: string;
+  Name: string;
+  TabOrder: number;
+}
+
 export interface BillingTypeNPFA {
   Id: number;
   Description: string;
@@ -451,6 +478,16 @@ export interface BillingTypeNPFA {
   OtherCostCode: string;
   UpdatedByName: string;
   UpdateDate: Date;
+}
+
+export interface State {
+  Id: number;
+  Active: boolean;
+  UpdatedByName: string;
+  UpdateDate: string;
+  ExternalId: string;
+  Name: string;
+  TabOrder: number;
 }
 
 export interface InspectionClass {

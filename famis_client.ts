@@ -63,7 +63,10 @@ import {
   UserType,
   WorkOrder,
   WorkOrderComment,
-  WorkType
+  WorkType,
+  FcaRank,
+  State,
+  SubSpace
 } from './model/famis_models';
 import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
@@ -798,6 +801,10 @@ export class FamisClient {
     return this.getAll<Space>(context, 'spaces');
   }
 
+  async getSubSpaces(context: QueryContext): Promise<Result<SubSpace>> {
+    return this.getAll<SubSpace>(context, 'subspaces');
+  }
+
   async getSpaceClasses(context: QueryContext): Promise<Result<SpaceClass>> {
     return this.getAll<SpaceClass>(context, 'spaceclasses');
   }
@@ -897,6 +904,14 @@ export class FamisClient {
 
   async getFailureCodes(context: QueryContext): Promise<Result<FailureCode>> {
     return this.getAll<FailureCode>(context, 'failurecodes');
+  }
+
+  async getFcaRanks(context: QueryContext): Promise<Result<FcaRank>> {
+    return this.getAll<FcaRank>(context, 'fcarank');
+  }
+
+  async getStates(context: QueryContext): Promise<Result<State>> {
+    return this.getAll<State>(context, 'states');
   }
 
   async getBillingTypeNPFA(context: QueryContext): Promise<Result<BillingTypeNPFA>> {
