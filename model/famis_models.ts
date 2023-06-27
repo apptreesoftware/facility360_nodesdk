@@ -212,6 +212,13 @@ export interface LaborRateType {
   Active: boolean;
 }
 
+export interface LaborReason {
+  Id: number;
+  Description: string;
+  TabOrder: number;
+  Active: boolean;
+}
+
 export interface FamisAttachment {
   Id: number;
   RequestId: number;

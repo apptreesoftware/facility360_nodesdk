@@ -66,7 +66,9 @@ import {
   WorkType,
   FcaRank,
   State,
-  SubSpace
+  SubSpace,
+  OtherCostType,
+  LaborReason
 } from './model/famis_models';
 import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
@@ -656,6 +658,10 @@ export class FamisClient {
     return this.getAll<LaborRateType>(context, 'laborratetypes');
   }
 
+  async getLaborReasons(context: QueryContext): Promise<Result<LaborReason>> {
+    return this.getAll<LaborReason>(context, 'laborreasons');
+  }
+
   async getRequestTypeActivities(context: QueryContext): Promise<Result<RequestTypeActivity>> {
     return this.getAll<RequestTypeActivity>(context, 'requesttypeactivities');
   }
@@ -1009,6 +1015,10 @@ export class FamisClient {
   //#region othercosts
   async getOtherCosts(context: QueryContext): Promise<Result<OtherCost>> {
     return this.getAll<OtherCost>(context, 'othercosts');
+  }
+
+  async getOtherCostTypes(context: QueryContext): Promise<Result<OtherCostType>> {
+    return this.getAll<OtherCostType>(context, 'othercosttypes');
   }
 
   async createOtherCost(otherCost: PostOtherCostRequest): Promise<OtherCost> {
