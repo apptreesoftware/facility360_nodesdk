@@ -233,6 +233,103 @@ export interface FamisAttachment {
   Contents?: string;
 }
 
+export interface Warehouse {
+  Id: number;
+  Name: string;
+  Active: boolean;
+  TabOrder: number;
+  UseMovingCostAverage: boolean;
+  StockItemIssueRequiredFlag: boolean;
+  ExtractRegionId: string;
+  Address1: string;
+  Address2: string;
+  ContactName: string;
+  City: string;
+  State: string;
+  Zip: string;
+  Fax: string;
+  Phone: string;
+  Comments: string;
+  UpdateDate: string;
+  UpdateById: number;
+  StateId: number;
+  VirtualWarehouseFlag: boolean;
+  ExternalWarehouseId: string;
+  PropertyId: number;
+  UseMovingAvg: boolean;
+}
+
+export interface MaterialClass {
+  Id: number;
+  Description: string;
+  UpdateDate: string;
+  UpdatedById: number;
+  Active: boolean;
+  TabOrder: number;
+  COAAccountId: number;
+  COAAccountMarkupId: number;
+  TaxableFlag: boolean;
+  IncomeCategory: string;
+}
+
+export interface MaterialItem {
+  Id: number;
+  PartNumber: string;
+  Description: string;
+  Fin: string;
+  MaterialClassId: number;
+  UnitCost: number;
+  ContraAccountNumber: string;
+  GlAccountNumber: string;
+  Manufacturer: string;
+  Model: string;
+  LotControlledFlag: boolean;
+  LotShelfLifeDays: number;
+  ConditionId: number;
+  Size: string;
+  IgnoreMarkupFlag: boolean;
+  Barcode: string;
+  Comments: string;
+  UnitOfMeasureId: number;
+  ExternalId: string;
+  ActiveFlag: boolean;
+  StockFlag: boolean;
+  UpdateDate: string;
+  MaterialCode: string;
+  MaterialsListId: number;
+  QuantityOnHand: number;
+  ReorderQuantity: number;
+  ReorderPoint: number;
+  LastCountDate: string;
+  TabOrder: number;
+  InventoryFlag: boolean;
+  UpdateById: number;
+  UpdatedByExternalId: string;
+  UPCCode: string;
+  OEMPartNumber: string;
+  COAAccountId: number;
+  LeedCertifiedFlag: boolean;
+  DirectPartFlag: boolean;
+  MSDSFlag: boolean;
+  ExternalSystemId: number;
+  ABCClass: string;
+  CommodityCodeId: number;
+  PropertyId: number;
+  PropertyExternalId: string;
+  CompanyId: number;
+  CompanyExternalId: string;
+}
+
+export interface UnitOfMeasure {
+  Id: number;
+  Description: string;
+  UpdatedById: number;
+  UpdatedByIdExternal: string;
+  UpdateDate: string;
+  ActiveFlag: boolean;
+  TabOrder: number;
+}
+
 export interface WorkType {
   Id: number;
   Name: string;

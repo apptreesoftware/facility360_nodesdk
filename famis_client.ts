@@ -61,14 +61,18 @@ import {
   UserPropertyAssociation,
   UserRegionAssociation,
   UserType,
+  UnitOfMeasure,
   WorkOrder,
   WorkOrderComment,
   WorkType,
+  Warehouse,
   FcaRank,
   State,
   SubSpace,
   OtherCostType,
-  LaborReason
+  LaborReason,
+  MaterialItem,
+  MaterialClass
 } from './model/famis_models';
 import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
@@ -672,6 +676,21 @@ export class FamisClient {
 
   async getWorkTypes(context: QueryContext): Promise<Result<WorkType>> {
     return this.getAll<WorkType>(context, 'worktypes');
+  }
+
+  async getWarehouses(context: QueryContext): Promise<Result<Warehouse>> {
+    return this.getAll<Warehouse>(context, 'warehouses');
+  }
+
+  async getMaterialClasses(context: QueryContext): Promise<Result<MaterialClass>> {
+    return this.getAll<MaterialClass>(context, 'materialclasses');
+  }
+  async getMaterialItems(context: QueryContext): Promise<Result<MaterialItem>> {
+    return this.getAll<MaterialItem>(context, 'materialitems');
+  }
+
+  async getUnitOfMeasures(context: QueryContext): Promise<Result<UnitOfMeasure>> {
+    return this.getAll<UnitOfMeasure>(context, 'uoms');
   }
 
   async getProperties(context: QueryContext): Promise<Result<Property>> {
