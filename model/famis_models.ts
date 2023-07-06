@@ -318,6 +318,10 @@ export interface MaterialItem {
   PropertyExternalId: string;
   CompanyId: number;
   CompanyExternalId: string;
+  UOM: UnitOfMeasure;
+  WarehouseMaterials: WarehouseMaterial[];
+  ItemLotBins: ItemLotBin[];
+  SupplierMaterials: SupplierMaterial[];
 }
 
 export interface UnitOfMeasure {
@@ -329,6 +333,77 @@ export interface UnitOfMeasure {
   ActiveFlag: boolean;
   TabOrder: number;
 }
+
+export interface WarehouseMaterial {
+  Id: number;
+  WarehouseId: number;
+  ItemId: number;
+  QuantityOnHand: number;
+  ReorderPoint: number;
+  ReorderQuantity: number;
+  DateLastCount: string;
+  UpdateDate: string;
+  UpdatedById: number;
+  Active: boolean;
+  MaxQuantityOnHand: number;
+  UnitCost: number;
+  TaxableFlag: boolean;
+  SafetyStockQuantity: number;
+  EconomicOrderQuantity: number;
+  ServiceLayerFactor: number;
+  ReorderQuantityCalcFlag: boolean;
+  LeadTimeDays: number;
+  MarkupPercent: number;
+  QuantityReserved: number;
+}
+
+export interface ItemLotBin {
+  Id: number;
+  ItemId: number;
+  LotId?: number;
+  BinId: number;
+  Quantity: number;
+  LastQtyCount: number;
+  LastCountedByName: string;
+  LastCountedByDate: string;
+  Active: boolean;
+  UpdateDate: string;
+  UpdatedByName: string;
+  Comments: string;
+  BinDetails: BinDetails;
+}
+
+export interface BinDetails {
+  Id: number;
+  WarehouseId: number;
+  Name: string;
+  MaxQuantity: number;
+  Location1: string;
+  Location2: string;
+  Location3: string;
+  Location4: string;
+  Active: boolean;
+  UpdateDate: string;
+  UpdatedByName: string;
+}
+
+export interface SupplierMaterial {
+  Id: number;
+  ItemId: number;
+  CompanyId: number;
+  UnitCost: number;
+  PartNumber: string;
+  PrimarySupplierFlag: boolean;
+  UpdateDate: string;
+  UpdatedbyId: number;
+  Active: boolean;
+  UomId: number;
+  UomConversion: number;
+  Comments: string;
+  MinimumReorderQuantity: number;
+  LeadTime?: string;
+}
+
 
 export interface WorkType {
   Id: number;
