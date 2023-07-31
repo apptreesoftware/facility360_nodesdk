@@ -72,7 +72,10 @@ import {
   OtherCostType,
   LaborReason,
   MaterialItem,
-  MaterialClass
+  MaterialClass,
+  LaborEntry,
+  ShoppingCart,
+  ShoppingCartItem
 } from './model/famis_models';
 import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
@@ -1015,6 +1018,10 @@ export class FamisClient {
     return this.createObject<PostLaborCostRequest, LaborCost>(laborCost, 'laborcosts');
   }
 
+  async getLaborEntries(context: QueryContext): Promise<Result<LaborEntry>> {
+    return this.getAll<LaborEntry>(context, 'laborentries');
+  }
+
   //#endregion
 
   //#region materialcosts
@@ -1045,6 +1052,18 @@ export class FamisClient {
   }
 
   //#endregion
+
+  //Shopping Cart
+
+  async getShoppingCarts(context: QueryContext): Promise<Result<ShoppingCart>> {
+    return this.getAll<ShoppingCart>(context, 'shoppingcarts');
+  }
+
+  async getShoppingCartItems(context: QueryContext): Promise<Result<ShoppingCartItem>> {
+    return this.getAll<ShoppingCartItem>(context, 'shoppingcartitems');
+  }
+  //End Region Cart
+
 
   // generic get methods
 

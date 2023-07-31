@@ -966,6 +966,7 @@ export interface WorkOrder {
   WorkOrderComment?: WorkOrderComment;
   Attachments?: FamisAttachment[];
   Udfs?: Udf[];
+  Crew?: Crew;
 }
 
 export interface AssetClass {
@@ -1871,6 +1872,42 @@ export interface LaborCost {
   InvoiceDate?: Date;
 }
 
+export interface LaborEntry {
+  Id: number;
+  TotalHours: number;
+  TimeType: string;
+  ActivityId: number;
+  ActivityExternalId: string;
+  ActivityName: string;
+  PropertyId: number;
+  PropertyExternalId: string;
+  PropertyName: string;
+  Comments: string;
+  RequestId: number;
+  RequestExternalId: string;
+  UserId: number;
+  UserExternalId: string;
+  EntryDate: string;
+  PayPeriodId: number;
+  PayYear: number;
+  CrewId: number;
+  CrewExternalId: string;
+  StartTime: string;
+  EndTime: string;
+  PositionId: number;
+  PositionExternalId: string;
+  LaborReasonId: number;
+  StatusId: number;
+  Status: {
+    StatusId: number;
+    Name: string;
+    ReadyFlag: boolean;
+    PendingFlag: boolean;
+    ApprovedFlag: boolean;
+    RejectedFlag: boolean;
+  };
+}
+
 export interface OtherCost {
   OtherCostTypeId?: number;
   OtherCostType?: OtherCostType;
@@ -2150,3 +2187,32 @@ export interface PriorityTypeSLADetails {
   SlaResponseInHours: boolean;
   UpdatedByExternalId: string;
 }
+
+export interface ShoppingCart {
+  Id: number;
+  Description: string;
+  RequestId: number;
+  RequestExternalId: string;
+  StatusId: number;
+  DeliveryDescription: string;
+  RequestedDeliveryDate: string;
+  UpdatedByName: string;
+  UpdateDate: string;
+  CreateDate: string;
+  MyCartsOnly: boolean;
+  CreatedById: number;
+}
+
+export interface ShoppingCartItem {
+  Id: number;
+  ShoppingCartId: number;
+  MaterialId: number;
+  WarehouseId: number;
+  QuantityRequested: number;
+  QuantityReceived: number;
+  UpdateDate: string;
+  UpdatedByName: string;
+  MaterialExternalId: string;
+  WarehouseExternalId: string;
+}
+
