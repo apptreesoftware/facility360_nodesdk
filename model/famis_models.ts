@@ -614,6 +614,16 @@ export interface WorkOrder {
   WorkOrderComment?: WorkOrderComment;
   Attachments?: FamisAttachment[];
   Udfs?: Udf[];
+  Watchers?: Watcher[]
+}
+
+export interface Watcher{
+  Id: number;
+  RequestId: number;
+  EmployeeId: number;
+  NotificationFlag: boolean;
+  CreateDate: string;
+  Name?: string;
 }
 
 export interface AssetClass {
