@@ -967,6 +967,16 @@ export interface WorkOrder {
   Attachments?: FamisAttachment[];
   Udfs?: Udf[];
   Crew?: Crew;
+  Watchers?: Watcher[];
+}
+
+export interface Watcher{
+  Id: number;
+  RequestId: number;
+  EmployeeId: number;
+  NotificationFlag: boolean;
+  CreateDate: string;
+  Name?: string;
 }
 
 export interface AssetClass {
