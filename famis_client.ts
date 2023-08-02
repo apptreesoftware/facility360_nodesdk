@@ -688,6 +688,7 @@ export class FamisClient {
   async getMaterialClasses(context: QueryContext): Promise<Result<MaterialClass>> {
     return this.getAll<MaterialClass>(context, 'materialclasses');
   }
+
   async getMaterialItems(context: QueryContext): Promise<Result<MaterialItem>> {
     return this.getAll<MaterialItem>(context, 'materialitems');
   }
@@ -1062,6 +1063,7 @@ export class FamisClient {
   async getShoppingCartItems(context: QueryContext): Promise<Result<ShoppingCartItem>> {
     return this.getAll<ShoppingCartItem>(context, 'shoppingcartitems');
   }
+
   //End Region Cart
 
 
@@ -1218,6 +1220,13 @@ export class FamisClient {
     });
     this.throwResponseError(resp);
     return resp.data as T;
+  }
+
+  async getAttachmentStream(context: QueryContext) {
+    const url = context.buildUrl('attachmentstream');
+    return await this.http.get(url,{
+      responseType:"arraybuffer"
+    });
   }
 
   async createObject<T, K>(toCreate: T, entity: string): Promise<K> {

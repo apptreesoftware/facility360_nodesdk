@@ -546,6 +546,7 @@ export interface PostWorkOrderRequest {
   AccountInfo?: AccountInfo;
   BillCode?: BillCode;
   ChargeType?: ChargeType;
+  RoomCube?: string;
 }
 
 export interface PostAttachmentRequest {
