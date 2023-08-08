@@ -1019,6 +1019,10 @@ export class FamisClient {
     return this.createObject<PostLaborCostRequest, LaborCost>(laborCost, 'laborcosts');
   }
 
+  async deleteLaborCost(entityId: string) {
+    return this.deleteObject('laborcosts', entityId);
+  }
+
   async getLaborEntries(context: QueryContext): Promise<Result<LaborEntry>> {
     return this.getAll<LaborEntry>(context, 'laborentries');
   }
@@ -1224,8 +1228,8 @@ export class FamisClient {
 
   async getAttachmentStream(context: QueryContext) {
     const url = context.buildUrl('attachmentstream');
-    return await this.http.get(url,{
-      responseType:"arraybuffer"
+    return await this.http.get(url, {
+      responseType: 'arraybuffer'
     });
   }
 
@@ -1241,8 +1245,14 @@ export class FamisClient {
     url += `?key=${entityId}`;
     const resp = await this.http.patch(url, patch);
     this.throwResponseError(resp);
-
     return resp.data as K;
+  }
+
+  async deleteObject(entity: string, entityId: string) {
+    let url = buildEntityUrl(entity);
+    url += `?key=${entityId}`;
+    const resp = await this.http.delete(url);
+    this.throwResponseError(resp);
   }
 
   throwResponseError(resp: AxiosResponse) {
