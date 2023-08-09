@@ -722,6 +722,32 @@ export interface PostLaborCostRequest {
   InvoiceDate?:                   Date;
 }
 
+export interface PostLaborEntryRequest {
+  TotalHours?: number;
+  TimeType?: string;
+  ActivityId?: number;
+  ActivityExternalId?: string;
+  ActivityName?: string;
+  PropertyId?: number;
+  PropertyExternalId?: string;
+  PropertyName?: string;
+  Comments?: string;
+  RequestId?: number;
+  RequestExternalId?: string;
+  UserId?: number;
+  UserExternalId?: string;
+  EntryDate?: string;
+  PayPeriodId?: number;
+  PayYear?: number;
+  CrewId?: number;
+  CrewExternalId?: string;
+  StartTime?: Date;
+  EndTime?: Date;
+  PositionId?: Date;
+  PositionExternalId?: string;
+  LaborReasonId?: number;
+}
+
 export interface PostOtherCostRequest {
   OtherCostTypeId?:          number;
   OtherCostType?:            OtherCostType;

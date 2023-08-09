@@ -1910,8 +1910,8 @@ export interface LaborEntry {
   PayYear: number;
   CrewId: number;
   CrewExternalId: string;
-  StartTime: string;
-  EndTime: string;
+  StartTime: Date;
+  EndTime: Date;
   PositionId: number;
   PositionExternalId: string;
   LaborReasonId: number;
