@@ -970,7 +970,7 @@ export interface WorkOrder {
   Watchers?: Watcher[];
 }
 
-export interface Watcher{
+export interface Watcher {
   Id: number;
   RequestId: number;
   EmployeeId: number;
@@ -1272,6 +1272,14 @@ export interface Currency {
   InstalledFlag: boolean;
   CurrencyInstallId?: number;
   Sign: string;
+}
+
+export interface PayPeriod {
+  Id: number;
+  Active: boolean;
+  StartDate: Date;
+  EndDate: Date;
+  PayPeriodNumber: number;
 }
 
 export interface Property {

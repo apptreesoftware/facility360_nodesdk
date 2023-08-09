@@ -75,7 +75,8 @@ import {
   MaterialClass,
   LaborEntry,
   ShoppingCart,
-  ShoppingCartItem
+  ShoppingCartItem,
+  PayPeriod
 } from './model/famis_models';
 import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
@@ -281,6 +282,10 @@ export class FamisClient {
     const now = moment(Date.now()).add(30, 'seconds');
     const expired = now.isAfter(m);
     return expired;
+  }
+  
+  async getPayPeriods(context: QueryContext): Promise<Result<PayPeriod>> {
+    return this.getAll<PayPeriod>(context, 'payperiods');
   }
 
   // Assets
