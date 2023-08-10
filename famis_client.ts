@@ -75,7 +75,8 @@ import {
   MaterialClass,
   LaborEntry,
   ShoppingCart,
-  ShoppingCartItem
+  ShoppingCartItem,
+  PayPeriod,
 } from './model/famis_models';
 import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
@@ -91,6 +92,7 @@ import {
   PatchWorkOrderRequest,
   PostAttachmentRequest,
   PostLaborCostRequest,
+  PostLaborEntryRequest,
   PostMaterialCostRequest,
   PostOtherCostRequest,
   PostUdfForWoRequest,
@@ -281,6 +283,10 @@ export class FamisClient {
     const now = moment(Date.now()).add(30, 'seconds');
     const expired = now.isAfter(m);
     return expired;
+  }
+
+  async getPayPeriods(context: QueryContext): Promise<Result<PayPeriod>> {
+    return this.getAll<PayPeriod>(context, 'payperiods');
   }
 
   // Assets
@@ -1023,10 +1029,20 @@ export class FamisClient {
     return this.deleteObject('laborcosts', entityId);
   }
 
+  //#endregion
+
+  //#region Labor Entry
   async getLaborEntries(context: QueryContext): Promise<Result<LaborEntry>> {
     return this.getAll<LaborEntry>(context, 'laborentries');
   }
 
+  async createLaborEntry(postRequest: PostLaborEntryRequest): Promise<LaborEntry> {
+    return this.createObject<PostLaborEntryRequest, LaborEntry>(postRequest, 'laborentries');
+  }
+
+  async updateLaborEntry(laborId: string, patchRequest: PostLaborEntryRequest): Promise<LaborEntry> {
+    return this.patchObject<PostLaborEntryRequest, LaborEntry>(patchRequest, 'laborentries', laborId);
+  }
   //#endregion
 
   //#region materialcosts
