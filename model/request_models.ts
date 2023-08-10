@@ -727,23 +727,17 @@ export interface PostLaborEntryRequest {
   TimeType?: string;
   ActivityId?: number;
   ActivityExternalId?: string;
-  ActivityName?: string;
-  PropertyId?: number;
-  PropertyExternalId?: string;
-  PropertyName?: string;
   Comments?: string;
   RequestId?: number;
   RequestExternalId?: string;
   UserId?: number;
   UserExternalId?: string;
   EntryDate?: string;
-  PayPeriodId?: number;
-  PayYear?: number;
   CrewId?: number;
   CrewExternalId?: string;
   StartTime?: Date;
   EndTime?: Date;
-  PositionId?: Date;
+  PositionId?: number;
   PositionExternalId?: string;
   LaborReasonId?: number;
 }
