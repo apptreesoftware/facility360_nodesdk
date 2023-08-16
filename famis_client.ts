@@ -4,17 +4,17 @@ import { ApiError, AuthorizationError } from './errors';
 import {
   AccountSegment,
   AccountSegmentValue,
-  ChartOfAccount,
   ActivityGroup,
   Asset,
   AssetClass,
-  AssetRank,
   AssetKeyword,
   AssetMake,
   AssetModel,
+  AssetRank,
   AssetStatus,
   AssetType,
   BillingTypeNPFA,
+  ChartOfAccount,
   Company,
   CreateAssetAttachment,
   CreateAssetMake,
@@ -27,15 +27,29 @@ import {
   FamisAttachment,
   FamisResponse,
   FamisUser,
+  FcaRank,
   Floor,
+  Inspection,
+  InspectionAttachment,
   InspectionClass,
+  InspectionCondition,
+  InspectionDetail,
+  InspectionItem,
+  InspectionScoringItem,
+  InspectionScoringType,
   InspectionType,
   InstallationConfig,
   LaborCost,
+  LaborEntry,
   LaborRateType,
+  LaborReason,
   LogbookConfiguration,
+  MaterialClass,
   MaterialCost,
+  MaterialItem,
   OtherCost,
+  OtherCostType,
+  PayPeriod,
   PriorityTypeSLADetails,
   Procedure,
   Property,
@@ -50,33 +64,26 @@ import {
   RequestTypeActivity,
   RequestTypeActivityGroupAssociations,
   ServiceType,
+  ShoppingCart,
+  ShoppingCartItem,
   Space,
   SpaceArea,
   SpaceCategory,
   SpaceClass,
   SpaceSubCategory,
+  State,
+  SubSpace,
   Udf,
   UdfField,
+  UnitOfMeasure,
   UserActivityGroupAssociations,
   UserPropertyAssociation,
   UserRegionAssociation,
   UserType,
-  UnitOfMeasure,
+  Warehouse,
   WorkOrder,
   WorkOrderComment,
-  WorkType,
-  Warehouse,
-  FcaRank,
-  State,
-  SubSpace,
-  OtherCostType,
-  LaborReason,
-  MaterialItem,
-  MaterialClass,
-  LaborEntry,
-  ShoppingCart,
-  ShoppingCartItem,
-  PayPeriod,
+  WorkType
 } from './model/famis_models';
 import { buildEntityUrl, QueryContext } from './model/request_context';
 import * as AxiosLogger from 'axios-logger';
@@ -84,7 +91,9 @@ import { Result } from './model/common';
 import {
   AssetCreateRequest,
   CreateCompanyRequest,
+  CreateInspectionAttachment,
   FamisOAuthCredential,
+  InspectionTransactionRequest,
   LoginResponse,
   PatchCompanyRequest,
   PatchSpaceAreaRequest,
@@ -100,9 +109,9 @@ import {
   SearchUsersRequest
 } from './model/request_models';
 import _ from 'lodash';
-import moment = require('moment');
 import axiosRetry from 'axios-retry';
 import Bottleneck from 'bottleneck';
+import moment = require('moment');
 
 type ResultCallback<T> = (results: FamisResponse<T>) => void;
 
@@ -953,6 +962,32 @@ export class FamisClient {
     return this.getAll<BillingTypeNPFA>(context, 'billingtypenpfa');
   }
 
+  // Region Inspection
+
+  async getInspections(context: QueryContext): Promise<Result<Inspection>> {
+    return this.getAll<Inspection>(context, 'inspections');
+  }
+
+  async getInspectionDetails(context: QueryContext): Promise<Result<InspectionDetail>> {
+    return this.getAll<InspectionDetail>(context, 'inspectiondetails');
+  }
+
+  async getInspectionItems(context: QueryContext): Promise<Result<InspectionItem>> {
+    return this.getAll<InspectionItem>(context, 'inspectionitems');
+  }
+
+  async getInspectionConditions(context: QueryContext): Promise<Result<InspectionCondition>> {
+    return this.getAll<InspectionCondition>(context, 'inspectionconditions');
+  }
+
+  async getInspectionScoringItems(context: QueryContext): Promise<Result<InspectionScoringItem>> {
+    return this.getAll<InspectionScoringItem>(context, 'inspectionscoringitems');
+  }
+
+  async getInspectionScoringTypes(context: QueryContext): Promise<Result<InspectionScoringType>> {
+    return this.getAll<InspectionScoringType>(context, 'inspectionscoringtypes');
+  }
+
   async getInspectionTypes(context: QueryContext): Promise<Result<InspectionType>> {
     return this.getAll<InspectionType>(context, 'inspectiontypes');
   }
@@ -960,6 +995,22 @@ export class FamisClient {
   async getInspectionClasses(context: QueryContext): Promise<Result<InspectionClass>> {
     return this.getAll<InspectionClass>(context, 'inspectionclasses');
   }
+
+  async createInspectionTransaction(request: InspectionTransactionRequest): Promise<Inspection> {
+    return this.createObject<InspectionTransactionRequest, Inspection>(request, 'inspectiontransactions');
+  }
+
+  async createInspectionAttachment(attachment: CreateInspectionAttachment): Promise<void> {
+    const url = buildEntityUrl('inspectionattachments');
+    const resp = await this.http.post(url, attachment);
+    this.throwResponseError(resp);
+  }
+
+  async getInspectionAttachments(context: QueryContext): Promise<Result<InspectionAttachment>> {
+    return this.getAll<InspectionAttachment>(context, 'inspectionattachments');
+  }
+
+  //End Region Inspection
 
   async getWorkOrderComments(context: QueryContext): Promise<Result<WorkOrderComment>> {
     return this.getAll<WorkOrderComment>(context, 'workordercomments');
@@ -1043,6 +1094,7 @@ export class FamisClient {
   async updateLaborEntry(laborId: string, patchRequest: PostLaborEntryRequest): Promise<LaborEntry> {
     return this.patchObject<PostLaborEntryRequest, LaborEntry>(patchRequest, 'laborentries', laborId);
   }
+
   //#endregion
 
   //#region materialcosts
