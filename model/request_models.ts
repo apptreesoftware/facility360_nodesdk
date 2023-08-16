@@ -1,4 +1,14 @@
-import {BillCode, ChargeType, WorkOrderComment, FamisAttachment, Udf, AccountInfo, Asset, Account, OtherCostType} from './famis_models';
+import {
+  Account,
+  AccountInfo,
+  Asset,
+  BillCode,
+  ChargeType,
+  FamisAttachment,
+  OtherCostType,
+  Udf,
+  WorkOrderComment
+} from './famis_models';
 
 export interface FamisOAuthCredential {
   access_token: string;
@@ -148,32 +158,32 @@ export interface PatchCompanyRequest {
 }
 
 export interface PatchSpaceAreaRequest {
-  Id?:             number;
-  SpaceId?:        number;
+  Id?: number;
+  SpaceId?: number;
   TotalArea1SqFt?: number;
   TotalArea2SqFt?: number;
-  TotalArea1SqM?:  number;
-  TotalArea2SqM?:  number;
+  TotalArea1SqM?: number;
+  TotalArea2SqM?: number;
   OtherArea1SqFt?: number;
   OtherArea2SqFt?: number;
   OtherArea3SqFt?: number;
   OtherArea4SqFt?: number;
   OtherArea5SqFt?: number;
-  OtherArea1SqM?:  number;
-  OtherArea2SqM?:  number;
-  OtherArea3SqM?:  number;
-  OtherArea4SqM?:  number;
-  OtherArea5SqM?:  number;
-  IncludeEG?:      number;
-  IncludeIG?:      number;
-  IncludeRPC?:     number;
-  IncludeBR?:      number;
-  IncludeUA?:      number;
-  IncludeIPA?:     number;
-  IncludeAA?:      number;
-  IncludeNAA?:     number;
-  IncludeNMP?:     number;
-  Force100?:       boolean;
+  OtherArea1SqM?: number;
+  OtherArea2SqM?: number;
+  OtherArea3SqM?: number;
+  OtherArea4SqM?: number;
+  OtherArea5SqM?: number;
+  IncludeEG?: number;
+  IncludeIG?: number;
+  IncludeRPC?: number;
+  IncludeBR?: number;
+  IncludeUA?: number;
+  IncludeIPA?: number;
+  IncludeAA?: number;
+  IncludeNAA?: number;
+  IncludeNMP?: number;
+  Force100?: boolean;
 }
 
 export interface PatchWorkOrderRequest {
@@ -666,60 +676,30 @@ export interface PatchUserRequest {
 }
 
 export interface PostLaborCostRequest {
-  EmployeeId?:                    number;
-  ExternalEmployeeId?:            string;
-  TimeStarted?:                   string;
-  TimeFinished?:                  string;
-  Rate?:                          number;
-  Hours?:                         number;
-  RateTypeId?:                    number;
-  RequestTypeActivityId?:         number;
-  ExternalRequestTypeActivityId?: string;
-  ApInvoiceNumber?:               string;
-  ApAccountNumber?:               string;
-  LienWaiverAmount?:              number;
-  LienWaiverComments?:            string;
-  PaymentComments?:               string;
-  ApInvoiceAmount?:               number;
-  ApPostDate?:                    Date;
-  ApDueDate?:                     Date;
-  ApTaxAmount?:                   number;
-  ApShippingHandlingAmount?:      number;
-  ApInvoiceStatusId?:             number;
-  ApInvoiceDate?:                 Date;
-  CoaAccountId?:                  number;
-  Payee?:                         string;
-  TaxAmount?:                     number;
-  BudgetYear?:                    number;
-  VendorCode?:                    string;
-  VendorCompanyExternalId?:       string;
-  CrewId?:                        number;
-  Id?:                            number;
-  InstallId?:                     number;
-  RequestId?:                     number;
-  RequestExternalId?:             string;
-  Date?:                          Date;
-  Description?:                   string;
-  VendorCompanyId?:               number;
-  TotalAmount?:                   number;
-  MarkupFlag?:                    boolean;
-  TotalMarkup?:                   number;
-  AccountId?:                     number;
-  UpdateDate?:                    Date;
-  RecurrenceId?:                  number;
-  UpdatedById?:                   number;
-  AccountsPayableFlag?:           boolean;
-  ApExportFlag?:                  boolean;
-  TaxableFlag?:                   boolean;
-  CurrencySign?:                  string;
-  CurrencyCode?:                  string;
-  LineItemNumber?:                number;
-  ExternalId?:                    string;
-  TaxRate?:                       number;
-  ExternalUpdatedById?:           string;
-  ExternalRecurrenceId?:          string;
-  InvoiceNumber?:                 string;
-  InvoiceDate?:                   Date;
+  EmployeeId?: number;
+  TimeStarted?: string;
+  TimeFinished?: string;
+  Rate?: number;
+  Hours?: number;
+  RateTypeId?: number;
+  RequestTypeActivityId?: number;
+  TaxAmount?: number;
+  VendorCompanyExternalId?: string;
+  CrewId?: number;
+  Id?: number;
+  RequestId?: number;
+  RequestExternalId?: string;
+  Date?: Date;
+  Description?: string;
+  VendorCompanyId?: number;
+  MarkupFlag?: boolean;
+  AccountId?: number;
+  RecurrenceId?: number;
+  TaxableFlag?: boolean;
+  ExternalId?: string;
+  TaxRate?: number;
+  ExternalRecurrenceId?: string;
+
 }
 
 export interface PostLaborEntryRequest {
@@ -743,85 +723,112 @@ export interface PostLaborEntryRequest {
 }
 
 export interface PostOtherCostRequest {
-  OtherCostTypeId?:          number;
-  OtherCostType?:            OtherCostType;
-  Quantity?:                 number;
-  UnitCost?:                 number;
-  ShippingAndHandlingCost?:  number;
-  Account?:                  Account;
-  ReceivedById?:             number;
-  ApInvoiceNumber?:          string;
-  ApAccountNumber?:          string;
-  LienWaiverAmount?:         number;
-  LienWaiverComments?:       string;
-  PaymentComments?:          string;
-  ApInvoiceAmount?:          number;
-  ApPostDate?:               Date;
-  ApDueDate?:                Date;
-  ApTaxAmount?:              number;
+  OtherCostTypeId?: number;
+  OtherCostType?: OtherCostType;
+  Quantity?: number;
+  UnitCost?: number;
+  ShippingAndHandlingCost?: number;
+  Account?: Account;
+  ReceivedById?: number;
+  ApInvoiceNumber?: string;
+  ApAccountNumber?: string;
+  LienWaiverAmount?: number;
+  LienWaiverComments?: string;
+  PaymentComments?: string;
+  ApInvoiceAmount?: number;
+  ApPostDate?: Date;
+  ApDueDate?: Date;
+  ApTaxAmount?: number;
   ApShippingHandlingAmount?: number;
-  ApInvoiceStatusId?:        number;
-  ApInvoiceDate?:            Date;
-  CoaAccountId?:             number;
-  Payee?:                    string;
-  TaxAmount?:                number;
-  BudgetYear?:               number;
-  VendorCode?:               string;
-  VendorCompanyExternalId?:  string;
-  Id?:                       number;
-  InstallId?:                number;
-  RequestId?:                number;
-  RequestExternalId?:        string;
-  Date?:                     Date;
-  Description?:              string;
-  VendorCompanyId?:          number;
-  TotalAmount?:              number;
-  MarkupFlag?:               boolean;
-  TotalMarkup?:              number;
-  AccountId?:                number;
-  UpdateDate?:               Date;
-  RecurrenceId?:             number;
-  UpdatedById?:              number;
-  AccountsPayableFlag?:      boolean;
-  ApExportFlag?:             boolean;
-  TaxableFlag?:              boolean;
-  CurrencySign?:             string;
-  CurrencyCode?:             string;
-  LineItemNumber?:           number;
-  ExternalId?:               string;
-  TaxRate?:                  number;
-  ExternalUpdatedById?:      string;
-  ExternalRecurrenceId?:     string;
-  InvoiceNumber?:            string;
-  InvoiceDate?:              Date;
+  ApInvoiceStatusId?: number;
+  ApInvoiceDate?: Date;
+  CoaAccountId?: number;
+  Payee?: string;
+  TaxAmount?: number;
+  BudgetYear?: number;
+  VendorCode?: string;
+  VendorCompanyExternalId?: string;
+  RequestId?: number;
+  RequestExternalId?: string;
+  Date?: Date;
+  Description?: string;
+  VendorCompanyId?: number;
+  MarkupFlag?: boolean;
+  AccountId?: number;
+  TaxableFlag?: boolean;
+  ExternalId?: string;
+  TaxRate?: number;
 }
 
 export interface PostMaterialCostRequest {
-  Id?:                    number;
-  RequestId?:             number;
-  ItemName?:              string;
-  Description?:           string;
+  Id?: number;
+  RequestId?: number;
+  ItemName?: string;
+  Description?: string;
   ChargeToAccountNumber?: string;
-  ChargeToAccount?:       string;
-  Quantity?:              number;
-  UnitCost?:              number;
-  TaxCost?:               number;
-  SHCost?:                number;
-  TotalCost?:             number;
-  Date?:                  Date;
-  LineNumber?:            number;
-  EmployeeId?:            number;
-  Markup?:                boolean;
-  UpdateDate?:            Date;
-  TotalMarkup?:           number;
-  ItemId?:                number;
-  AccountId?:             number;
-  TaxRate?:               number;
-  MarkupPercentage?:      number;
-  WarehouseMaterialId?:   number;
-  BudgetYear?:            number;
-  Taxable?:               boolean;
-  BinId?:                 number;
-  PoDetailId?:            number;
-  UpdatedByExternalId?:   string;
+  ChargeToAccount?: string;
+  Quantity?: number;
+  UnitCost?: number;
+  TaxCost?: number;
+  SHCost?: number;
+  TotalCost?: number;
+  Date?: Date;
+  LineNumber?: number;
+  EmployeeId?: number;
+  Markup?: boolean;
+  UpdateDate?: Date;
+  TotalMarkup?: number;
+  ItemId?: number;
+  AccountId?: number;
+  TaxRate?: number;
+  MarkupPercentage?: number;
+  WarehouseMaterialId?: number;
+  BudgetYear?: number;
+  Taxable?: boolean;
+  BinId?: number;
+  PoDetailId?: number;
+  UpdatedByExternalId?: string;
 }
+
+//Region Inspection
+
+export interface InspectionTransactionRequest {
+  Inspection: InspectionRequest;
+  InspectionDetails?: InspectionDetailRequest[];
+}
+
+export interface InspectionRequest {
+  InspectionClassId?: number;
+  InspectionTypeId?: number;
+  PropertyId?: number;
+  SpaceId?: number;
+  SubspaceId?: null;
+  FloorId?: number;
+  InspectorId?: number;
+  InspectionDate?: Date;
+  Occupant?: string;
+  Room?: string;
+  AssetId?: number;
+  WorkOrderId?: number;
+  Comments?: string;
+}
+
+export interface InspectionDetailRequest {
+  AssetReading?: number;
+  Comment?: string;
+  ConditionId?: number;
+  ItemId?: number;
+  ScoringItemId?: number;
+}
+
+export interface CreateInspectionAttachment {
+  InspectionId: string;
+  FileName: string;
+  TypeId: number;
+  Contents: any;
+  Name: string;
+  Description: string;
+}
+
+
+//End Region Inspection

@@ -669,6 +669,94 @@ export interface State {
   TabOrder: number;
 }
 
+// Region Inspection
+
+export interface Inspection {
+  Id: number;
+  InspectionClassId: number;
+  InspectionTypeId: number;
+  PropertyId: number;
+  SpaceId: number;
+  SubspaceId: number;
+  FloorId: number;
+  InspectorId: number;
+  InspectionDate: Date;
+  InspectionTime: string;
+  Occupant: string;
+  Room: string;
+  Score: number;
+  AssetId: number;
+  ExternalId: string;
+  WorkOrderId: number;
+  WorkOrderTaskId: string;
+  Comments: string;
+  CreatorId: number;
+  CreateDate: Date;
+  UpdateDate: Date;
+  PropertyExternalId: string;
+  SpaceExternalId: string;
+  SubspaceExternalId: string;
+  FloorExternalId: string;
+  InspectorExternalId: string;
+  CreatorExternalId: string;
+  AssetExternalId: string;
+  AssetNumber: string;
+  WorkOrderExternalId: string;
+}
+
+export interface InspectionDetail {
+  Id: number;
+  AssetReading: number;
+  BudgetYear: number;
+  Comment: string;
+  ConditionId: number;
+  EpPlanChildId: number;
+  FundingSourceId: number;
+  FundingSourceDescription: string;
+  FundingAmount: number;
+  InspectionId: number;
+  InspectionExternalId: string;
+  ItemId: number;
+  ItemDescription: string;
+  ScoringItemId: number;
+  ScoringItemDescription: string;
+  ScoringItemValue: number;
+  ScoringItem2Id: number;
+  ScoringItem2Description: string;
+  ScoringItem2Value?: null;
+  UpdateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  Weight: number;
+}
+
+export interface InspectionItem {
+  Id: number;
+  Description: string;
+  InspectionClassId: number;
+  UpdateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  Active: boolean;
+  Weight: number;
+  WorkOrderTypeId: number;
+  WorkOrderTypeExternalId: string;
+  WorkOrderSubtypeId: number;
+  WorkOrderSubtypeExternalId: string;
+  Instructions: string;
+  ExternalId: string;
+  EpPlanParentId: string;
+  RoomTypeId: number;
+  RuntimeTypeId: number;
+  AreaTypeId: number;
+  IncludeScore: number;
+  DocumentUploadFlag: boolean;
+  ScoringTypeId: number;
+  DisplayOnlyFlag: boolean;
+  IncludeInReportFlag: boolean;
+}
+
+
 export interface InspectionClass {
   Id: number;
   Description: string;
@@ -699,6 +787,62 @@ export interface InspectionType {
   DisplayScoreFlag: boolean;
   TabOrder: number;
 }
+
+export interface InspectionCondition {
+  UpdatedByExternalId: string;
+  Id: number;
+  Description: string;
+  InspectionClassId: number;
+  UpdateDate: Date;
+  UpdatedById: number;
+  ActiveFlag: boolean;
+  TabOrder: number;
+  EpPlanParentId: string;
+}
+
+export interface InspectionScoringItem {
+  Id: number;
+  Description: string;
+  ScoringTypeId: number;
+  UpdateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  Active: boolean;
+  ScoringItemValue: number;
+  EpPlanParentId: number;
+  ScoreFlag: boolean;
+  ScoreDescription: string;
+  RequireAllFieldsFlag: boolean;
+}
+
+export interface InspectionScoringType {
+  Id: number;
+  Description: string;
+  ScoringMultiplier: number;
+  UpdateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  Active: boolean;
+  ScoringMethod: number;
+  EpPlanParentId: number;
+  AutoCompleteFlag: boolean;
+}
+
+export interface InspectionAttachment {
+  Id: number;
+  Name: string;
+  Description: string;
+  FileName: string;
+  UpdateDate: string;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  InspectionId: number;
+  InspectionExternalId: string;
+  InspectionDetailId: number;
+}
+
+
+//End region Inspection
 
 export interface RequestSubType {
   Id: number;
