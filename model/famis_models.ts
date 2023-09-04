@@ -2759,6 +2759,7 @@ export interface ShoppingCart {
   CreateDate: string;
   MyCartsOnly: boolean;
   CreatedById: number;
+  CrewUserAssociations?:CrewUserAssociation[]
 }
 
 export interface ShoppingCartItem {

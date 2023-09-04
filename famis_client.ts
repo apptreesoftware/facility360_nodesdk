@@ -101,7 +101,7 @@ import * as AxiosLogger from 'axios-logger';
 import { Result } from './model/common';
 import {
   AssetCreateRequest,
-  AssetUpdateRequest,
+  AssetUpdateRequest, CheckOutShoppingCartRequest,
   CreateCompanyRequest,
   CreateInspectionAttachment,
   FamisOAuthCredential,
@@ -1214,9 +1214,9 @@ export class FamisClient {
     return this.patchObject<ShoppingCartUpdateRequest, ShoppingCart>(postRequest, entity);
   }
 
-  async checkOutShoppingCart(postRequest: ShoppingCartItemCreateRequest, cartId: number): Promise<ShoppingCartItem> {
+  async checkOutShoppingCart(postRequest: CheckOutShoppingCartRequest, cartId: number): Promise<ShoppingCart> {
     const entity = `shoppingcarts(${cartId})/checkout`;
-    return this.createObject<ShoppingCartItemCreateRequest, ShoppingCartItem>(postRequest, entity);
+    return this.createObject<CheckOutShoppingCartRequest, ShoppingCart>(postRequest, entity);
   }
 
   //End Region Shopping Cart
@@ -1242,7 +1242,7 @@ export class FamisClient {
   //End Region Purchase Order
 
   //Region Purchase Requisition
-  async getPurchaseRequisitiontHeaderStatuses(context: QueryContext): Promise<Result<PurchaseRequisitionHeaderStatus>> {
+  async getPurchaseRequisitionHeaderStatuses(context: QueryContext): Promise<Result<PurchaseRequisitionHeaderStatus>> {
     return this.getAll<PurchaseRequisitionHeaderStatus>(context, 'purchaserequisitionheaderstatuses');
   }
 

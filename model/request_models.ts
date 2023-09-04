@@ -915,12 +915,10 @@ export interface ShoppingCartUpdateRequest {
   Description?: string;
   RequestId?: number;
   StatusId?: number;
-  DeliveryDescription?: string;
-  RequestedDeliveryDate?: string;
 }
 
 export interface CheckOutShoppingCartRequest{
-  DeliveryDescription?:number;
+  DeliveryDescription?:String;
   RequestedDeliveryDate?:Date
 }
 
