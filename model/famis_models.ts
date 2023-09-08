@@ -776,6 +776,18 @@ export interface InspectionClass {
   RequestSubTypeExternalId: string;
 }
 
+export interface UserInspectionClassAssoc {
+  Id: number;
+  EmployeeId: number;
+  InspectionClassId: number;
+  InspectionTypeId: number;
+  DefaultFlag: boolean;
+  TabOrder: number;
+  UpdateDate: Date;
+  UpdatedbyId: number;
+  UpdatedByExternalId: string;
+}
+
 export interface InspectionType {
   Id: number;
   Description: string;
@@ -1247,14 +1259,14 @@ export interface Asset {
   WarrantyContractNumber?: string;
   WarrantyEffectiveDate?: Date;
   WarrantyExpirationDate?: Date;
-  WarrantyExpirationContact?: number;
+  WarrantyExpirationContact?: string;
   WarrantyExpirationContactPhone?: string;
   WarrantyVendorId?: number;
   WarrantyPoNumberId?: number;
-  MaintenanceContractNumber?: number;
+  MaintenanceContractNumber?: string;
   MaintenanceContractVendorId?: number;
   MaintenanceContractExpirationDate?: Date;
-  MaintenanceContractNotificationDays?: string;
+  MaintenanceContractNotificationDays?: number;
   PurchaseDate?: Date;
   PurchaseAmount?: number;
   ExternalCostCenterId?: number;
@@ -2049,7 +2061,7 @@ export interface LaborEntry {
   RequestExternalId: string;
   UserId: number;
   UserExternalId: string;
-  EntryDate: string;
+  EntryDate: Date;
   PayPeriodId: number;
   PayYear: number;
   CrewId: number;

@@ -77,6 +77,7 @@ import {
   UdfField,
   UnitOfMeasure,
   UserActivityGroupAssociations,
+  UserInspectionClassAssoc,
   UserPropertyAssociation,
   UserRegionAssociation,
   UserType,
@@ -90,10 +91,12 @@ import * as AxiosLogger from 'axios-logger';
 import { Result } from './model/common';
 import {
   AssetCreateRequest,
+  AssetUpdateRequest,
   CreateCompanyRequest,
   CreateInspectionAttachment,
   FamisOAuthCredential,
   InspectionTransactionRequest,
+  LaborEntryApprovalRequest,
   LoginResponse,
   PatchCompanyRequest,
   PatchSpaceAreaRequest,
@@ -347,6 +350,12 @@ export class FamisClient {
     return this.createObject<AssetCreateRequest, Asset>(asset, 'assets');
   }
 
+  async updateAsset(id: number, asset: AssetUpdateRequest) {
+    return this.patchObject<AssetUpdateRequest, Asset>(asset, 'assets', id.toString());
+  }
+
+  // This call should not work. But not sure why it here
+  // Left it here, Just in case it used by any
   async patchAsset(asset: Asset): Promise<Asset> {
     return this.patchObject<Asset, Asset>(asset, 'assets', asset.Id.toString());
   }
@@ -996,6 +1005,10 @@ export class FamisClient {
     return this.getAll<InspectionClass>(context, 'inspectionclasses');
   }
 
+  async getUserInspectionClassAssocs(context: QueryContext): Promise<Result<UserInspectionClassAssoc>> {
+    return this.getAll<UserInspectionClassAssoc>(context, 'userinspectionclassassociations');
+  }
+
   async createInspectionTransaction(request: InspectionTransactionRequest): Promise<Inspection> {
     return this.createObject<InspectionTransactionRequest, Inspection>(request, 'inspectiontransactions');
   }
@@ -1094,6 +1107,23 @@ export class FamisClient {
   async updateLaborEntry(laborId: string, patchRequest: PostLaborEntryRequest): Promise<LaborEntry> {
     return this.patchObject<PostLaborEntryRequest, LaborEntry>(patchRequest, 'laborentries', laborId);
   }
+
+  async submitLaborEntry(postRequest: LaborEntryApprovalRequest, userId: number): Promise<LaborEntry> {
+    const entity = `users(${userId})/SubmitTimeCard`;
+    return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
+  }
+
+  async rejectLaborEntry(postRequest: LaborEntryApprovalRequest, userId: number): Promise<LaborEntry> {
+    const entity = `users(${userId})/RejectTimeCard`;
+    return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
+  }
+
+  async approveLaborEntry(postRequest: LaborEntryApprovalRequest, userId: number): Promise<LaborEntry> {
+    const entity = `users(${userId})/ApproveTimeCard`;
+    return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
+  }
+
+  //LaborEntryApprovalRequest
 
   //#endregion
 

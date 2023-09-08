@@ -31,6 +31,7 @@ export interface LoginResponse {
   Message: string;
 }
 
+//Region Asset
 export interface AssetCreateRequest {
   Name: string;
   Description: string;
@@ -55,6 +56,49 @@ export interface AssetCreateRequest {
   SpaceExternalId: string;
   FloorExternalId: string;
 }
+
+export interface AssetUpdateRequest {
+  Name: string;
+  Description: string;
+  AssetNumber: string;
+  SerialNumber: string;
+  AssetClassId: number;
+  AssetRankId: number;
+  EcriCodeId: number;
+  MakeId: number;
+  ModelId: number;
+  InServiceDate: Date;
+  AssetStatusId: number;
+  StatusComment: string;
+  BarcodeNumber: string;
+  AssetSafetyComments: string;
+  AssetKeywordId: number;
+  AssetTypeId: number;
+  RiskAssessment: string;
+  SpaceId: number;
+  EmployeeId: number;
+  Room: string;
+  QuantityAvailable: number;
+  Comments: string;
+  ActiveFlag: boolean;
+  FloorId: number;
+  WarrantyContractNumber: string;
+  WarrantyEffectiveDate: Date;
+  WarrantyExpirationDate: Date;
+  WarrantyExpirationContact: string;
+  WarrantyExpirationContactPhone: string;
+  WarrantyVendorId: number;
+  WarrantyPoNumberId: number;
+  MaintenanceContractNumber: string;
+  MaintenanceContractVendorId: number;
+  MaintenanceContractExpirationDate: Date;
+  MaintenanceContractNotificationDays: number;
+  UomId: number;
+  FcaRankId: number;
+}
+
+
+//End Region Asset
 
 export interface CreateCompanyRequest {
   Name: string;
@@ -712,7 +756,7 @@ export interface PostLaborEntryRequest {
   RequestExternalId?: string;
   UserId?: number;
   UserExternalId?: string;
-  EntryDate?: string;
+  EntryDate?: Date;
   CrewId?: number;
   CrewExternalId?: string;
   StartTime?: Date;
@@ -720,6 +764,11 @@ export interface PostLaborEntryRequest {
   PositionId?: number;
   PositionExternalId?: string;
   LaborReasonId?: number;
+}
+
+export interface LaborEntryApprovalRequest {
+  LaborEntryIds: number[];
+  LaborEntryComment?: string;
 }
 
 export interface PostOtherCostRequest {
@@ -829,6 +878,5 @@ export interface CreateInspectionAttachment {
   Name: string;
   Description: string;
 }
-
 
 //End Region Inspection
