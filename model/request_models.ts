@@ -880,3 +880,84 @@ export interface CreateInspectionAttachment {
 }
 
 //End Region Inspection
+
+// Region Geo Location
+export interface GeoLocationRequest {
+  RequestId: number;
+  AssetId: number;
+  RegionId: number;
+  PropertyId: number;
+  EmployeeId: number;
+  Latitude: number;
+  Longitude: number;
+  Altitude: number;
+}
+
+//End Geo Location
+
+
+//Region Shopping Cart
+export interface ShoppingCartCreateRequest {
+  Description: string;
+  RequestId?: number;
+}
+
+export interface ShoppingCartItemCreateRequest {
+  ShoppingCartId: number;
+  MaterialId: number;
+  WarehouseId?: number;
+  QuantityRequested: number;
+  MaterialExternalId?: string;
+  WarehouseExternalId?: string;
+}
+
+export interface ShoppingCartUpdateRequest {
+  Description?: string;
+  RequestId?: number;
+  StatusId?: number;
+}
+
+export interface CheckOutShoppingCartRequest{
+  DeliveryDescription?:String;
+  RequestedDeliveryDate?:Date
+}
+
+//End Region Shopping Cart
+
+//Region Purchase Requisition
+export interface PurchaseRequisitionCreateRequest {
+  RequestorName?: string;
+  RequestorEmail?: string;
+  RequestorPhone?: string;
+  Description?: string;
+  TypeId?: number;
+  CreateDate?: Date;
+  PropertyId?: number;
+  ShipToAddress?: string;
+  RequestId?: number;
+  NTE?: number;
+  AttentionTo?: string;
+}
+
+export interface PurchaseRequisitionLineCreateRequest {
+  PRId: number;
+  RequiredDate?: string;
+  RequestId?: number;
+  RequestExternalId?: string;
+  Material?: boolean;
+  OtherCostType?: boolean;
+  OtherCostTypeId?: number;
+  VendorId?: number;
+  VendorExternalId?: string;
+  WarehouseId?: number;
+  WarehouseExternalId?: string;
+  MaterialItemId: number;
+  MaterialItemExternalId?: string;
+  Description?: string;
+  UnitOfMeasureId?: number;
+  Quantity: number;
+  UnitCost: number;
+  GLAccountId?: number;
+}
+
+//End Region Purchase Requisition

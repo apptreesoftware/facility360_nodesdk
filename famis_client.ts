@@ -56,6 +56,14 @@ import {
   PropertyBillCodeAssociations,
   PropertyRegionAssociation,
   PropertyRequestTypeAssociation,
+  PurchaseOrderHeader,
+  PurchaseOrderLine,
+  PurchaseOrderStatus,
+  PurchaseOrderType,
+  PurchaseRequisitionHeader,
+  PurchaseRequisitionHeaderStatus,
+  PurchaseRequisitionLine,
+  PurchaseRequisitionType,
   Region,
   RequestPriority,
   RequestStatus,
@@ -66,6 +74,7 @@ import {
   ServiceType,
   ShoppingCart,
   ShoppingCartItem,
+  ShoppingCartStatus,
   Space,
   SpaceArea,
   SpaceCategory,
@@ -80,6 +89,7 @@ import {
   UserInspectionClassAssoc,
   UserPropertyAssociation,
   UserRegionAssociation,
+  UserSecurity,
   UserType,
   Warehouse,
   WorkOrder,
@@ -91,10 +101,11 @@ import * as AxiosLogger from 'axios-logger';
 import { Result } from './model/common';
 import {
   AssetCreateRequest,
-  AssetUpdateRequest,
+  AssetUpdateRequest, CheckOutShoppingCartRequest,
   CreateCompanyRequest,
   CreateInspectionAttachment,
   FamisOAuthCredential,
+  GeoLocationRequest,
   InspectionTransactionRequest,
   LaborEntryApprovalRequest,
   LoginResponse,
@@ -109,11 +120,17 @@ import {
   PostOtherCostRequest,
   PostUdfForWoRequest,
   PostWorkOrderRequest,
-  SearchUsersRequest
+  PurchaseRequisitionCreateRequest,
+  PurchaseRequisitionLineCreateRequest,
+  SearchUsersRequest,
+  ShoppingCartCreateRequest,
+  ShoppingCartItemCreateRequest,
+  ShoppingCartUpdateRequest
 } from './model/request_models';
 import _ from 'lodash';
 import axiosRetry from 'axios-retry';
 import Bottleneck from 'bottleneck';
+import { GeoLocation } from './model/geo_locations';
 import moment = require('moment');
 
 type ResultCallback<T> = (results: FamisResponse<T>) => void;
@@ -450,6 +467,10 @@ export class FamisClient {
       new QueryContext().setFilter(`UserName eq '${username}'`).setSelect(select.join(','))
     );
     return res.first;
+  }
+
+  async getUserSecurities(context: QueryContext): Promise<Result<UserSecurity>> {
+    return this.getAll(context, 'usersecurities');
   }
 
   async getAllUsersBatch(
@@ -1033,10 +1054,20 @@ export class FamisClient {
     return this.getAll<RequestStatus>(context, 'requeststatuses');
   }
 
-  async getGeoLocations(context: QueryContext): Promise<Result<Geolocation>> {
-    return this.getAll<Geolocation>(context, 'geolocations');
+  //Region Geo Location
+  async getGeoLocations(context: QueryContext): Promise<Result<GeoLocation>> {
+    return this.getAll<GeoLocation>(context, 'geolocations');
   }
 
+  async createGeoLocation(request: GeoLocationRequest): Promise<GeoLocation> {
+    return this.createObject<GeoLocationRequest, GeoLocation>(request, 'geolocations');
+  }
+
+  async updateGeoLocation(request: GeoLocationRequest, id: string): Promise<GeoLocation> {
+    return this.patchObject<GeoLocationRequest, GeoLocation>(request, 'geolocations', id);
+  }
+
+  //End Region Geo Location
   async getDepartments(context: QueryContext): Promise<Result<Department>> {
     return this.getAll<Department>(context, 'departments');
   }
@@ -1156,7 +1187,7 @@ export class FamisClient {
 
   //#endregion
 
-  //Shopping Cart
+  //Region Shopping Cart
 
   async getShoppingCarts(context: QueryContext): Promise<Result<ShoppingCart>> {
     return this.getAll<ShoppingCart>(context, 'shoppingcarts');
@@ -1166,8 +1197,77 @@ export class FamisClient {
     return this.getAll<ShoppingCartItem>(context, 'shoppingcartitems');
   }
 
-  //End Region Cart
+  async getShoppingCartStatuses(context: QueryContext): Promise<Result<ShoppingCartStatus>> {
+    return this.getAll<ShoppingCartStatus>(context, 'shoppingcartstatuses');
+  }
 
+  async createShoppingCart(postRequest: ShoppingCartCreateRequest): Promise<ShoppingCart> {
+    return this.createObject<ShoppingCartCreateRequest, ShoppingCart>(postRequest, 'shoppingcarts');
+  }
+
+  async createShoppingCartItem(postRequest: ShoppingCartItemCreateRequest): Promise<ShoppingCartItem> {
+    return this.createObject<ShoppingCartItemCreateRequest, ShoppingCartItem>(postRequest, 'shoppingcartitems');
+  }
+
+  async updateShoppingCart(postRequest: ShoppingCartUpdateRequest, cartId: number): Promise<ShoppingCart> {
+    const entity = `shoppingcarts(${cartId})`;
+    return this.patchObject<ShoppingCartUpdateRequest, ShoppingCart>(postRequest, entity);
+  }
+
+  async checkOutShoppingCart(postRequest: CheckOutShoppingCartRequest, cartId: number): Promise<ShoppingCart> {
+    const entity = `shoppingcarts(${cartId})/checkout`;
+    return this.createObject<CheckOutShoppingCartRequest, ShoppingCart>(postRequest, entity);
+  }
+
+  //End Region Shopping Cart
+
+  //Region Purchase Order
+
+  async getPurchaseOrdertStatuses(context: QueryContext): Promise<Result<PurchaseOrderStatus>> {
+    return this.getAll<PurchaseOrderStatus>(context, 'purchaseorderstatuses');
+  }
+
+  async getPurchaseOrdertTypes(context: QueryContext): Promise<Result<PurchaseOrderType>> {
+    return this.getAll<PurchaseOrderType>(context, 'purchaseordertypes');
+  }
+
+  async getPurchaseOrdertHeaders(context: QueryContext): Promise<Result<PurchaseOrderHeader>> {
+    return this.getAll<PurchaseOrderHeader>(context, 'purchaseorderheaders');
+  }
+
+  async getPurchaseOrdertLines(context: QueryContext): Promise<Result<PurchaseOrderLine>> {
+    return this.getAll<PurchaseOrderLine>(context, 'purchaseorderlines');
+  }
+
+  //End Region Purchase Order
+
+  //Region Purchase Requisition
+  async getPurchaseRequisitionHeaderStatuses(context: QueryContext): Promise<Result<PurchaseRequisitionHeaderStatus>> {
+    return this.getAll<PurchaseRequisitionHeaderStatus>(context, 'purchaserequisitionheaderstatuses');
+  }
+
+  async getPurchaseRequisitionTypes(context: QueryContext): Promise<Result<PurchaseRequisitionType>> {
+    return this.getAll<PurchaseRequisitionType>(context, 'purchaserequisitiontypes');
+  }
+
+  async getPurchaseRequisitionHeaders(context: QueryContext): Promise<Result<PurchaseRequisitionHeader>> {
+    return this.getAll<PurchaseRequisitionHeader>(context, 'purchaserequisitionheaders');
+  }
+
+  async getPurchaseRequisitionLines(context: QueryContext): Promise<Result<PurchaseRequisitionLine>> {
+    return this.getAll<PurchaseRequisitionLine>(context, 'purchaserequisitionlines');
+  }
+
+  async createPurchaseRequisitionHeader(postRequest: PurchaseRequisitionCreateRequest, userId: number): Promise<PurchaseRequisitionHeader> {
+    return this.createObject<PurchaseRequisitionCreateRequest, PurchaseRequisitionHeader>(postRequest, 'purchaserequisitionheaders');
+  }
+
+  async createPurchaseRequisitionLine(postRequest: PurchaseRequisitionLineCreateRequest, userId: number): Promise<PurchaseRequisitionLine> {
+    return this.createObject<PurchaseRequisitionLineCreateRequest, PurchaseRequisitionLine>(postRequest, 'purchaserequisitionlines');
+  }
+
+
+  //End Region Purchase Requisition
 
   // generic get methods
 
@@ -1338,9 +1438,10 @@ export class FamisClient {
     return resp.data as K;
   }
 
-  async patchObject<T, K>(patch: T, entity: string, entityId: string): Promise<K> {
+  async patchObject<T, K>(patch: T, entity: string, entityId?: string): Promise<K> {
     let url = buildEntityUrl(entity);
-    url += `?key=${entityId}`;
+    if (entityId)
+      url += `?key=${entityId}`;
     const resp = await this.http.patch(url, patch);
     this.throwResponseError(resp);
     return resp.data as K;
