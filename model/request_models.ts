@@ -33,68 +33,112 @@ export interface LoginResponse {
 
 //Region Asset
 export interface AssetCreateRequest {
-  Name: string;
-  Description: string;
-  AssetNumber: string;
-  SerialNumber: string;
-  AssetClassId: number;
-  AssetRankId: number;
-  MakeId: number;
-  ModelId: number;
-  AssetStatusId: number;
-  AssetKeywordId: number;
-  AssetTypeId: number;
-  SpaceId: number;
-  QuantityAvailable: number;
-  ActiveFlag: boolean;
-  FloorId: number;
-  PurchaseDate: Date;
-  EstimatedLifeInYears: number;
-  EstimatedLifeInHours: number;
-  AnnualRuntimeInHours: number;
-  CapitalRepairCost: number;
-  SpaceExternalId: string;
-  FloorExternalId: string;
+  Name?: string;
+  Description?: string;
+  AssetNumber?: string;
+  SerialNumber?: string;
+  AssetClassId?: number;
+  AssetRankId?: number;
+  MakeId?: number;
+  ModelId?: number;
+  InServiceDate?: Date;
+  PurchasedFromVendor?: string;
+  AssetStatusId?: number;
+  StatusComment?: string;
+  BarcodeNumber?: string;
+  FinancialSystemId?: number;
+  AssetSafetyComments?: string;
+  AssetKeywordId?: number;
+  ExternalId?: string;
+  ExternalSystemId?: number;
+  AssetTypeId?: number;
+  SpaceId?: number;
+  EmployeeId?: number;
+  Room?: string;
+  QuantityAvailable?: number;
+  Comments?: string;
+  ActiveFlag?: boolean;
+  FloorId?: number;
+  AutoAssignedToId?: number;
+  WarrantyContractNumber?: string;
+  WarrantyEffectiveDate?: Date;
+  WarrantyExpirationDate?: Date;
+  WarrantyExpirationContact?: string;
+  WarrantyExpirationContactPhone?: string;
+  WarrantyVendorId?: number;
+  WarrantyPoNumberId?: number;
+  MaintenanceContractNumber?: string;
+  MaintenanceContractVendorId?: number;
+  MaintenanceContractExpirationDate?: Date;
+  MaintenanceContractNotificationDays?: number;
+  PurchaseDate?: Date;
+  PurchaseAmount?: number;
+  PurchaseCostCenter?: string;
+  PoNumber?: string;
+  EstimatedLifeInYears?: number;
+  EstimatedLifeInHours?: number;
+  AnnualRuntimeInHours?: number;
+  CapitalRepairCost?: number;
+  EstimatedReplacementCost?: number;
+  LifeExpectancy?: Date;
+  FcaRankId?: number;
 }
 
 export interface AssetUpdateRequest {
-  Name: string;
-  Description: string;
-  AssetNumber: string;
-  SerialNumber: string;
-  AssetClassId: number;
-  AssetRankId: number;
-  EcriCodeId: number;
-  MakeId: number;
-  ModelId: number;
-  InServiceDate: Date;
-  AssetStatusId: number;
-  StatusComment: string;
-  BarcodeNumber: string;
-  AssetSafetyComments: string;
-  AssetKeywordId: number;
-  AssetTypeId: number;
-  RiskAssessment: string;
-  SpaceId: number;
-  EmployeeId: number;
-  Room: string;
-  QuantityAvailable: number;
-  Comments: string;
-  ActiveFlag: boolean;
-  FloorId: number;
-  WarrantyContractNumber: string;
-  WarrantyEffectiveDate: Date;
-  WarrantyExpirationDate: Date;
-  WarrantyExpirationContact: string;
-  WarrantyExpirationContactPhone: string;
-  WarrantyVendorId: number;
-  WarrantyPoNumberId: number;
-  MaintenanceContractNumber: string;
-  MaintenanceContractVendorId: number;
-  MaintenanceContractExpirationDate: Date;
-  MaintenanceContractNotificationDays: number;
-  UomId: number;
-  FcaRankId: number;
+  Name?: string;
+  Description?: string;
+  AssetNumber?: string;
+  SerialNumber?: string;
+  AssetClassId?: number;
+  AssetRankId?: number;
+  EcriCodeId?: number;
+  MakeId?: number;
+  ModelId?: number;
+  InServiceDate?: Date;
+  PurchasedFromVendor?: string;
+  AssetStatusId?: number;
+  StatusComment?: string;
+  BarcodeNumber?: string;
+  FinancialSystemId?: number;
+  AssetSafetyComments?: string;
+  AssetKeywordId?: number;
+  ExternalId?: string;
+  AssetTypeId?: number;
+  RiskAssessment?: string;
+  ExternalSystemId?: number;
+  SpaceId?: number;
+  EmployeeId?: number;
+  Room?: string;
+  QuantityAvailable?: number;
+  Comments?: string;
+  ActiveFlag?: boolean;
+  FloorId?: number;
+  AutoAssignedToId?: number;
+  WarrantyContractNumber?: string;
+  WarrantyEffectiveDate?: Date;
+  WarrantyExpirationDate?: Date;
+  WarrantyExpirationContact?: string;
+  WarrantyExpirationContactPhone?: string;
+  WarrantyVendorId?: number;
+  WarrantyPoNumberId?: number;
+  MaintenanceContractNumber?: string;
+  MaintenanceContractVendorId?: number;
+  MaintenanceContractExpirationDate?: Date;
+  MaintenanceContractNotificationDays?: number;
+  PurchaseDate?: Date;
+  PurchaseAmount?: number;
+  ExternalCostCenterId?: number;
+  PurchaseCostCenter?: string;
+  PoNumber?: string;
+  EstimatedLifeInYears?: number;
+  EstimatedLifeInHours?: number;
+  AnnualRuntimeInHours?: number;
+  CapitalRepairCost?: number;
+  EstimatedReplacementCost?: number;
+  LifeExpectancy?: string;
+  UomId?: number;
+  LastCalibrationDate?: Date;
+  FcaRankId?: number;
 }
 
 
@@ -605,6 +649,8 @@ export interface PostWorkOrderRequest {
 
 export interface PostAttachmentRequest {
   RequestId?: number;
+  AssetId?: number;
+  InspectionId?: number;
   Name: string;
   Description?: string;
   FileName?: string;
@@ -917,9 +963,9 @@ export interface ShoppingCartUpdateRequest {
   StatusId?: number;
 }
 
-export interface CheckOutShoppingCartRequest{
-  DeliveryDescription?:String;
-  RequestedDeliveryDate?:Date
+export interface CheckOutShoppingCartRequest {
+  DeliveryDescription?: String;
+  RequestedDeliveryDate?: Date;
 }
 
 //End Region Shopping Cart

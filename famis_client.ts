@@ -6,6 +6,7 @@ import {
   AccountSegmentValue,
   ActivityGroup,
   Asset,
+  AssetAttachmentType,
   AssetClass,
   AssetKeyword,
   AssetMake,
@@ -71,6 +72,7 @@ import {
   RequestType,
   RequestTypeActivity,
   RequestTypeActivityGroupAssociations,
+  Schedule,
   ServiceType,
   ShoppingCart,
   ShoppingCartItem,
@@ -101,7 +103,8 @@ import * as AxiosLogger from 'axios-logger';
 import { Result } from './model/common';
 import {
   AssetCreateRequest,
-  AssetUpdateRequest, CheckOutShoppingCartRequest,
+  AssetUpdateRequest,
+  CheckOutShoppingCartRequest,
   CreateCompanyRequest,
   CreateInspectionAttachment,
   FamisOAuthCredential,
@@ -339,12 +342,16 @@ export class FamisClient {
     return this.getAll<AssetMake>(context, 'assetmakes');
   }
 
-  async createAssetMake(assetMake: AssetMake): Promise<AssetMake> {
+  async createAssetMake(assetMake: CreateAssetMake): Promise<AssetMake> {
     return this.createObject<CreateAssetMake, AssetMake>(assetMake, 'assetmakes');
   }
 
   async getAssetModels(context: QueryContext): Promise<Result<AssetModel>> {
     return this.getAll<AssetModel>(context, 'assetmodels');
+  }
+
+  async getAssetAttachmentTypes(context: QueryContext): Promise<Result<AssetAttachmentType>> {
+    return this.getAll<AssetAttachmentType>(context, 'assetattachmenttypes');
   }
 
   async createAssetModel(assetModel: CreateAssetModel): Promise<AssetModel> {
@@ -357,6 +364,10 @@ export class FamisClient {
 
   async getAssets(context: QueryContext): Promise<Result<Asset>> {
     return this.getAll<Asset>(context, 'assets');
+  }
+
+  async getSchedule(context: QueryContext): Promise<Result<Schedule>> {
+    return this.getAll<Schedule>(context, 'schedules');
   }
 
   async getAllAssetsBatch(context: QueryContext, callback: ResultCallback<Asset>): Promise<void> {

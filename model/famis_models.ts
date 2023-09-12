@@ -228,10 +228,27 @@ export interface FamisAttachment {
   UpdateDate: Date;
   UpdatedById: number;
   UpdatedByExternalId: string;
-  AttachmentTypeId?: string;
+  AttachmentTypeId?: number;
   RequestExternalId?: string;
   Contents?: string;
 }
+
+export interface AssetAttachment {
+  Id: number;
+  AssetClassId: number;
+  AssetId: number;
+  Name: string;
+  Description: string;
+  FileName: string;
+  UpdateDate: Date;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  TypeId: number;
+  Contents: string;
+  AssetNumber: string;
+  AssetExternalId: string;
+}
+
 
 export interface Warehouse {
   Id: number;
@@ -1213,14 +1230,123 @@ export interface AssetType {
   TabOrder: number;
 }
 
+export interface AssetAttachmentType{
+  Id?:number;
+  Name?:string;
+  ActiveFlag?:boolean;
+  ImageFlag?:boolean
+}
+
 export interface CreateAssetAttachment {
-  AssetId: string;
+  AssetId: number;
   FileName: string;
   TypeId: number;
   Contents: any;
   Name: string;
   Description: string;
 }
+
+export interface Schedule {
+  Id: number;
+  ExternalId: string;
+  StartDate: Date;
+  EndDate: Date;
+  AssetId: number;
+  AssetExternalId: string;
+  RequestTypeId: number;
+  RequestTypeExternalId: string;
+  RequestSubTypeId: number;
+  RequestSubtypeExternalId: string;
+  AssignedToId: number;
+  AssignedToExternalId: string;
+  Frequency: number;
+  RecurrencePattern: number;
+  NotificationTime: number;
+  NotificationPeriod: boolean;
+  OrderedById: number;
+  OrderedByExternalId: string;
+  Mon: boolean;
+  Tue: boolean;
+  Wed: boolean;
+  Thu: boolean;
+  Fri: boolean;
+  Sat: boolean;
+  Sun: boolean;
+  DayOfMonth: number;
+  MonthOfYear: number;
+  WeekOfMonth: number;
+  RequestedById: number;
+  CreatedById: number;
+  CreatedByExternalId: string;
+  RequestState: number;
+  UpdateDate: string;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  PropertyId: number;
+  PropertyExternalId: string;
+  SpaceId: number;
+  SpaceExternalId: string;
+  StatementOfWork: string;
+  LastName: string;
+  FirstName: string;
+  CompanyName: string;
+  Email: string;
+  Fax: string;
+  Phone: string;
+  NotifyAssignedToFlag: boolean;
+  NotifyFollowupAlert: number;
+  RequestPriorityId: number;
+  RequestPriorityExternalId: string;
+  BillableFlag: boolean;
+  ExcludeWeekends: boolean;
+  ScheduleName: string;
+  ProcedureId: number;
+  ProcedureExternalId: string;
+  TotalLabor: number;
+  TotalMaterials: number;
+  TotalOtherCosts: number;
+  TotalMarkup: number;
+  BillCodeId: number;
+  CreateDate: Date;
+  CostCodeId: number;
+  EstimatedLaborHours: number;
+  AutoExtendFlag: boolean;
+  AutoExtendPeriod: number;
+  NotifyAssignedToMethod: number;
+  EstimatedTotalAmount: number;
+  NotificationCCWOFlag: boolean;
+  OriginationCodeId: number;
+  ProjectId: number;
+  RecurrencePatternDesc: string;
+  ProjectExternalId: string;
+  CubeNumber: string;
+  InactivatedById: number;
+  InactiveDate: Date;
+  InactiveDateInt: number;
+  ChargeTypeId: number;
+  ExternalCostCenter: string;
+  SubspaceId: number;
+  SubspaceExternalId: string;
+  CrewAssignedId: number;
+  CrewAssignedExternalId: string;
+  GenerateByEnum: string;
+  ByCompleteDateNextRequestTypeEnum: string;
+  ByCompleteDateNextRequestQuantity: number;
+}
+
+export interface ParentAssetAssociation {
+  Id: number;
+  ParentId: number;
+  ParentExternalId: string;
+  ParentAssetNumber: string;
+  ChildId: number;
+  ChildExternalId: string;
+  ChildAssetNumber: string;
+  UpdateDate: string;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+}
+
 
 export interface Asset {
   Id: number;
@@ -1307,6 +1433,8 @@ export interface Asset {
   AssetModel?: AssetModel;
   AssetRank?: AssetRank;
   AssetClass?: AssetClass;
+  ParentAssetAssociation?: ParentAssetAssociation[];
+  Attachments?: AssetAttachment[];
 }
 
 export interface AssetRank {
@@ -2759,7 +2887,7 @@ export interface ShoppingCart {
   CreateDate: string;
   MyCartsOnly: boolean;
   CreatedById: number;
-  CrewUserAssociations?:CrewUserAssociation[]
+  CrewUserAssociations?: CrewUserAssociation[];
 }
 
 export interface ShoppingCartItem {
