@@ -985,6 +985,20 @@ export interface PurchaseRequisitionCreateRequest {
   AttentionTo?: string;
 }
 
+export interface PurchaseRequisitionUpdateRequest {
+  RequestorName?: string;
+  RequestorEmail?: string;
+  RequestorPhone?: string;
+  Description?: string;
+  TypeId?: number;
+  StatusId?: number;
+  PropertyId?: number;
+  ShipToAddress?: string;
+  RequestId?: number;
+  NTE?: number;
+  AttentionTo?: string;
+}
+
 export interface PurchaseRequisitionLineCreateRequest {
   PRId: number;
   RequiredDate?: string;
@@ -997,7 +1011,7 @@ export interface PurchaseRequisitionLineCreateRequest {
   VendorExternalId?: string;
   WarehouseId?: number;
   WarehouseExternalId?: string;
-  MaterialItemId: number;
+  MaterialItemId?: number;
   MaterialItemExternalId?: string;
   Description?: string;
   UnitOfMeasureId?: number;

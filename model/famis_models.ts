@@ -1230,11 +1230,11 @@ export interface AssetType {
   TabOrder: number;
 }
 
-export interface AssetAttachmentType{
-  Id?:number;
-  Name?:string;
-  ActiveFlag?:boolean;
-  ImageFlag?:boolean
+export interface AssetAttachmentType {
+  Id?: number;
+  Name?: string;
+  ActiveFlag?: boolean;
+  ImageFlag?: boolean;
 }
 
 export interface CreateAssetAttachment {
@@ -2944,6 +2944,7 @@ export interface PurchaseRequisitionHeader {
 
 export interface PurchaseRequisitionLine {
   Id: number;
+  PRId: number;
   Number: string;
   RequestorName: string;
   RequestorEmail: string;

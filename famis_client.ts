@@ -124,7 +124,7 @@ import {
   PostUdfForWoRequest,
   PostWorkOrderRequest,
   PurchaseRequisitionCreateRequest,
-  PurchaseRequisitionLineCreateRequest,
+  PurchaseRequisitionLineCreateRequest, PurchaseRequisitionUpdateRequest,
   SearchUsersRequest,
   ShoppingCartCreateRequest,
   ShoppingCartItemCreateRequest,
@@ -1269,11 +1269,16 @@ export class FamisClient {
     return this.getAll<PurchaseRequisitionLine>(context, 'purchaserequisitionlines');
   }
 
-  async createPurchaseRequisitionHeader(postRequest: PurchaseRequisitionCreateRequest, userId: number): Promise<PurchaseRequisitionHeader> {
+  async createPurchaseRequisitionHeader(postRequest: PurchaseRequisitionCreateRequest): Promise<PurchaseRequisitionHeader> {
     return this.createObject<PurchaseRequisitionCreateRequest, PurchaseRequisitionHeader>(postRequest, 'purchaserequisitionheaders');
   }
 
-  async createPurchaseRequisitionLine(postRequest: PurchaseRequisitionLineCreateRequest, userId: number): Promise<PurchaseRequisitionLine> {
+  async updatePurchaseRequisitionHeader(postRequest: PurchaseRequisitionUpdateRequest, prId: number): Promise<PurchaseRequisitionHeader> {
+    const entity = `purchaserequisitionheaders(${prId})`;
+    return this.patchObject<PurchaseRequisitionUpdateRequest, PurchaseRequisitionHeader>(postRequest, entity);
+  }
+
+  async createPurchaseRequisitionLine(postRequest: PurchaseRequisitionLineCreateRequest): Promise<PurchaseRequisitionLine> {
     return this.createObject<PurchaseRequisitionLineCreateRequest, PurchaseRequisitionLine>(postRequest, 'purchaserequisitionlines');
   }
 
