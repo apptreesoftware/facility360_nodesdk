@@ -1136,6 +1136,7 @@ export interface WorkOrder {
   RequestType?: RequestType;
   Asset?: Asset;
   RequestSubType?: RequestSubType;
+  Procedure?: Procedure;
   WorkOrderComment?: WorkOrderComment;
   Attachments?: FamisAttachment[];
   Udfs?: Udf[];
