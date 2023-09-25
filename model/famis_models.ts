@@ -690,35 +690,35 @@ export interface State {
 
 export interface Inspection {
   Id: number;
-  InspectionClassId: number;
-  InspectionTypeId: number;
-  PropertyId: number;
-  SpaceId: number;
-  SubspaceId: number;
-  FloorId: number;
-  InspectorId: number;
-  InspectionDate: Date;
-  InspectionTime: string;
-  Occupant: string;
-  Room: string;
-  Score: number;
-  AssetId: number;
-  ExternalId: string;
-  WorkOrderId: number;
-  WorkOrderTaskId: string;
-  Comments: string;
-  CreatorId: number;
-  CreateDate: Date;
-  UpdateDate: Date;
-  PropertyExternalId: string;
-  SpaceExternalId: string;
-  SubspaceExternalId: string;
-  FloorExternalId: string;
-  InspectorExternalId: string;
-  CreatorExternalId: string;
-  AssetExternalId: string;
-  AssetNumber: string;
-  WorkOrderExternalId: string;
+  InspectionClassId?: number;
+  InspectionTypeId?: number;
+  PropertyId?: number;
+  SpaceId?: number;
+  SubspaceId?: number;
+  FloorId?: number;
+  InspectorId?: number;
+  InspectionDate?: Date;
+  InspectionTime?: string;
+  Occupant?: string;
+  Room?: string;
+  Score?: number;
+  AssetId?: number;
+  ExternalId?: string;
+  WorkOrderId?: number;
+  WorkOrderTaskId?: string;
+  Comments?: string;
+  CreatorId?: number;
+  CreateDate?: Date;
+  UpdateDate?: Date;
+  PropertyExternalId?: string;
+  SpaceExternalId?: string;
+  SubspaceExternalId?: string;
+  FloorExternalId?: string;
+  InspectorExternalId?: string;
+  CreatorExternalId?: string;
+  AssetExternalId?: string;
+  AssetNumber?: string;
+  WorkOrderExternalId?: string;
 }
 
 export interface InspectionDetail {
