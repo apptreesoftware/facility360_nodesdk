@@ -421,6 +421,31 @@ export interface SupplierMaterial {
   LeadTime?: string;
 }
 
+export interface AdjustmentType {
+  Id: number;
+  Name: string;
+  Desc: string;
+  Type: number;
+  TabOrder: number;
+  Active: boolean;
+  UpdateDate: string;
+  UpdatedByName: string;
+  InitialFlag: boolean;
+  ReduceInventoryFlag: boolean;
+}
+
+export interface AdjustmentTransactionResponse {
+  Id?: number;
+  ItemId?: number;
+  AdjustmentTypeId?: number;
+  TransactionComments?: string;
+  BinId?: number;
+  WarehouseId?: number;
+  TransactionNumber?: string,
+  QuantityOnHand?: number;
+  UnitCost?: number;
+}
+
 
 export interface WorkType {
   Id: number;

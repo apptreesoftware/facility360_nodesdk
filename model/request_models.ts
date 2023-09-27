@@ -1021,3 +1021,31 @@ export interface PurchaseRequisitionLineCreateRequest {
 }
 
 //End Region Purchase Requisition
+
+//Region Inventory
+
+export interface QuantityAdjustmentTransactionRequest {
+  ItemId?: number;
+  WarehouseId?: number;
+  BinId?: number;
+  AdjustmentTypeId?: number;
+  Quantity?: number;
+  TransactionComments?: string;
+}
+
+export interface PhysicalCountTransactionRequest {
+  ItemId?: number;
+  WarehouseId?: number;
+  BinId?: number;
+  Count?: number;
+}
+
+export interface PriceAdjustmentTransactionRequest {
+  ItemId?: number;
+  WarehouseId?: number;
+  AdjustmentTypeId?: number;
+  UnitCost?: number;
+  TransactionComments?: string;
+}
+
+//End Region Inventory
