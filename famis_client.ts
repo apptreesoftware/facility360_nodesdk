@@ -5,6 +5,8 @@ import {
   AccountSegment,
   AccountSegmentValue,
   ActivityGroup,
+  AdjustmentTransactionResponse,
+  AdjustmentType,
   Asset,
   AssetAttachmentType,
   AssetClass,
@@ -116,6 +118,7 @@ import {
   PatchSpaceAreaRequest,
   PatchUserRequest,
   PatchWorkOrderRequest,
+  PhysicalCountTransactionRequest,
   PostAttachmentRequest,
   PostLaborCostRequest,
   PostLaborEntryRequest,
@@ -123,8 +126,11 @@ import {
   PostOtherCostRequest,
   PostUdfForWoRequest,
   PostWorkOrderRequest,
+  PriceAdjustmentTransactionRequest,
   PurchaseRequisitionCreateRequest,
-  PurchaseRequisitionLineCreateRequest, PurchaseRequisitionUpdateRequest,
+  PurchaseRequisitionLineCreateRequest,
+  PurchaseRequisitionUpdateRequest,
+  QuantityAdjustmentTransactionRequest,
   SearchUsersRequest,
   ShoppingCartCreateRequest,
   ShoppingCartItemCreateRequest,
@@ -737,6 +743,7 @@ export class FamisClient {
     return this.getAll<WorkType>(context, 'worktypes');
   }
 
+  //Region Inventory
   async getWarehouses(context: QueryContext): Promise<Result<Warehouse>> {
     return this.getAll<Warehouse>(context, 'warehouses');
   }
@@ -752,6 +759,24 @@ export class FamisClient {
   async getUnitOfMeasures(context: QueryContext): Promise<Result<UnitOfMeasure>> {
     return this.getAll<UnitOfMeasure>(context, 'uoms');
   }
+
+  async getAdjustmentTypes(context: QueryContext): Promise<Result<AdjustmentType>> {
+    return this.getAll<AdjustmentType>(context, 'adjustmenttypes');
+  }
+
+  async adjustQuantity(request: QuantityAdjustmentTransactionRequest): Promise<AdjustmentTransactionResponse> {
+    return this.createObject<QuantityAdjustmentTransactionRequest, AdjustmentTransactionResponse>(request, 'quantityadjustmenttransactions');
+  }
+
+  async physicalCount(request: PhysicalCountTransactionRequest): Promise<AdjustmentTransactionResponse> {
+    return this.createObject<PhysicalCountTransactionRequest, WorkOrder>(request, 'physicalcounttransactions');
+  }
+
+  async adjustPrice(request: PriceAdjustmentTransactionRequest): Promise<AdjustmentTransactionResponse> {
+    return this.createObject<PriceAdjustmentTransactionRequest, AdjustmentTransactionResponse>(request, 'priceadjustmenttransactions');
+  }
+
+  //End Region Inventory
 
   async getProperties(context: QueryContext): Promise<Result<Property>> {
     return this.getAll<Property>(context, 'properties');

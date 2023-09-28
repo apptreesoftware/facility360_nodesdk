@@ -421,6 +421,31 @@ export interface SupplierMaterial {
   LeadTime?: string;
 }
 
+export interface AdjustmentType {
+  Id: number;
+  Name: string;
+  Desc: string;
+  Type: number;
+  TabOrder: number;
+  Active: boolean;
+  UpdateDate: string;
+  UpdatedByName: string;
+  InitialFlag: boolean;
+  ReduceInventoryFlag: boolean;
+}
+
+export interface AdjustmentTransactionResponse {
+  Id?: number;
+  ItemId?: number;
+  AdjustmentTypeId?: number;
+  TransactionComments?: string;
+  BinId?: number;
+  WarehouseId?: number;
+  TransactionNumber?: string,
+  QuantityOnHand?: number;
+  UnitCost?: number;
+}
+
 
 export interface WorkType {
   Id: number;
@@ -690,35 +715,35 @@ export interface State {
 
 export interface Inspection {
   Id: number;
-  InspectionClassId: number;
-  InspectionTypeId: number;
-  PropertyId: number;
-  SpaceId: number;
-  SubspaceId: number;
-  FloorId: number;
-  InspectorId: number;
-  InspectionDate: Date;
-  InspectionTime: string;
-  Occupant: string;
-  Room: string;
-  Score: number;
-  AssetId: number;
-  ExternalId: string;
-  WorkOrderId: number;
-  WorkOrderTaskId: string;
-  Comments: string;
-  CreatorId: number;
-  CreateDate: Date;
-  UpdateDate: Date;
-  PropertyExternalId: string;
-  SpaceExternalId: string;
-  SubspaceExternalId: string;
-  FloorExternalId: string;
-  InspectorExternalId: string;
-  CreatorExternalId: string;
-  AssetExternalId: string;
-  AssetNumber: string;
-  WorkOrderExternalId: string;
+  InspectionClassId?: number;
+  InspectionTypeId?: number;
+  PropertyId?: number;
+  SpaceId?: number;
+  SubspaceId?: number;
+  FloorId?: number;
+  InspectorId?: number;
+  InspectionDate?: Date;
+  InspectionTime?: string;
+  Occupant?: string;
+  Room?: string;
+  Score?: number;
+  AssetId?: number;
+  ExternalId?: string;
+  WorkOrderId?: number;
+  WorkOrderTaskId?: string;
+  Comments?: string;
+  CreatorId?: number;
+  CreateDate?: Date;
+  UpdateDate?: Date;
+  PropertyExternalId?: string;
+  SpaceExternalId?: string;
+  SubspaceExternalId?: string;
+  FloorExternalId?: string;
+  InspectorExternalId?: string;
+  CreatorExternalId?: string;
+  AssetExternalId?: string;
+  AssetNumber?: string;
+  WorkOrderExternalId?: string;
 }
 
 export interface InspectionDetail {
@@ -1136,6 +1161,7 @@ export interface WorkOrder {
   RequestType?: RequestType;
   Asset?: Asset;
   RequestSubType?: RequestSubType;
+  Procedure?: Procedure;
   WorkOrderComment?: WorkOrderComment;
   Attachments?: FamisAttachment[];
   Udfs?: Udf[];
