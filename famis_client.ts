@@ -1109,9 +1109,9 @@ export class FamisClient {
   }
 
   async getInstallationConfigurations(context: QueryContext): Promise<InstallationConfig[]> {
-    const url = context.buildApiUrl('installationconfigurations');
-    const resp = await this.http.get<InstallationConfig[]>(url);
-    return resp.data;
+    const url = context.buildUrl('installationconfigurations');
+    const resp = await this.http.get<FamisResponse<InstallationConfig>>(url);
+    return resp.data.value ?? [];
   }
 
   //#region Logbook
