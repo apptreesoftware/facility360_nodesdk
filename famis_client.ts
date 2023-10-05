@@ -50,6 +50,10 @@ import {
   MaterialClass,
   MaterialCost,
   MaterialItem,
+  MeterReading,
+  MeterSite,
+  MeterSiteGroup,
+  MeterSiteStatus,
   OtherCost,
   OtherCostType,
   PayPeriod,
@@ -114,6 +118,7 @@ import {
   InspectionTransactionRequest,
   LaborEntryApprovalRequest,
   LoginResponse,
+  MeterReadingCreateRequest,
   PatchCompanyRequest,
   PatchSpaceAreaRequest,
   PatchUserRequest,
@@ -764,16 +769,31 @@ export class FamisClient {
     return this.getAll<AdjustmentType>(context, 'adjustmenttypes');
   }
 
-  async adjustQuantity(request: QuantityAdjustmentTransactionRequest): Promise<AdjustmentTransactionResponse> {
-    return this.createObject<QuantityAdjustmentTransactionRequest, AdjustmentTransactionResponse>(request, 'quantityadjustmenttransactions');
+  async adjustQuantity(
+    request: QuantityAdjustmentTransactionRequest
+  ): Promise<AdjustmentTransactionResponse> {
+    return this.createObject<QuantityAdjustmentTransactionRequest, AdjustmentTransactionResponse>(
+      request,
+      'quantityadjustmenttransactions'
+    );
   }
 
-  async physicalCount(request: PhysicalCountTransactionRequest): Promise<AdjustmentTransactionResponse> {
-    return this.createObject<PhysicalCountTransactionRequest, WorkOrder>(request, 'physicalcounttransactions');
+  async physicalCount(
+    request: PhysicalCountTransactionRequest
+  ): Promise<AdjustmentTransactionResponse> {
+    return this.createObject<PhysicalCountTransactionRequest, WorkOrder>(
+      request,
+      'physicalcounttransactions'
+    );
   }
 
-  async adjustPrice(request: PriceAdjustmentTransactionRequest): Promise<AdjustmentTransactionResponse> {
-    return this.createObject<PriceAdjustmentTransactionRequest, AdjustmentTransactionResponse>(request, 'priceadjustmenttransactions');
+  async adjustPrice(
+    request: PriceAdjustmentTransactionRequest
+  ): Promise<AdjustmentTransactionResponse> {
+    return this.createObject<PriceAdjustmentTransactionRequest, AdjustmentTransactionResponse>(
+      request,
+      'priceadjustmenttransactions'
+    );
   }
 
   //End Region Inventory
@@ -1062,12 +1082,17 @@ export class FamisClient {
     return this.getAll<InspectionClass>(context, 'inspectionclasses');
   }
 
-  async getUserInspectionClassAssocs(context: QueryContext): Promise<Result<UserInspectionClassAssoc>> {
+  async getUserInspectionClassAssocs(
+    context: QueryContext
+  ): Promise<Result<UserInspectionClassAssoc>> {
     return this.getAll<UserInspectionClassAssoc>(context, 'userinspectionclassassociations');
   }
 
   async createInspectionTransaction(request: InspectionTransactionRequest): Promise<Inspection> {
-    return this.createObject<InspectionTransactionRequest, Inspection>(request, 'inspectiontransactions');
+    return this.createObject<InspectionTransactionRequest, Inspection>(
+      request,
+      'inspectiontransactions'
+    );
   }
 
   async createInspectionAttachment(attachment: CreateInspectionAttachment): Promise<void> {
@@ -1171,21 +1196,37 @@ export class FamisClient {
     return this.createObject<PostLaborEntryRequest, LaborEntry>(postRequest, 'laborentries');
   }
 
-  async updateLaborEntry(laborId: string, patchRequest: PostLaborEntryRequest): Promise<LaborEntry> {
-    return this.patchObject<PostLaborEntryRequest, LaborEntry>(patchRequest, 'laborentries', laborId);
+  async updateLaborEntry(
+    laborId: string,
+    patchRequest: PostLaborEntryRequest
+  ): Promise<LaborEntry> {
+    return this.patchObject<PostLaborEntryRequest, LaborEntry>(
+      patchRequest,
+      'laborentries',
+      laborId
+    );
   }
 
-  async submitLaborEntry(postRequest: LaborEntryApprovalRequest, userId: number): Promise<LaborEntry> {
+  async submitLaborEntry(
+    postRequest: LaborEntryApprovalRequest,
+    userId: number
+  ): Promise<LaborEntry> {
     const entity = `users(${userId})/SubmitTimeCard`;
     return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
   }
 
-  async rejectLaborEntry(postRequest: LaborEntryApprovalRequest, userId: number): Promise<LaborEntry> {
+  async rejectLaborEntry(
+    postRequest: LaborEntryApprovalRequest,
+    userId: number
+  ): Promise<LaborEntry> {
     const entity = `users(${userId})/RejectTimeCard`;
     return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
   }
 
-  async approveLaborEntry(postRequest: LaborEntryApprovalRequest, userId: number): Promise<LaborEntry> {
+  async approveLaborEntry(
+    postRequest: LaborEntryApprovalRequest,
+    userId: number
+  ): Promise<LaborEntry> {
     const entity = `users(${userId})/ApproveTimeCard`;
     return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
   }
@@ -1241,16 +1282,27 @@ export class FamisClient {
     return this.createObject<ShoppingCartCreateRequest, ShoppingCart>(postRequest, 'shoppingcarts');
   }
 
-  async createShoppingCartItem(postRequest: ShoppingCartItemCreateRequest): Promise<ShoppingCartItem> {
-    return this.createObject<ShoppingCartItemCreateRequest, ShoppingCartItem>(postRequest, 'shoppingcartitems');
+  async createShoppingCartItem(
+    postRequest: ShoppingCartItemCreateRequest
+  ): Promise<ShoppingCartItem> {
+    return this.createObject<ShoppingCartItemCreateRequest, ShoppingCartItem>(
+      postRequest,
+      'shoppingcartitems'
+    );
   }
 
-  async updateShoppingCart(postRequest: ShoppingCartUpdateRequest, cartId: number): Promise<ShoppingCart> {
+  async updateShoppingCart(
+    postRequest: ShoppingCartUpdateRequest,
+    cartId: number
+  ): Promise<ShoppingCart> {
     const entity = `shoppingcarts(${cartId})`;
     return this.patchObject<ShoppingCartUpdateRequest, ShoppingCart>(postRequest, entity);
   }
 
-  async checkOutShoppingCart(postRequest: CheckOutShoppingCartRequest, cartId: number): Promise<ShoppingCart> {
+  async checkOutShoppingCart(
+    postRequest: CheckOutShoppingCartRequest,
+    cartId: number
+  ): Promise<ShoppingCart> {
     const entity = `shoppingcarts(${cartId})/checkout`;
     return this.createObject<CheckOutShoppingCartRequest, ShoppingCart>(postRequest, entity);
   }
@@ -1278,38 +1330,87 @@ export class FamisClient {
   //End Region Purchase Order
 
   //Region Purchase Requisition
-  async getPurchaseRequisitionHeaderStatuses(context: QueryContext): Promise<Result<PurchaseRequisitionHeaderStatus>> {
-    return this.getAll<PurchaseRequisitionHeaderStatus>(context, 'purchaserequisitionheaderstatuses');
+  async getPurchaseRequisitionHeaderStatuses(
+    context: QueryContext
+  ): Promise<Result<PurchaseRequisitionHeaderStatus>> {
+    return this.getAll<PurchaseRequisitionHeaderStatus>(
+      context,
+      'purchaserequisitionheaderstatuses'
+    );
   }
 
-  async getPurchaseRequisitionTypes(context: QueryContext): Promise<Result<PurchaseRequisitionType>> {
+  async getPurchaseRequisitionTypes(
+    context: QueryContext
+  ): Promise<Result<PurchaseRequisitionType>> {
     return this.getAll<PurchaseRequisitionType>(context, 'purchaserequisitiontypes');
   }
 
-  async getPurchaseRequisitionHeaders(context: QueryContext): Promise<Result<PurchaseRequisitionHeader>> {
+  async getPurchaseRequisitionHeaders(
+    context: QueryContext
+  ): Promise<Result<PurchaseRequisitionHeader>> {
     return this.getAll<PurchaseRequisitionHeader>(context, 'purchaserequisitionheaders');
   }
 
-  async getPurchaseRequisitionLines(context: QueryContext): Promise<Result<PurchaseRequisitionLine>> {
+  async getPurchaseRequisitionLines(
+    context: QueryContext
+  ): Promise<Result<PurchaseRequisitionLine>> {
     return this.getAll<PurchaseRequisitionLine>(context, 'purchaserequisitionlines');
   }
 
-  async createPurchaseRequisitionHeader(postRequest: PurchaseRequisitionCreateRequest): Promise<PurchaseRequisitionHeader> {
-    return this.createObject<PurchaseRequisitionCreateRequest, PurchaseRequisitionHeader>(postRequest, 'purchaserequisitionheaders');
+  async createPurchaseRequisitionHeader(
+    postRequest: PurchaseRequisitionCreateRequest
+  ): Promise<PurchaseRequisitionHeader> {
+    return this.createObject<PurchaseRequisitionCreateRequest, PurchaseRequisitionHeader>(
+      postRequest,
+      'purchaserequisitionheaders'
+    );
   }
 
-  async updatePurchaseRequisitionHeader(postRequest: PurchaseRequisitionUpdateRequest, prId: number): Promise<PurchaseRequisitionHeader> {
+  async updatePurchaseRequisitionHeader(
+    postRequest: PurchaseRequisitionUpdateRequest,
+    prId: number
+  ): Promise<PurchaseRequisitionHeader> {
     const entity = `purchaserequisitionheaders(${prId})`;
-    return this.patchObject<PurchaseRequisitionUpdateRequest, PurchaseRequisitionHeader>(postRequest, entity);
+    return this.patchObject<PurchaseRequisitionUpdateRequest, PurchaseRequisitionHeader>(
+      postRequest,
+      entity
+    );
   }
 
-  async createPurchaseRequisitionLine(postRequest: PurchaseRequisitionLineCreateRequest): Promise<PurchaseRequisitionLine> {
-    return this.createObject<PurchaseRequisitionLineCreateRequest, PurchaseRequisitionLine>(postRequest, 'purchaserequisitionlines');
+  async createPurchaseRequisitionLine(
+    postRequest: PurchaseRequisitionLineCreateRequest
+  ): Promise<PurchaseRequisitionLine> {
+    return this.createObject<PurchaseRequisitionLineCreateRequest, PurchaseRequisitionLine>(
+      postRequest,
+      'purchaserequisitionlines'
+    );
   }
-
 
   //End Region Purchase Requisition
 
+  //Region Meter Site
+
+  async getMeterSiteGroups(context: QueryContext): Promise<Result<MeterSiteGroup>> {
+    return this.getAll<MeterSiteGroup>(context, 'metersitegroups');
+  }
+
+  async getMeterSiteStatuses(context: QueryContext): Promise<Result<MeterSiteStatus>> {
+    return this.getAll<MeterSiteStatus>(context, 'metersitestatuses');
+  }
+
+  async getMeterSites(context: QueryContext): Promise<Result<MeterSite>> {
+    return this.getAll<MeterSite>(context, 'metersites');
+  }
+
+  async getMeterReadings(context: QueryContext): Promise<Result<MeterReading>> {
+    return this.getAll<MeterReading>(context, 'meterreadings');
+  }
+
+  async createMeterReading(postRequest: MeterReadingCreateRequest): Promise<MeterReading> {
+    return this.createObject<MeterReadingCreateRequest, MeterReading>(postRequest, 'meterreadings');
+  }
+
+  //End Region Meter Site
   // generic get methods
 
   async getAll<T>(context: QueryContext, type: string): Promise<Result<T>> {
@@ -1481,8 +1582,7 @@ export class FamisClient {
 
   async patchObject<T, K>(patch: T, entity: string, entityId?: string): Promise<K> {
     let url = buildEntityUrl(entity);
-    if (entityId)
-      url += `?key=${entityId}`;
+    if (entityId) url += `?key=${entityId}`;
     const resp = await this.http.patch(url, patch);
     this.throwResponseError(resp);
     return resp.data as K;

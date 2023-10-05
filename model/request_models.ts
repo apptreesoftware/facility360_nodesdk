@@ -141,7 +141,6 @@ export interface AssetUpdateRequest {
   FcaRankId?: number;
 }
 
-
 //End Region Asset
 
 export interface CreateCompanyRequest {
@@ -789,7 +788,6 @@ export interface PostLaborCostRequest {
   ExternalId?: string;
   TaxRate?: number;
   ExternalRecurrenceId?: string;
-
 }
 
 export interface PostLaborEntryRequest {
@@ -941,7 +939,6 @@ export interface GeoLocationRequest {
 
 //End Geo Location
 
-
 //Region Shopping Cart
 export interface ShoppingCartCreateRequest {
   Description: string;
@@ -1049,3 +1046,15 @@ export interface PriceAdjustmentTransactionRequest {
 }
 
 //End Region Inventory
+
+//Region Meter
+export interface MeterReadingCreateRequest {
+  MeterSiteId: number;
+  EstimateCodeId?: number;
+  EntryMethod?: number;
+  RecentReadDate?: Date;
+  RecentReading?: number;
+  RecentDemandReading?: number;
+}
+
+//End Region Meter
