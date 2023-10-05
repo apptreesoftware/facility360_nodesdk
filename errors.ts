@@ -25,12 +25,13 @@ export class ApiError extends Error {
   }
 
   toString() {
-    if (this.isAuthorizationError) {
+    const message = this.message;
+    if (this.isAuthorizationError && !message) {
       return 'Authorization Failed';
     }
-    let str = this.message;
+    let str = message;
     if (this.resp.request) {
-      str = `${str} 
+      str = `${message} 
 METHOD: ${this.resp.request.method}
 HOST: ${this.resp.config.baseURL}
 URL: ${this.resp.request.path}
