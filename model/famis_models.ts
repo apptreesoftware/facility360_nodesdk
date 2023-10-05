@@ -714,12 +714,15 @@ export interface State {
 export interface Inspection {
   Id: number;
   InspectionClassId?: number;
+  InspectionClass?: InspectionClass;
   InspectionTypeId?: number;
+  InspectionType?: InspectionType;
   PropertyId?: number;
   SpaceId?: number;
   SubspaceId?: number;
   FloorId?: number;
   InspectorId?: number;
+  Inspector?: FamisUser;
   InspectionDate?: Date;
   InspectionTime?: string;
   Occupant?: string;
