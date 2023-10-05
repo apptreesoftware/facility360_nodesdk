@@ -249,7 +249,6 @@ export interface AssetAttachment {
   AssetExternalId: string;
 }
 
-
 export interface Warehouse {
   Id: number;
   Name: string;
@@ -441,11 +440,10 @@ export interface AdjustmentTransactionResponse {
   TransactionComments?: string;
   BinId?: number;
   WarehouseId?: number;
-  TransactionNumber?: string,
+  TransactionNumber?: string;
   QuantityOnHand?: number;
   UnitCost?: number;
 }
-
 
 export interface WorkType {
   Id: number;
@@ -798,7 +796,6 @@ export interface InspectionItem {
   IncludeInReportFlag: boolean;
 }
 
-
 export interface InspectionClass {
   Id: number;
   Description: string;
@@ -894,7 +891,6 @@ export interface InspectionAttachment {
   InspectionExternalId: string;
   InspectionDetailId: number;
 }
-
 
 //End region Inspection
 
@@ -1373,7 +1369,6 @@ export interface ParentAssetAssociation {
   UpdatedByExternalId: string;
 }
 
-
 export interface Asset {
   Id: number;
   Name: string;
@@ -1432,7 +1427,7 @@ export interface Asset {
   LifeExpectancy?: number;
   UnitMultiplier?: number;
   MeterMultiplier?: number;
-  MeterFormat?: string;
+  MeterFormat?: number;
   UomId?: number;
   UtilityId?: number;
   LastCalibrationDate?: Date;
@@ -2246,7 +2241,6 @@ export interface UserSecurity {
   BillOfMaterialsAccess: boolean;
   BillOfMaterialsEdit: boolean;
 }
-
 
 export interface UserRegionAssociation {
   Id: number;
@@ -3116,7 +3110,6 @@ export interface PurchaseOrderLine {
   PRLineNumber: string;
 }
 
-
 export interface PurchaseOrderStatus {
   Id: number;
   Name: string;
@@ -3149,5 +3142,97 @@ export interface PurchaseOrderType {
   ApprovalRequired: boolean;
 }
 
-
 //End Region Purchase Order
+
+//Region Meter Site
+
+export interface MeterSite {
+  Id?: number;
+  Name?: string;
+  Description?: string;
+  StatusId?: number;
+  TypeId?: number;
+  On?: boolean;
+  UtilitySystemId?: number;
+  FromMeterSiteId?: number;
+  Level?: string;
+  AssociateMeterSiteId?: number;
+  GroupId?: number;
+  GroupOrderNumber?: number;
+  CalculatedCostUsingRate?: boolean;
+  InitialReadDate?: Date;
+  OverrideChargeRate?: number;
+  RecentConsumption?: number;
+  PropertyId?: number;
+  PropertyExternalId?: string;
+  SpaceId?: number;
+  SpaceExternalId?: string;
+  Comments?: string;
+  Directions?: string;
+  SpecialInstructions?: string;
+  EstimateCodeId?: number;
+  EstimateActive?: boolean;
+  EstimateComment?: string;
+  EstimateConsumption?: number;
+  FloorId?: number;
+  SubspaceId?: number;
+  RoomArea?: string;
+  AllocBasedOnArea?: boolean;
+  UpdatedbyName?: string;
+  UpdateDate?: string;
+  MeterInstalled?: boolean;
+  RecentReadDate?: Date;
+  PreviousReadDate?: Date;
+  PreviousReading?: number;
+  PreviousDemand?: number;
+  PreviousConsumption?: number;
+  RecentReading?: number;
+  RecentDemandReading?: number;
+  ReadingUpdateDate?: Date;
+  SwapConsumption?: number;
+  SwapConsumptionDate?: Date;
+  RecentDemandConsumption?: number;
+  MeterGroup?: string;
+  CurrentChargeRate?: number;
+}
+
+export interface MeterSiteGroup {
+  Id?: number;
+  Name?: string;
+  Description?: string;
+  TabOrder?: number;
+  UpdatedByName?: string;
+  UpdateDate?: Date;
+}
+
+export interface MeterSiteStatus {
+  Id?: number;
+  Name?: string;
+  Description?: null;
+  ActiveFlag?: boolean;
+  DefaultFlag?: boolean;
+  TabOrder?: number;
+  UpdatedByName?: string;
+  UpdateDate?: Date;
+}
+
+export interface MeterReading {
+  InstallId?: number;
+  Id?: number;
+  CreateDate?: string;
+  MeterSiteId?: number;
+  BillingperiodId?: number;
+  EstimateCodeId?: number;
+  EntryMethod?: number;
+  PreviousReadDate?: Date;
+  PreviousReading?: number;
+  PreviousDemand?: number;
+  PreviousConsumption?: number;
+  RecentReadDate?: Date;
+  RecentReading?: number;
+  RecentDemandReading?: number;
+  RecentConsumption?: number;
+  RecentDemandConsumption?: number;
+}
+
+//End Region Meter Site
