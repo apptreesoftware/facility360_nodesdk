@@ -3239,3 +3239,56 @@ export interface MeterReading {
 }
 
 //End Region Meter Site
+
+export interface ExternalSystem {
+  Id: number;
+  ActiveFlag: boolean;
+  ExternalSystemName: string;
+  UpdatedDate: Date;
+  AdvancedIntegrationOptions: string;
+  CloseEmailMessageFormat: string;
+  CloseEmailMessageSubject: string;
+  CloseEmailSendMessageFlag: boolean;
+  CloseVerifyEmailMessageFormat: string;
+  CloseVerifyEmailMessageSubject: string;
+  CloseVerifyEmailSendMessageFlag: boolean;
+  DefaultEmployeeId: number;
+  DefaultEmployeeExternalId: string;
+  DestinationEmailAddress: string;
+  DestinationEmailName: string;
+  DispatchVerifyEmailMessageFormat: string;
+  DispatchVerifyEmailMessageSubject: string;
+  DispatchVerifyEmailSendMessageFlag: boolean;
+  ExternalInstallationId: string;
+  ExternalPropertyIdPrefix: string;
+  InstallationId: number;
+  OriginationSystemName: string;
+  PriorityOverrideFlag: boolean;
+  SourceEmailAddress: string;
+  SourceEmailName: string;
+  UpdateEmailMessageFormat: string;
+  UpdateEmailMessageSubject: string;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  WebServiceFlag: boolean;
+  WebServiceUrl: string;
+  WebServiceAdvancedTransportOptions: string;
+  WebServiceAdvancedTransportOptionsFlag: boolean;
+  WebServiceInboundDatesUtcFlag: boolean;
+  WebServiceLinkedSystemsFlag: boolean;
+  WebServiceSendReactiveFlag: boolean;
+  UseHierarchyFlag: boolean;
+  Alias: string;
+  Type: string;
+}
+
+export interface Position {
+  Id: number;
+  Description: string;
+  ExternalId: string;
+  Active: boolean;
+  UpdatedById: number;
+  UpdatedByExternalId: string;
+  UpdateDate: Date;
+}
+
