@@ -120,7 +120,7 @@ import {
   InspectionTransactionRequest,
   LaborEntryApprovalRequest,
   LoginResponse,
-  MeterReadingCreateRequest,
+  MeterReadingCreateRequest, OriginationCode,
   PatchCompanyRequest,
   PatchSpaceAreaRequest,
   PatchUserRequest,
@@ -702,7 +702,7 @@ export class FamisClient {
 
   //#endregion
 
-  //#region property bill code assocations
+  //#region property bill code associations
   async getPropertyBillCodeAssociations(
     context: QueryContext
   ): Promise<Result<PropertyBillCodeAssociations>> {
@@ -1413,6 +1413,11 @@ export class FamisClient {
   }
 
   //End Region Meter Site
+
+  //region Origination Codes
+  async getOriginationCodes(context: QueryContext): Promise<Result<OriginationCode>> {
+    return this.getAll<OriginationCode>(context, 'originationcodes');
+}
 
   async getExternalSystems(context: QueryContext): Promise<Result<ExternalSystem>> {
     return this.getAll<ExternalSystem>(context, 'externalsystems');

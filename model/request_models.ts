@@ -1058,3 +1058,28 @@ export interface MeterReadingCreateRequest {
 }
 
 //End Region Meter
+
+//region Origination Codes
+export interface OriginationCode {
+  Id: number;
+  Description: string;
+  DefaultFlag: boolean;
+  Active: boolean;
+  UpdateDate: Date;
+  UpdatedById: number;
+  TabOrder: number;
+  InspectionFlag: boolean;
+  DefaultScheduledFlag: boolean;
+  DefaultProjectWorkFlag: boolean;
+  DefaultProvisionFlag: boolean;
+  ExcludeFromSlaReportingFlag: boolean;
+  DefaultPriorityDescription: string;
+  RequestorEmailEnabled: number;
+  SlaCalculateOnHoldEnabled: boolean;
+  DefaultAssignedToCreator: boolean;
+  OriginationGroupDescription: string;
+  CompleteByDateEditFlag: boolean;
+  DefaultSelfGenFlag: boolean;
+  UpdatedByExternalId: string;
+}
+//end region
