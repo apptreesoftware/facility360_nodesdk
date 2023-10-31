@@ -26,6 +26,7 @@ import {
   CrewUserAssociation,
   DefaultPropertyAndSpace,
   Department,
+  ExternalSystem,
   FailureCode,
   FamisAttachment,
   FamisResponse,
@@ -57,6 +58,7 @@ import {
   OtherCost,
   OtherCostType,
   PayPeriod,
+  Position,
   PriorityTypeSLADetails,
   Procedure,
   Property,
@@ -1411,8 +1413,16 @@ export class FamisClient {
   }
 
   //End Region Meter Site
-  // generic get methods
 
+  async getExternalSystems(context: QueryContext): Promise<Result<ExternalSystem>> {
+    return this.getAll<ExternalSystem>(context, 'externalsystems');
+  }
+
+  async getPositions(context: QueryContext): Promise<Result<Position>> {
+    return this.getAll<Position>(context, 'positions');
+  }
+
+  // generic get methods
   async getAll<T>(context: QueryContext, type: string): Promise<Result<T>> {
     if (supportsNextLink(type)) {
       return this.getAllUsingLink<T>(context.buildUrl(type));
