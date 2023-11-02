@@ -1177,6 +1177,23 @@ export interface Watcher {
   Name?: string;
 }
 
+export interface CreateWatcher {
+  RequestId: number;
+  EmployeeId: number;
+  NotificationFlag: boolean;
+  CreateDate?: string;
+  Name?: string;
+}
+
+export interface UpdateWatcher {
+  Id: number;
+  RequestId?: number;
+  EmployeeId?: number;
+  NotificationFlag?: boolean;
+  CreateDate?: string;
+  Name?: string;
+}
+
 export interface AssetClass {
   Id: number;
   Description: string;

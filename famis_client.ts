@@ -21,7 +21,7 @@ import {
   Company,
   CreateAssetAttachment,
   CreateAssetMake,
-  CreateAssetModel,
+  CreateAssetModel, CreateWatcher,
   Crew,
   CrewUserAssociation,
   DefaultPropertyAndSpace,
@@ -94,14 +94,14 @@ import {
   SubSpace,
   Udf,
   UdfField,
-  UnitOfMeasure,
+  UnitOfMeasure, UpdateWatcher,
   UserActivityGroupAssociations,
   UserInspectionClassAssoc,
   UserPropertyAssociation,
   UserRegionAssociation,
   UserSecurity,
   UserType,
-  Warehouse,
+  Warehouse, Watcher,
   WorkOrder,
   WorkOrderComment,
   WorkType
@@ -148,6 +148,7 @@ import axiosRetry from 'axios-retry';
 import Bottleneck from 'bottleneck';
 import { GeoLocation } from './model/geo_locations';
 import moment = require('moment');
+import {watch} from "fs";
 
 type ResultCallback<T> = (results: FamisResponse<T>) => void;
 
@@ -408,6 +409,40 @@ export class FamisClient {
   }
 
   //
+
+  //region Watchers
+  async getWatchers(context: QueryContext): Promise<Result<Watcher>> {
+    return await this.getAll<Watcher>(context, 'watchers');
+  }
+
+  async getWatcher(watcherId: number): Promise<Watcher> {
+    const response = await this.getWatchers(new QueryContext().setFilter(`Id eq ${watcherId}`));
+
+    if (!response || response.results.length === 0) {
+      throw new Error('not found');
+    }
+    return response.results[0];
+  }
+
+  async createWatcher(watcher: CreateWatcher): Promise<Watcher> {
+    return this.createObject<CreateWatcher, Watcher>(watcher, 'watchers');
+  }
+
+  async patchWatcher(watcher: UpdateWatcher): Promise<Watcher> {
+    let url = buildEntityUrl('watchers');
+    url += `(${watcher.Id})`;
+    const resp = await this.http.patch(url, watcher);
+
+    return this.getWatcher(watcher.Id);
+  }
+
+  async deleteWatcher(watcherId: number): Promise<void> {
+    let url = buildEntityUrl('watchers');
+    url += `(${watcherId})`;
+    const resp = await this.http.delete(url);
+    this.throwResponseError(resp);
+  }
+  //end region
 
   // crews
 
