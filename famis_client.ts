@@ -91,7 +91,7 @@ import {
   SpaceClass,
   SpaceSubCategory,
   State,
-  SubSpace,
+  SubSpace, TimeZone,
   Udf,
   UdfField,
   UnitOfMeasure, UpdateWatcher,
@@ -334,6 +334,18 @@ export class FamisClient {
   async getPayPeriods(context: QueryContext): Promise<Result<PayPeriod>> {
     return this.getAll<PayPeriod>(context, 'payperiods');
   }
+
+  //region TimeZones
+  async getTimeZones(context: QueryContext): Promise<Result<TimeZone>> {
+    return this.getAll<TimeZone>(context, 'timezones');
+  }
+
+  async getTimeZone(id: number): Promise<TimeZone | null> {
+    const filter = `Id eq ${id}`;
+    const zoneResponse = await this.getTimeZones(new QueryContext().setFilter(filter));
+    return zoneResponse.first;
+  }
+  //endregion
 
   // Assets
   async getAssetClasses(context: QueryContext): Promise<Result<AssetClass>> {

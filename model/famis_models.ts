@@ -3309,3 +3309,14 @@ export interface Position {
   UpdateDate: Date;
 }
 
+export interface TimeZone {
+  Id: number;
+  DisplayName: string;
+  StDesc: string;
+  StOffset: number;
+  DstDescription: string;
+  DstOffset: number;
+  TabOrder: number;
+  Default: boolean;
+}
+
