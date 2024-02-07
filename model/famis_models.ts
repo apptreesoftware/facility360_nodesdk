@@ -797,6 +797,7 @@ export interface InspectionItem {
   ScoringTypeId: number;
   DisplayOnlyFlag: boolean;
   IncludeInReportFlag: boolean;
+  InspectionConditions?: InspectionCondition[]
 }
 
 export interface InspectionClass {
