@@ -1,6 +1,17 @@
-import axios from 'axios';
-import Axios, { AxiosError, AxiosInstance, AxiosResponse, Method } from 'axios';
+import {
+  default as Axios,
+  AxiosError,
+  AxiosInstance,
+  AxiosResponse,
+  Method,
+  default as axios
+} from 'axios';
+import * as AxiosLogger from 'axios-logger';
+import axiosRetry from 'axios-retry';
+import Bottleneck from 'bottleneck';
+import _ from 'lodash';
 import { ApiError, AuthorizationError } from './errors';
+import { Result } from './model/common';
 import {
   AccountSegment,
   AccountSegmentValue,
@@ -21,7 +32,8 @@ import {
   Company,
   CreateAssetAttachment,
   CreateAssetMake,
-  CreateAssetModel, CreateWatcher,
+  CreateAssetModel,
+  CreateWatcher,
   Crew,
   CrewUserAssociation,
   DefaultPropertyAndSpace,
@@ -91,24 +103,26 @@ import {
   SpaceClass,
   SpaceSubCategory,
   State,
-  SubSpace, TimeZone,
+  SubSpace,
+  TimeZone,
   Udf,
   UdfField,
-  UnitOfMeasure, UpdateWatcher,
+  UnitOfMeasure,
+  UpdateWatcher,
   UserActivityGroupAssociations,
   UserInspectionClassAssoc,
   UserPropertyAssociation,
   UserRegionAssociation,
   UserSecurity,
   UserType,
-  Warehouse, Watcher,
+  Warehouse,
+  Watcher,
   WorkOrder,
   WorkOrderComment,
   WorkType
 } from './model/famis_models';
-import { buildEntityUrl, QueryContext } from './model/request_context';
-import * as AxiosLogger from 'axios-logger';
-import { Result } from './model/common';
+import { GeoLocation } from './model/geo_locations';
+import { QueryContext, buildEntityUrl } from './model/request_context';
 import {
   AssetCreateRequest,
   AssetUpdateRequest,
@@ -120,7 +134,8 @@ import {
   InspectionTransactionRequest,
   LaborEntryApprovalRequest,
   LoginResponse,
-  MeterReadingCreateRequest, OriginationCode,
+  MeterReadingCreateRequest,
+  OriginationCode,
   PatchCompanyRequest,
   PatchSpaceAreaRequest,
   PatchUserRequest,
@@ -143,12 +158,7 @@ import {
   ShoppingCartItemCreateRequest,
   ShoppingCartUpdateRequest
 } from './model/request_models';
-import _ from 'lodash';
-import axiosRetry from 'axios-retry';
-import Bottleneck from 'bottleneck';
-import { GeoLocation } from './model/geo_locations';
 import moment = require('moment');
-import {watch} from "fs";
 
 type ResultCallback<T> = (results: FamisResponse<T>) => void;
 
@@ -265,7 +275,7 @@ export class FamisClient {
           refresh_token: opts.refreshToken
         },
         {
-          validateStatus: (s) => true
+          validateStatus: s => true
         }
       );
       const loginResponse = resp.data as LoginResponse;
@@ -291,7 +301,7 @@ export class FamisClient {
     this.host = host;
     this.http = axios.create({
       baseURL: host,
-      validateStatus: (status) => true
+      validateStatus: status => true
     });
     if (autoRetry) {
       axiosRetry(this.http, {
@@ -302,7 +312,7 @@ export class FamisClient {
 
     this.debug = debug;
     this.autoRefresh = autoRefresh;
-    this.http.interceptors.request.use(async (config) => {
+    this.http.interceptors.request.use(async config => {
       if (this.autoRefresh && FamisClient.isCredentialExpired(this.credentials)) {
         this.credentials = await this.refreshAuthCredential();
       }
@@ -443,7 +453,7 @@ export class FamisClient {
   async patchWatcher(watcher: UpdateWatcher): Promise<Watcher> {
     let url = buildEntityUrl('watchers');
     url += `(${watcher.Id})`;
-    const resp = await this.http.patch(url, watcher);
+    await this.http.patch(url, watcher);
 
     return this.getWatcher(watcher.Id);
   }
@@ -470,7 +480,7 @@ export class FamisClient {
     const crewAssocs = await this.getCrewUserAssociations(
       new QueryContext().setFilter(`UserId eq ${opts.userId}`)
     );
-    const crewIds = crewAssocs.results.map((c) => c.CrewId);
+    const crewIds = crewAssocs.results.map(c => c.CrewId);
     return this.getCrewsByIds({ ids: crewIds });
   }
 
@@ -479,8 +489,8 @@ export class FamisClient {
     const promises = [];
     const crews: Crew[] = [];
     for (const chunk of chunks) {
-      const filterString = chunk.map((c) => `Id eq ${c}`).join(' or ');
-      const promise = this.getCrews(new QueryContext().setFilter(filterString)).then((res) =>
+      const filterString = chunk.map(c => `Id eq ${c}`).join(' or ');
+      const promise = this.getCrews(new QueryContext().setFilter(filterString)).then(res =>
         crews.push(...res.results)
       );
       promises.push(promise);
@@ -582,7 +592,7 @@ export class FamisClient {
       const assocs = await this.getRequestTypeActivityGroupAssociations(
         new QueryContext().setFilter(`RequestTypeId eq ${searchParams.requestTypeId}`)
       );
-      requestTypeActivityIds = assocs.results.map((a) => a.ActivityGroupId);
+      requestTypeActivityIds = assocs.results.map(a => a.ActivityGroupId);
     }
     if (searchParams.activityGroupId || requestTypeActivityIds.length > 0) {
       const activityIds = [searchParams.activityGroupId] ?? requestTypeActivityIds;
@@ -593,30 +603,30 @@ export class FamisClient {
           new QueryContext().setFilter(
             `AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`
           )
-        ).then((res) => userActivityGroupAssocs.push(...res.results));
+        ).then(res => userActivityGroupAssocs.push(...res.results));
         assocPromises.push(promise);
       }
       await Promise.all(assocPromises);
-      activityUserIds = [...new Set(userActivityGroupAssocs.map((a) => a.UserId))];
+      activityUserIds = [...new Set(userActivityGroupAssocs.map(a => a.UserId))];
     }
     if (searchParams.propertyId) {
       const regionAssocs = await this.getPropertyRegionAssociations(
         new QueryContext().setFilter(`PropertyId eq ${searchParams.propertyId}`)
       );
       const regionIdString = regionAssocs.results
-        .map((r) => `RegionId eq ${r.RegionId}`)
+        .map(r => `RegionId eq ${r.RegionId}`)
         .join(' or ');
       const regionUserAssocs = await this.getUserRegionAssociations(
         new QueryContext().setFilter(regionIdString)
       );
-      propertyUserIds = regionUserAssocs.results.map((a) => a.UserId);
+      propertyUserIds = regionUserAssocs.results.map(a => a.UserId);
     }
     let userIds =
       searchParams.propertyId && (searchParams.requestTypeId || searchParams.activityGroupId)
-        ? activityUserIds.filter((a) => propertyUserIds.includes(a))
+        ? activityUserIds.filter(a => propertyUserIds.includes(a))
         : searchParams.requestTypeId || searchParams.activityGroupId
-          ? activityUserIds
-          : propertyUserIds;
+        ? activityUserIds
+        : propertyUserIds;
     return this.getUsersForIds({ userIds: userIds }, context);
   }
 
@@ -625,7 +635,7 @@ export class FamisClient {
     const promises = [];
     const users: FamisUser[] = [];
     for (const chunk of chunks) {
-      let filter = `(${chunk.map((c) => `Id eq ${c}`).join(' or ')}) and ActiveFlag eq true`;
+      let filter = `(${chunk.map(c => `Id eq ${c}`).join(' or ')}) and ActiveFlag eq true`;
       if (context.filter && context.filter.length > 0) {
         filter += ` and ${context.filter}`;
       }
@@ -635,8 +645,8 @@ export class FamisClient {
           .setFilter(filter)
           .setExpand(context.expand ?? '')
       )
-        .then((res) => users.push(...res.results))
-        .catch((error) => {
+        .then(res => users.push(...res.results))
+        .catch(error => {
           if (error.response) {
             console.log(`call failed with error ${JSON.stringify(error.response.data)}`);
           }
@@ -657,7 +667,7 @@ export class FamisClient {
     const assocs = await this.getRequestTypeActivityGroupAssociations(
       new QueryContext().setFilter(`RequestTypeId eq ${opts.requestTypeId}`)
     );
-    const activityGroupIds = assocs.results.map((a) => a.ActivityGroupId);
+    const activityGroupIds = assocs.results.map(a => a.ActivityGroupId);
     return this.getUsersForActivityGroups({
       activityGroupIds: activityGroupIds,
       select: opts.select,
@@ -679,17 +689,17 @@ export class FamisClient {
         new QueryContext().setFilter(
           `AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`
         )
-      ).then((res) => userActivityGroupAssocs.push(...res.results));
+      ).then(res => userActivityGroupAssocs.push(...res.results));
       assocPromises.push(promise);
     }
     await Promise.all(assocPromises);
-    const userIds = [...new Set(userActivityGroupAssocs.map((a) => a.UserId))];
+    const userIds = [...new Set(userActivityGroupAssocs.map(a => a.UserId))];
     const select = opts.select ?? DefaultUserSelect;
     const chunks = _.chunk(userIds, 6);
     const promises = [];
     const users: FamisUser[] = [];
     for (const chunk of chunks) {
-      let filter = chunk.map((c) => `Id eq ${c}`).join(' or ');
+      let filter = chunk.map(c => `Id eq ${c}`).join(' or ');
       if (!opts.includeInactive) {
         filter = `(${filter}) and ActiveFlag eq true`;
       }
@@ -699,8 +709,8 @@ export class FamisClient {
           .setFilter(filter)
           .setExpand(opts.expand ? opts.expand.join(',') : '')
       )
-        .then((res) => users.push(...res.results))
-        .catch((error) => {
+        .then(res => users.push(...res.results))
+        .catch(error => {
           if (error.response) {
             console.log(`call failed with error ${JSON.stringify(error.response.data)}`);
           }
@@ -860,7 +870,7 @@ export class FamisClient {
       new QueryContext().setFilter(`UserId eq ${userId}`)
     );
 
-    const defaultPropId = result.results.find((p) => p.DefaultPropertyFlag);
+    const defaultPropId = result.results.find(p => p.DefaultPropertyFlag);
     if (!defaultPropId) {
       return null;
     }
@@ -882,7 +892,7 @@ export class FamisClient {
       new QueryContext().setFilter(`UserId eq ${userId}`)
     );
 
-    const defaultPropId = result.results.find((p) => p.DefaultPropertyFlag);
+    const defaultPropId = result.results.find(p => p.DefaultPropertyFlag);
     if (!defaultPropId) {
       return {};
     }
@@ -937,10 +947,13 @@ export class FamisClient {
     const promises = [];
     const properties: Property[] = [];
     for (const chunk of chunks) {
-      const filterString = chunk.map((n) => `Id eq ${n}`).join(' or ');
+      const filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
       const promise = this.getProperties(
-        new QueryContext().setFilter(filterString!).setSelect(selects).setExpand(expands)
-      ).then((res) => properties.push(...res.results));
+        new QueryContext()
+          .setFilter(filterString!)
+          .setSelect(selects)
+          .setExpand(expands)
+      ).then(res => properties.push(...res.results));
       promises.push(promise);
     }
 
@@ -1022,7 +1035,7 @@ export class FamisClient {
     const activityGroupResponse = await this.getRequestTypeActivityGroupAssociations(
       new QueryContext().setFilter(`ActivityGroupId eq ${activityId}`)
     );
-    const requestIds = activityGroupResponse.results.map((a) => a.RequestTypeId);
+    const requestIds = activityGroupResponse.results.map(a => a.RequestTypeId);
     return await this.getRequestTypesByIds({ ids: requestIds }, context);
   }
 
@@ -1037,11 +1050,11 @@ export class FamisClient {
     const requestTypes: RequestType[] = [];
     for (const chunk of chunks) {
       const subContext = new QueryContext().copyFromOther(context);
-      let filterString = chunk.map((n) => `Id eq ${n}`).join(' or ');
+      let filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
       subContext.setFilter(
         context.filter ? `(${filterString}) and ${context.filter}` : filterString
       );
-      const promise = this.getRequestTypes(subContext).then((res) =>
+      const promise = this.getRequestTypes(subContext).then(res =>
         requestTypes.push(...res.results)
       );
       promises.push(promise);
@@ -1060,11 +1073,11 @@ export class FamisClient {
     const subTypes: RequestSubType[] = [];
     for (const chunk of chunks) {
       const subContext = new QueryContext().copyFromOther(context);
-      let filterString = chunk.map((id) => `Id eq ${id}`).join(' or ');
+      let filterString = chunk.map(id => `Id eq ${id}`).join(' or ');
       subContext.setFilter(
         context.filter ? `(${filterString}) and ${context.filter}` : filterString
       );
-      const promise = this.getRequestSubtypes(subContext).then((res) =>
+      const promise = this.getRequestSubtypes(subContext).then(res =>
         subTypes.push(...res.results)
       );
       promises.push(promise);
@@ -1202,7 +1215,7 @@ export class FamisClient {
   async getUdfField(name: string, context: QueryContext): Promise<UdfField | undefined> {
     context.setFilter(`DisplayName eq '${name}'`);
     const fieldResp = await this.getUdfFields(context);
-    return fieldResp.results.find((f) => f.DisplayName === name);
+    return fieldResp.results.find(f => f.DisplayName === name);
   }
 
   async getUdfFields(context: QueryContext): Promise<Result<UdfField>> {
@@ -1210,7 +1223,7 @@ export class FamisClient {
   }
 
   async getUdfFieldsForNames(names: string[]): Promise<UdfField[]> {
-    const filterString = names.map((name) => `DisplayName eq '${name}'`).join(' or ');
+    const filterString = names.map(name => `DisplayName eq '${name}'`).join(' or ');
     const res = await this.getUdfFields(new QueryContext().setFilter(filterString));
     return res.results;
   }
@@ -1464,7 +1477,7 @@ export class FamisClient {
   //region Origination Codes
   async getOriginationCodes(context: QueryContext): Promise<Result<OriginationCode>> {
     return this.getAll<OriginationCode>(context, 'originationcodes');
-}
+  }
 
   async getExternalSystems(context: QueryContext): Promise<Result<ExternalSystem>> {
     return this.getAll<ExternalSystem>(context, 'externalsystems');
@@ -1667,16 +1680,17 @@ export class FamisClient {
 }
 
 function supportsNextLink(type: string): boolean {
+  console.log(type);
   if (type === 'workorders') {
     return false;
   } else if (type === 'propertyregionassociations') {
     return false;
   } else if (type === 'userregionassociations') {
-    return false;
+    return true;
   } else if (type === 'propertyrequesttypeassociations') {
     return false;
   } else if (type === 'userpropertyassociation') {
-    return false;
+    return true;
   } else if (type === 'assets') {
     return false;
   } else if (type === 'useractivitygroupassociations') {
