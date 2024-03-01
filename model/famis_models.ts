@@ -707,6 +707,7 @@ export interface State {
   ExternalId: string;
   Name: string;
   TabOrder: number;
+  Abbreviation: string;
 }
 
 // Region Inspection
