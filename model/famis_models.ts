@@ -676,6 +676,13 @@ export interface FailureCode {
   UpdateDate: Date;
 }
 
+export interface TrackingCode {
+  Id: number;
+  Name: string;
+  Active: boolean;
+  TabOrder: number
+}
+
 export interface FcaRank {
   Id: number;
   Active: boolean;
