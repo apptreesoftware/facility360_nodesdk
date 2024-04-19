@@ -104,7 +104,7 @@ import {
   SpaceSubCategory,
   State,
   SubSpace,
-  TimeZone,
+  TimeZone, TrackingCode,
   Udf,
   UdfField,
   UnitOfMeasure,
@@ -1096,6 +1096,10 @@ export class FamisClient {
 
   async getFailureCodes(context: QueryContext): Promise<Result<FailureCode>> {
     return this.getAll<FailureCode>(context, 'failurecodes');
+  }
+
+  async getTrackingCodes(context: QueryContext): Promise<Result<TrackingCode>> {
+    return this.getAll<TrackingCode>(context, 'trackingcodes');
   }
 
   async getFcaRanks(context: QueryContext): Promise<Result<FcaRank>> {
