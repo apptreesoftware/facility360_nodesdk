@@ -1747,6 +1747,7 @@ export interface Property {
   TimeZoneExternalId: string;
   TotalArea1: number;
   TotalArea2: number;
+  State?: State;
 }
 
 export interface PropertyRequestTypeAssociation {
