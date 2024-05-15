@@ -998,7 +998,7 @@ export interface PurchaseRequisitionUpdateRequest {
 
 export interface PurchaseRequisitionLineCreateRequest {
   PRId: number;
-  RequiredDate?: string;
+  RequiredDate?: Date;
   RequestId?: number;
   RequestExternalId?: string;
   Material?: boolean;
