@@ -680,7 +680,7 @@ export interface TrackingCode {
   Id: number;
   Name: string;
   Active: boolean;
-  TabOrder: number
+  TabOrder: number;
 }
 
 export interface FcaRank {
@@ -779,6 +779,7 @@ export interface InspectionDetail {
   UpdatedById: number;
   UpdatedByExternalId: string;
   Weight: number;
+  Condition?: InspectionCondition;
 }
 
 export interface InspectionItem {
@@ -805,7 +806,7 @@ export interface InspectionItem {
   ScoringTypeId: number;
   DisplayOnlyFlag: boolean;
   IncludeInReportFlag: boolean;
-  InspectionConditions?: InspectionCondition[]
+  InspectionConditions?: InspectionCondition[];
 }
 
 export interface InspectionClass {
