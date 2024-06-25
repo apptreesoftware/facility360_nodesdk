@@ -66,7 +66,7 @@ import {
   MeterReading,
   MeterSite,
   MeterSiteGroup,
-  MeterSiteStatus,
+  MeterSiteStatus, MeterSiteType,
   OtherCost,
   OtherCostType,
   PayPeriod,
@@ -197,12 +197,12 @@ export class FamisClient {
     const cred = await this.login({
       username: opts.username,
       password: opts.password,
-      url: opts.host
+      url: opts.host,
+      debug: opts.debug
     });
-    if (opts.debug) {
+    if (opts.debug === true) {
       console.log(`Logged in with ${JSON.stringify(cred)}`);
     }
-    console.log();
     return new FamisClient(
       cred.Item,
       opts.host,
@@ -242,11 +242,13 @@ export class FamisClient {
     username: string;
     password: string;
     url: string;
+    debug?: boolean
   }): Promise<LoginResponse> {
     const http = axios.create({
       baseURL: opts.url
     });
-    console.log(`Logging into ${opts.url}. ${(opts.username, opts.password)}`);
+    if (opts?.debug === true)
+      console.log(`Logging into ${opts.url}. ${(opts.username, opts.password)}`);
     const resp = await http.post('MobileWebServices/api/Login', {
       username: opts.username,
       password: opts.password
@@ -1462,6 +1464,10 @@ export class FamisClient {
 
   async getMeterSiteStatuses(context: QueryContext): Promise<Result<MeterSiteStatus>> {
     return this.getAll<MeterSiteStatus>(context, 'metersitestatuses');
+  }
+
+  async getMeterSiteTypes(context: QueryContext): Promise<Result<MeterSiteType>> {
+    return this.getAll<MeterSiteType>(context, 'metersitetypes');
   }
 
   async getMeterSites(context: QueryContext): Promise<Result<MeterSite>> {
