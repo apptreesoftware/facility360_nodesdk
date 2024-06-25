@@ -3248,20 +3248,20 @@ export interface MeterSiteStatus {
 }
 
 export interface MeterSiteType {
-  Id: number
-  Name: string
-  Description: string
-  Active: boolean
-  ProductionFlag: boolean
-  ConsumptionFlag: boolean
-  DeductFlag: boolean
-  IncludeInTotals: boolean
-  AvailableForInvoiceFlag: boolean
-  VirtualMeterFlag: boolean
-  RequiresAllocation: boolean
-  TabOrder: number
-  UpdateDate: Date
-  UpdatedByName: string
+  Id: number;
+  Name: string;
+  Description: string;
+  Active: boolean;
+  ProductionFlag: boolean;
+  ConsumptionFlag: boolean;
+  DeductFlag: boolean;
+  IncludeInTotals: boolean;
+  AvailableForInvoiceFlag: boolean;
+  VirtualMeterFlag: boolean;
+  RequiresAllocation: boolean;
+  TabOrder: number;
+  UpdateDate: Date;
+  UpdatedByName: string;
 }
 
 export interface MeterReading {
