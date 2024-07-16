@@ -2302,7 +2302,7 @@ export interface Udf {
   Value?: string;
   ListboxDescription?: string;
   DataType?: string;
-  ListBoxId?: string;
+  ListboxId?: number;
   AssetClassId?: number;
   AssetId?: number;
   FieldId?: number;
