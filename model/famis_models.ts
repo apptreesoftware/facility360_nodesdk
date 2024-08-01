@@ -1399,6 +1399,14 @@ export interface ParentAssetAssociation {
   UpdatedByExternalId: string;
 }
 
+export interface EcriCode {
+  Id: number;
+  Name?: string;
+  Description?: string;
+  TabOrder?: number;
+  ActiveFlag?: boolean;
+}
+
 export interface Asset {
   Id: number;
   Name: string;

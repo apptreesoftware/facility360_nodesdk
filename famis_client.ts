@@ -38,6 +38,7 @@ import {
   CrewUserAssociation,
   DefaultPropertyAndSpace,
   Department,
+  EcriCode,
   ExternalSystem,
   FailureCode,
   FamisAttachment,
@@ -1108,6 +1109,9 @@ export class FamisClient {
     return this.getAll<FcaRank>(context, 'fcarank');
   }
 
+  async getEcriCode(context: QueryContext): Promise<Result<EcriCode>> {
+    return this.getAll<FcaRank>(context, 'ecricodes');
+  }
   async getStates(context: QueryContext): Promise<Result<State>> {
     return this.getAll<State>(context, 'states');
   }
