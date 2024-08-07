@@ -46,7 +46,7 @@ export interface AssetCreateRequest {
   AssetStatusId?: number;
   StatusComment?: string;
   BarcodeNumber?: string;
-  FinancialSystemId?: number;
+  FinancialSystemId?: string;
   AssetSafetyComments?: string;
   AssetKeywordId?: number;
   ExternalId?: string;
@@ -99,7 +99,7 @@ export interface AssetUpdateRequest {
   AssetStatusId?: number;
   StatusComment?: string;
   BarcodeNumber?: string;
-  FinancialSystemId?: number;
+  FinancialSystemId?: string;
   AssetSafetyComments?: string;
   AssetKeywordId?: number;
   ExternalId?: string;
@@ -135,7 +135,7 @@ export interface AssetUpdateRequest {
   AnnualRuntimeInHours?: number;
   CapitalRepairCost?: number;
   EstimatedReplacementCost?: number;
-  LifeExpectancy?: string;
+  LifeExpectancy?: Date;
   UomId?: number;
   LastCalibrationDate?: Date;
   FcaRankId?: number;

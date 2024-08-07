@@ -1399,6 +1399,14 @@ export interface ParentAssetAssociation {
   UpdatedByExternalId: string;
 }
 
+export interface EcriCode {
+  Id: number;
+  Name?: string;
+  Description?: string;
+  TabOrder?: number;
+  ActiveFlag?: boolean;
+}
+
 export interface Asset {
   Id: number;
   Name: string;
@@ -1447,14 +1455,14 @@ export interface Asset {
   PurchaseDate?: Date;
   PurchaseAmount?: number;
   ExternalCostCenterId?: number;
-  PurchaseCostCenter?: number;
+  PurchaseCostCenter?: string;
   PoNumber?: string;
   EstimatedLifeInYears: number;
   EstimatedLifeInHours: number;
   AnnualRuntimeInHours: number;
   CapitalRepairCost: number;
   EstimatedReplacementCost?: number;
-  LifeExpectancy?: number;
+  LifeExpectancy?: Date;
   UnitMultiplier?: number;
   MeterMultiplier?: number;
   MeterFormat?: number;
@@ -1463,7 +1471,7 @@ export interface Asset {
   LastCalibrationDate?: Date;
   MeterSiteId?: number;
   MeterInstallationDate?: Date;
-  MeterInitialReading?: string;
+  MeterInitialReading?: number;
   MeterLastReadingDate?: Date;
   MeterLastReading?: number;
   UpdateDate: Date;
@@ -1484,6 +1492,7 @@ export interface Asset {
   AssetModel?: AssetModel;
   AssetRank?: AssetRank;
   AssetClass?: AssetClass;
+  AssetMake?: AssetMake;
   ParentAssetAssociation?: ParentAssetAssociation[];
   Attachments?: AssetAttachment[];
 }
