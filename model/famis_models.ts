@@ -540,10 +540,14 @@ export interface Floor {
 export interface Segment {
   SegmentId: number;
   SegmentValueId?: number;
-  SegmentValue: string;
+  SegmentValue?: string;
+  ValueText?: string
 }
 
 export interface Detail {
+  AccountDetailId: number;
+  AccountString: String;
+  Active: boolean;
   Percentage: number;
   ChartOfAccountsId?: number;
   ChartOfAccountsExternalId?: string;
