@@ -3009,26 +3009,36 @@ export interface PurchaseRequisitionHeader {
 export interface PurchaseRequisitionLine {
   Id: number;
   PRId: number;
-  Number: string;
-  RequestorName: string;
-  RequestorEmail: string;
-  RequestorPhone: string;
-  CreatedById: number;
-  CreatedByExternalId: string;
-  AttentionTo: string;
-  Description: string;
-  TypeId: number;
-  TotalAmount: number;
-  CreateDate: Date;
-  UpdateDate: Date;
+  PRNumber: string;
+  LineNumber: number;
   StatusId: number;
-  PropertyId: number;
-  PropertyExternalId: string;
-  ShipToAddress: string;
+  RequiredDate: string;
   RequestId: number;
-  RequestExternalId?: null;
-  NTE: number;
-  NTEApproved: number;
+  RequestExternalId: string;
+  Material: boolean;
+  OtherCostType: boolean;
+  OtherCostTypeId: number;
+  VendorId: number;
+  VendorExternalId: string;
+  VendorName: string;
+  VendorAddress: string;
+  WarehouseId: number;
+  WarehouseExternalId: string;
+  MaterialItemId: number;
+  MaterialItemExternalId: string;
+  PartNumber: string;
+  BuyerId: number;
+  BuyerExternalId: string;
+  Description: string;
+  UnitOfMeasureId: number;
+  Quantity: number;
+  UnitCost: number;
+  CreateDate: Date;
+  CreatedByName: string;
+  UpdateDate: Date;
+  UpdatedByName: string
+  GLAccountId: number;
+  Active: boolean;
 }
 
 export interface PurchaseRequisitionHeaderStatus {
