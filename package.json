@@ -16,7 +16,7 @@
   "author": "AppTree Software",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^1.6.0",
     "axios-logger": "^2.3.1",
     "axios-retry": "^3.1.9",
     "dotenv": "^8.2.0",
