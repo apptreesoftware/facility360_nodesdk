@@ -21,7 +21,7 @@
     "axios-retry": "^3.1.9",
     "dotenv": "^8.2.0",
     "moment": "^2.24.0",
-    "lodash": "^4.17.20",
+    "lodash": "4.17.20",
     "bottleneck": "^2.19.5"
   },
   "prettier": {
@@ -30,10 +30,10 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
-    "@types/node": "^22.10.5",
-    "@types/lodash": "^4.14.168",
+    "@types/node": "^12.12.11",
+    "@types/lodash": "4.14.168",
     "jest": "^24.9.0",
     "ts-jest": "^24.1.0",
-    "typescript": "^5.7.2"
+    "typescript": "^3.7.4"
   }
 }
