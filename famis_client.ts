@@ -304,7 +304,8 @@ export class FamisClient {
     this.host = host;
     this.http = axios.create({
       baseURL: host,
-      validateStatus: status => true
+      validateStatus: status => true,
+      maxBodyLength: Infinity,
     });
     if (autoRetry) {
       axiosRetry(this.http, {
@@ -598,7 +599,7 @@ export class FamisClient {
       requestTypeActivityIds = assocs.results.map(a => a.ActivityGroupId);
     }
     if (searchParams.activityGroupId || requestTypeActivityIds.length > 0) {
-      const activityIds = [searchParams.activityGroupId] ?? requestTypeActivityIds;
+      const activityIds = searchParams.activityGroupId ? [searchParams.activityGroupId] : requestTypeActivityIds;
       const assocPromises = [];
       const userActivityGroupAssocs: UserActivityGroupAssociations[] = [];
       for (const activityId of activityIds) {
