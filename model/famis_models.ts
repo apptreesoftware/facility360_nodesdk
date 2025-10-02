@@ -1182,6 +1182,15 @@ export interface WorkOrder {
   Watchers?: Watcher[];
 }
 
+export interface WorkOrderChargeToAccount {
+  Id: number;
+  RequestId: number;
+  RequestExternalId?: string;
+  Description?: string;
+  Number?: string;
+  IsDefault?: boolean;
+}
+
 export interface Watcher {
   Id: number;
   RequestId: number;
@@ -1491,6 +1500,7 @@ export interface Asset {
   SubSpaceExternalId?: string;
   AutoAssignedToExternalId?: string;
   // Expandable properties
+  Property?: Property;
   Space?: Space;
   AssetUdfs?: Udf[];
   AssetModel?: AssetModel;
