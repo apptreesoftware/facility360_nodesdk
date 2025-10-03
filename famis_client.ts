@@ -119,6 +119,7 @@ import {
   Warehouse,
   Watcher,
   WorkOrder,
+  WorkOrderChargeToAccount,
   WorkOrderComment,
   WorkType
 } from './model/famis_models';
@@ -744,6 +745,10 @@ export class FamisClient {
 
   async patchWorkOrder(workOrderId: string, workOrder: PatchWorkOrderRequest): Promise<WorkOrder> {
     return this.patchObject<PatchWorkOrderRequest, WorkOrder>(workOrder, 'workorders', workOrderId);
+  }
+
+  async getWorkOrderChargeToAccount(context: QueryContext): Promise<Result<WorkOrderChargeToAccount>> {
+    return this.getAll<WorkOrderChargeToAccount>(context, 'workorderchargetoaccounts');
   }
 
   //
