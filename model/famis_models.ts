@@ -811,6 +811,7 @@ export interface InspectionItem {
   DisplayOnlyFlag: boolean;
   IncludeInReportFlag: boolean;
   InspectionConditions?: InspectionCondition[];
+  InspectionItemAssociationsByType?: InspectionItemAssociationsByType[];
 }
 
 export interface InspectionClass {
@@ -866,6 +867,14 @@ export interface InspectionCondition {
   ActiveFlag: boolean;
   TabOrder: number;
   EpPlanParentId: string;
+}
+
+export interface InspectionItemAssociationsByType {
+  Id: number;
+  TypeId: number;
+  TabOrder?: number;
+  ItemId: number;
+  Active: boolean;
 }
 
 export interface InspectionScoringItem {
