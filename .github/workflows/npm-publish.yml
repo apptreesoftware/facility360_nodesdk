@@ -2,7 +2,12 @@ name: CI
 
 on:
   push:
-    branches: master
+    branches: 
+      - master
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   publish-npm:
@@ -16,6 +21,4 @@ jobs:
       - run: yarn
       - run: npm run-script build
       - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
 
