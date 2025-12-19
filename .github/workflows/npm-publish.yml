@@ -18,8 +18,9 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org
-      - run: npm logout
       - run: yarn
       - run: npm run-script build
       - run: npm publish
+        env:
+          NPM_CONFIG_PROVENANCE: true
 
