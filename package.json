@@ -11,7 +11,7 @@
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "github.com:apptreesoftware/facility360_nodesdk"
+    "url": "https://github.com/apptreesoftware/facility360_nodesdk"
   },
   "engines": {
     "node": ">=20.0.0"
