@@ -1,4 +1,4 @@
-import { AxiosHeaders, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 
 export class ApiError extends Error {
   private resp: AxiosResponse;
@@ -42,10 +42,8 @@ URL: ${this.resp.request.path}
 }
 
 export const AuthorizationError = new ApiError({
-  config: {
-    headers: new AxiosHeaders()
-  },
-  headers: new AxiosHeaders(),
+  config: {},
+  headers: {},
   data: null,
   statusText: 'Authorization Failed',
   status: 401,

@@ -19,13 +19,14 @@
   "author": "AppTree Software",
   "license": "ISC",
   "dependencies": {
-    "axios": "^1.13.2",
-    "axios-logger": "^2.8.1",
+    "axios": "^0.21.1",
+    "axios-logger": "2.6.1",
     "axios-retry": "^3.1.9",
     "bottleneck": "^2.19.5",
     "dotenv": "^8.2.0",
     "lodash": "4.17.20",
-    "moment": "^2.24.0"
+    "moment": "^2.24.0",
+    "ts-node": "^9.0.0"
   },
   "prettier": {
     "singleQuote": true,
