@@ -1,5 +1,4 @@
 import {QueryContext} from "../model/request_context";
-import { URL } from "url";
 
 describe('QueryContext', function () {
     it('should include select statement', function () {

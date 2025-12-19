@@ -43,8 +43,8 @@ URL: ${this.resp.request.path}
 
 export const AuthorizationError = new ApiError({
   config: {},
+  headers: {},
   data: null,
-  headers: null,
   statusText: 'Authorization Failed',
   status: 401,
 });

@@ -13,16 +13,20 @@
     "type": "git",
     "url": "github.com:apptreesoftware/facility360_nodesdk.git"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "author": "AppTree Software",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.21.1",
-    "axios-logger": "^2.3.1",
+    "axios-logger": "2.6.1",
     "axios-retry": "^3.1.9",
+    "bottleneck": "^2.19.5",
     "dotenv": "^8.2.0",
-    "moment": "^2.24.0",
     "lodash": "4.17.20",
-    "bottleneck": "^2.19.5"
+    "moment": "^2.24.0",
+    "ts-node": "^9.0.0"
   },
   "prettier": {
     "singleQuote": true,
@@ -30,10 +34,10 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
-    "@types/node": "^12.12.11",
     "@types/lodash": "4.14.168",
+    "@types/node": "^20.3.1",
     "jest": "^24.9.0",
     "ts-jest": "^24.1.0",
-    "typescript": "^3.7.4"
+    "typescript": "^5.9.3"
   }
 }
