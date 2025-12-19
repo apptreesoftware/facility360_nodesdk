@@ -3,7 +3,9 @@ import { QueryContext } from '../model/request_context';
 import { PatchWorkOrderRequest } from '../model/request_models';
 import { Asset } from '../model/famis_models';
 import moment from 'moment';
-require('dotenv').config();
+
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 describe('Attachments', () => {
   it('should fetch all attachments', async function() {
