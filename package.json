@@ -16,10 +16,6 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
   "author": "AppTree Software",
   "license": "ISC",
   "dependencies": {
