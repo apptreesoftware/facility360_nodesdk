@@ -11,7 +11,7 @@ import axiosRetry from 'axios-retry';
 import Bottleneck from 'bottleneck';
 import _ from 'lodash';
 import { ApiError, AuthorizationError } from './errors';
-import { Result } from './model/common';
+import { OnCompleteCallback, Result, SdkCallInfo } from './model/common';
 import {
   AccountSegment,
   AccountSegmentValue,
@@ -187,6 +187,7 @@ export class FamisClient {
   credentials: FamisOAuthCredential;
   autoRefresh: boolean;
   debug: boolean;
+  onComplete?: OnCompleteCallback;
 
   static async withLoginCredential(opts: {
     username: string;
@@ -195,6 +196,7 @@ export class FamisClient {
     autoRefresh?: boolean;
     debug?: boolean;
     autoRetry?: boolean;
+    onComplete?: OnCompleteCallback;
   }) {
     const cred = await this.login({
       username: opts.username,
@@ -210,7 +212,8 @@ export class FamisClient {
       opts.host,
       opts.autoRefresh ?? false,
       opts.debug ?? false,
-      opts.autoRetry ?? false
+      opts.autoRetry ?? false,
+      opts.onComplete
     );
   }
 
@@ -219,6 +222,7 @@ export class FamisClient {
     host: string;
     debug?: boolean;
     autoRetry?: boolean;
+    onComplete?: OnCompleteCallback;
   }): FamisClient {
     return new FamisClient(
       {
@@ -236,7 +240,9 @@ export class FamisClient {
       },
       opts.host,
       false,
-      opts.debug
+      opts.debug ?? false,
+      opts.autoRetry ?? false,
+      opts.onComplete
     );
   }
 
@@ -299,10 +305,12 @@ export class FamisClient {
     host: string,
     autoRefresh: boolean,
     debug: boolean = false,
-    autoRetry: boolean = false
+    autoRetry: boolean = false,
+    onComplete?: OnCompleteCallback
   ) {
     this.credentials = credentials;
     this.host = host;
+    this.onComplete = onComplete;
     this.http = axios.create({
       baseURL: host,
       validateStatus: status => true,
@@ -330,6 +338,52 @@ export class FamisClient {
       this.http.interceptors.request.use(AxiosLogger.requestLogger);
       this.http.interceptors.response.use(AxiosLogger.responseLogger);
     }
+
+    this.http.interceptors.request.use(config => {
+      (config as any).__startTime = Date.now();
+      return config;
+    });
+
+    this.http.interceptors.response.use(
+      (response) => {
+        if (this.onComplete) {
+          const startTime = (response.config as any).__startTime;
+          const durationMs = startTime ? Date.now() - startTime : 0;
+          const callInfo: SdkCallInfo = {
+            method: (response.config.method ?? 'GET').toUpperCase(),
+            url: response.config.url ?? '',
+            baseUrl: response.config.baseURL ?? '',
+            requestHeaders: response.config.headers as Record<string, any>,
+            requestBody: response.config.data,
+            responseStatus: response.status,
+            responseBody: response.data,
+            durationMs,
+          };
+          Promise.resolve().then(() => this.onComplete!(callInfo)).catch(() => {});
+        }
+        return response;
+      },
+      (error) => {
+        if (this.onComplete) {
+          const config = error.config ?? {};
+          const startTime = (config as any).__startTime;
+          const durationMs = startTime ? Date.now() - startTime : 0;
+          const callInfo: SdkCallInfo = {
+            method: (config.method ?? 'GET').toUpperCase(),
+            url: config.url ?? '',
+            baseUrl: config.baseURL ?? '',
+            requestHeaders: config.headers ?? {},
+            requestBody: config.data,
+            responseStatus: error.response?.status ?? null,
+            responseBody: error.response?.data ?? null,
+            durationMs,
+            error: error.message,
+          };
+          Promise.resolve().then(() => this.onComplete!(callInfo)).catch(() => {});
+        }
+        return Promise.reject(error);
+      }
+    );
   }
 
   async refreshAuthCredential(): Promise<FamisOAuthCredential> {
