@@ -1928,6 +1928,7 @@ export interface FamisUser {
   IsAllocatingIndividual: boolean;
   LaborEntryIds: number[];
   LaborEntryComment?: string;
+  UserType?: UserType;
 }
 
 export interface UserSecurity {
