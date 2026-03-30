@@ -111,6 +111,7 @@ import {
   UnitOfMeasure,
   UpdateWatcher,
   UserActivityGroupAssociations,
+  UserAssetGroupAssociations,
   UserInspectionClassAssoc,
   UserPropertyAssociation,
   UserRegionAssociation,
@@ -632,6 +633,12 @@ export class FamisClient {
     context: QueryContext
   ): Promise<Result<UserPropertyAssociation>> {
     return this.getAll<UserPropertyAssociation>(context, 'userpropertyassociation');
+  }
+
+  async getUserAssetGroupAssociations(
+    context: QueryContext
+  ): Promise<Result<UserAssetGroupAssociations>> {
+    return this.getAll<UserAssetGroupAssociations>(context, 'userassetgroupassociations');
   }
 
   async getUserActivityGroupAssociations(
