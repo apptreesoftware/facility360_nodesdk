@@ -1260,6 +1260,12 @@ export interface AssetStatus {
   TabOrder: number;
 }
 
+export interface AssetGroup {
+  Id: number;
+  Description?: string;
+  DefaultFlag?: boolean;
+}
+
 export interface AssetMake {
   Id: number;
   Description: string;
@@ -1518,6 +1524,7 @@ export interface Asset {
   AssetMake?: AssetMake;
   ParentAssetAssociation?: ParentAssetAssociation[];
   Attachments?: AssetAttachment[];
+  AssetGroups?: AssetGroup[];
 }
 
 export interface AssetRank {
@@ -1921,6 +1928,7 @@ export interface FamisUser {
   IsAllocatingIndividual: boolean;
   LaborEntryIds: number[];
   LaborEntryComment?: string;
+  UserType?: UserType;
 }
 
 export interface UserSecurity {
@@ -2327,6 +2335,15 @@ export interface UserPropertyAssociation {
   PropertyExternalId: string;
   DefaultSpaceExternalId: string;
   DefaultSubspaceExternalId: string;
+}
+
+export interface UserAssetGroupAssociations {
+  Id: number;
+  UpdateDate?: string;
+  UpdatedById?: number;
+  UpdatedByExternalId?: string;
+  AssetGroupId: number;
+  EmployeeId: number;
 }
 
 export interface Udf {
