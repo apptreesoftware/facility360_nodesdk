@@ -1369,9 +1369,24 @@ export class FamisClient {
     const entity = `users(${userId})/ApproveTimeCard`;
     return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
   }
+  //#endregion
 
-  //LaborEntryApprovalRequest
+  //Region Timecard Entries
+  async getTimecardEntries(context: QueryContext): Promise<Result<LaborEntry>> {
+    return this.getAll<LaborEntry>(context, 'timecardentries');
+  }
 
+  async createTimecardEntry(timecardEntry: PostLaborEntryRequest): Promise<LaborEntry> {
+    return this.createObject<PostLaborEntryRequest, LaborEntry>(timecardEntry, 'timecardentries');
+  }
+  
+  async updateTimecardEntry(
+    laborId: string,
+    patchRequest: PostLaborEntryRequest
+  ): Promise<LaborEntry> {
+    return this.patchObject<PostLaborEntryRequest, LaborEntry>(patchRequest, 'timecardentries', laborId);
+  }
+  
   //#endregion
 
   //#region materialcosts
