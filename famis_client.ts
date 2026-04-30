@@ -105,6 +105,7 @@ import {
   SpaceSubCategory,
   State,
   SubSpace,
+  TimeCardConfiguration,
   TimeZone, TrackingCode,
   Udf,
   UdfField,
@@ -149,6 +150,7 @@ import {
   PostLaborEntryRequest,
   PostMaterialCostRequest,
   PostOtherCostRequest,
+  PostTimecardEntryRequest,
   PostUdfForWoRequest,
   PostWorkOrderRequest,
   PriceAdjustmentTransactionRequest,
@@ -1376,17 +1378,21 @@ export class FamisClient {
     return this.getAll<LaborEntry>(context, 'timecardentries');
   }
 
-  async createTimecardEntry(timecardEntry: PostLaborEntryRequest): Promise<LaborEntry> {
-    return this.createObject<PostLaborEntryRequest, LaborEntry>(timecardEntry, 'timecardentries');
+  async createTimecardEntry(timecardEntry: PostTimecardEntryRequest): Promise<LaborEntry> {
+    return this.createObject<PostTimecardEntryRequest, LaborEntry>(timecardEntry, 'timecardentries');
   }
   
   async updateTimecardEntry(
     laborId: string,
-    patchRequest: PostLaborEntryRequest
+    patchRequest: PostTimecardEntryRequest
   ): Promise<LaborEntry> {
-    return this.patchObject<PostLaborEntryRequest, LaborEntry>(patchRequest, 'timecardentries', laborId);
+    return this.patchObject<PostTimecardEntryRequest, LaborEntry>(patchRequest, 'timecardentries', laborId);
   }
-  
+
+  async getTimecardConfiguration(context: QueryContext): Promise<Result<TimeCardConfiguration>> {
+    return this.getAll<TimeCardConfiguration>(context, 'timecardconfigurations');
+  }
+
   //#endregion
 
   //#region materialcosts

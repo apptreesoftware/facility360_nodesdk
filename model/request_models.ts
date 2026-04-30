@@ -810,6 +810,26 @@ export interface PostLaborEntryRequest {
   LaborReasonId?: number;
 }
 
+export interface PostTimecardEntryRequest {
+  TotalHours?: number;
+  TimeType?: string;
+  ActivityId?: number;
+  ActivityExternalId?: string;
+  Comments?: string;
+  PropertyId?: number;
+  UserId?: number;
+  UserExternalId?: string;
+  EntryDate?: Date;
+  CrewId?: number;
+  CrewExternalId?: string;
+  StartTime?: Date;
+  EndTime?: Date;
+  PositionId?: number;
+  PositionExternalId?: string;
+  LaborReasonId?: number;
+}
+
+
 export interface LaborEntryApprovalRequest {
   LaborEntryIds: number[];
   LaborEntryComment?: string;
