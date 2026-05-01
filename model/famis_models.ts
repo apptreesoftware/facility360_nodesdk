@@ -3407,3 +3407,21 @@ export interface TimeZone {
   Default: boolean;
 }
 
+export interface TimeCardConfiguration {
+  Id: number;
+  TeTimecardCostCenterFlag: boolean;
+  TeTimecardAccountsFlag: boolean;
+  TeTimecardWoactivityFlag: boolean;
+  TeTimecardValidateWoFlag: boolean;
+  TeTimecardStartEndTimeFlag: boolean;
+  TeTimecardDtHoursFlag: boolean;
+  TeTimecardRegularHoursLimit: number;
+  TeTimecardOtHoursLimit: number;
+  TeTimecardDtHoursLimit: number;
+  TeManagerSecurityFlag: boolean;
+  TransactionId: number;
+  TeTimecardLrFlag: number;
+  ApprovalNotificationsFlag: boolean;
+  NotifyEmployeeOnNoApprover: boolean | null;
+}
+
