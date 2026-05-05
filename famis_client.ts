@@ -4,7 +4,7 @@ import {
   AxiosInstance,
   AxiosResponse,
   Method,
-  default as axios
+  default as axios,
 } from 'axios';
 import * as AxiosLogger from 'axios-logger';
 import axiosRetry from 'axios-retry';
@@ -67,7 +67,8 @@ import {
   MeterReading,
   MeterSite,
   MeterSiteGroup,
-  MeterSiteStatus, MeterSiteType,
+  MeterSiteStatus,
+  MeterSiteType,
   OtherCost,
   OtherCostType,
   PayPeriod,
@@ -106,7 +107,8 @@ import {
   State,
   SubSpace,
   TimeCardConfiguration,
-  TimeZone, TrackingCode,
+  TimeZone,
+  TrackingCode,
   Udf,
   UdfField,
   UnitOfMeasure,
@@ -123,7 +125,7 @@ import {
   WorkOrder,
   WorkOrderChargeToAccount,
   WorkOrderComment,
-  WorkType
+  WorkType,
 } from './model/famis_models';
 import { GeoLocation } from './model/geo_locations';
 import { QueryContext, buildEntityUrl } from './model/request_context';
@@ -161,7 +163,7 @@ import {
   SearchUsersRequest,
   ShoppingCartCreateRequest,
   ShoppingCartItemCreateRequest,
-  ShoppingCartUpdateRequest
+  ShoppingCartUpdateRequest,
 } from './model/request_models';
 import moment = require('moment');
 
@@ -176,11 +178,11 @@ export const DefaultUserSelect = [
   'UserName',
   'Name',
   'Email',
-  'ActiveFlag'
+  'ActiveFlag',
 ];
 export const DefaultPropertySelect = ['Id', 'Name', 'Addr1', 'City', 'StateId', 'Zip'];
 export const DefaultPropertyExpand = [
-  'State($select=Id,CountryName,Name,Abbreviation,Description,StateCode)'
+  'State($select=Id,CountryName,Name,Abbreviation,Description,StateCode)',
 ];
 export const DefaultSpaceSelect = ['Id', 'Name', 'LongDescription'];
 
@@ -191,6 +193,16 @@ export class FamisClient {
   autoRefresh: boolean;
   debug: boolean;
   onComplete?: OnCompleteCallback;
+  /**
+   * When true, a 401 response (after the refresh-token attempt also fails) triggers a full
+   * re-login using the credentials passed to `withLoginCredential`. Opt-in: defaults to false.
+   */
+  reauthOnFailure: boolean;
+  /**
+   * Stored ONLY when `reauthOnFailure` is true. Used to perform a fresh `FamisClient.login`
+   * after the refresh-token path has failed. Never populated when the flag is off.
+   */
+  private reauthCredentials?: { username: string; password: string };
 
   static async withLoginCredential(opts: {
     username: string;
@@ -200,12 +212,17 @@ export class FamisClient {
     debug?: boolean;
     autoRetry?: boolean;
     onComplete?: OnCompleteCallback;
+    /**
+     * When true, the client will perform a full re-login (using the username/password supplied
+     * here) if a request returns 401 AND the refresh-token attempt also fails. Defaults to false.
+     */
+    reauthOnFailure?: boolean;
   }) {
     const cred = await this.login({
       username: opts.username,
       password: opts.password,
       url: opts.host,
-      debug: opts.debug
+      debug: opts.debug,
     });
     if (opts.debug === true) {
       console.log(`Logged in with ${JSON.stringify(cred)}`);
@@ -216,7 +233,10 @@ export class FamisClient {
       opts.autoRefresh ?? false,
       opts.debug ?? false,
       opts.autoRetry ?? false,
-      opts.onComplete
+      opts.onComplete,
+      opts.reauthOnFailure ?? false,
+      // Only retain credentials when the caller explicitly opted in.
+      opts.reauthOnFailure ? { username: opts.username, password: opts.password } : undefined,
     );
   }
 
@@ -239,13 +259,13 @@ export class FamisClient {
         refresh_token: '',
         expires_in: 0,
         first_name: '',
-        last_name: ''
+        last_name: '',
       },
       opts.host,
       false,
       opts.debug ?? false,
       opts.autoRetry ?? false,
-      opts.onComplete
+      opts.onComplete,
     );
   }
 
@@ -253,16 +273,16 @@ export class FamisClient {
     username: string;
     password: string;
     url: string;
-    debug?: boolean
+    debug?: boolean;
   }): Promise<LoginResponse> {
     const http = axios.create({
-      baseURL: opts.url
+      baseURL: opts.url,
     });
     if (opts?.debug === true)
       console.log(`Logging into ${opts.url}. ${(opts.username, opts.password)}`);
     const resp = await http.post('MobileWebServices/api/Login', {
       username: opts.username,
-      password: opts.password
+      password: opts.password,
     });
     try {
       const loginResponse = resp.data as LoginResponse;
@@ -285,11 +305,11 @@ export class FamisClient {
         `${opts.url}/MobileWebServices/api/refreshtoken`,
         {
           grant_type: 'bearer',
-          refresh_token: opts.refreshToken
+          refresh_token: opts.refreshToken,
         },
         {
-          validateStatus: s => true
-        }
+          validateStatus: (s) => true,
+        },
       );
       const loginResponse = resp.data as LoginResponse;
       console.log(`Refresh response: ${JSON.stringify(loginResponse)}`);
@@ -309,26 +329,31 @@ export class FamisClient {
     autoRefresh: boolean,
     debug: boolean = false,
     autoRetry: boolean = false,
-    onComplete?: OnCompleteCallback
+    onComplete?: OnCompleteCallback,
+    reauthOnFailure: boolean = false,
+    reauthCredentials?: { username: string; password: string },
   ) {
     this.credentials = credentials;
     this.host = host;
     this.onComplete = onComplete;
+    this.reauthOnFailure = reauthOnFailure;
+    // Defensive: only retain credentials if the flag is on.
+    this.reauthCredentials = reauthOnFailure ? reauthCredentials : undefined;
     this.http = axios.create({
       baseURL: host,
-      validateStatus: status => true,
+      validateStatus: (status) => true,
       maxBodyLength: Infinity,
     });
     if (autoRetry) {
       axiosRetry(this.http, {
         retries: 2,
-        retryDelay: () => 2
+        retryDelay: () => 2,
       });
     }
 
     this.debug = debug;
     this.autoRefresh = autoRefresh;
-    this.http.interceptors.request.use(async config => {
+    this.http.interceptors.request.use(async (config) => {
       if (this.autoRefresh && FamisClient.isCredentialExpired(this.credentials)) {
         this.credentials = await this.refreshAuthCredential();
       }
@@ -337,18 +362,46 @@ export class FamisClient {
       config.transformRequest;
       return config;
     });
+
+    // Reactive 401 handler. Opt-in: only attached when reauthOnFailure is true so the default
+    // path is byte-for-byte identical to before. Because the axios instance is configured with
+    // `validateStatus: () => true`, a 401 RESOLVES (does not reject) and lands in the success
+    // arm of this interceptor. We try the refresh-token path first, then full re-login as a
+    // fallback. A `_reauthRetry` marker on the request config prevents infinite loops.
+    if (this.reauthOnFailure) {
+      this.http.interceptors.response.use(async (response) => {
+        if (response.status !== 401) {
+          return response;
+        }
+        const cfg = response.config as any;
+        if (cfg && cfg._reauthRetry) {
+          // Already retried once on this request — don't loop, surface the 401 as-is.
+          return response;
+        }
+        return this.handleAuthFailure(response);
+      });
+    }
     if (debug) {
       this.http.interceptors.request.use(AxiosLogger.requestLogger);
       this.http.interceptors.response.use(AxiosLogger.responseLogger);
     }
 
-    this.http.interceptors.request.use(config => {
+    this.http.interceptors.request.use((config) => {
       (config as any).__startTime = Date.now();
       return config;
     });
 
     this.http.interceptors.response.use(
       (response) => {
+        // Suppress the duplicate firing that happens when handleAuthFailure reissues a
+        // request via this.http.request(originalConfig): that nested call traverses the
+        // full interceptor chain and would invoke onComplete here, then again on the outer
+        // chain when the result returns. We mark the config in handleAuthFailure and skip
+        // the inner invocation so each logical request emits one event.
+        const cfg = response.config as any;
+        if (cfg && cfg.__reauthRetryReported) {
+          return response;
+        }
         if (this.onComplete) {
           const startTime = (response.config as any).__startTime;
           const durationMs = startTime ? Date.now() - startTime : 0;
@@ -362,7 +415,9 @@ export class FamisClient {
             responseBody: response.data,
             durationMs,
           };
-          Promise.resolve().then(() => this.onComplete!(callInfo)).catch(() => {});
+          Promise.resolve()
+            .then(() => this.onComplete!(callInfo))
+            .catch(() => {});
         }
         return response;
       },
@@ -382,18 +437,107 @@ export class FamisClient {
             durationMs,
             error: error.message,
           };
-          Promise.resolve().then(() => this.onComplete!(callInfo)).catch(() => {});
+          Promise.resolve()
+            .then(() => this.onComplete!(callInfo))
+            .catch(() => {});
         }
         return Promise.reject(error);
-      }
+      },
     );
   }
 
   async refreshAuthCredential(): Promise<FamisOAuthCredential> {
     return FamisClient.refreshCredential({
       refreshToken: this.credentials.refresh_token,
-      url: this.host
+      url: this.host,
     });
+  }
+
+  /**
+   * Reactive auth-failure handler invoked when a request returns 401 and `reauthOnFailure`
+   * is enabled. Tries the refresh-token path first; if that throws, falls back to a full
+   * re-login using the stored credentials. Marks the request config with `_reauthRetry` so
+   * we never retry a single request more than once.
+   *
+   * @param failedResponse The original 401 response.
+   * @returns A new AxiosResponse from the retried request, OR the original 401 response if
+   *          recovery isn't possible (no stored credentials, login fails, etc.) — letting
+   *          downstream callers (e.g. `throwResponseError`) surface the failure as usual.
+   */
+  private async handleAuthFailure(failedResponse: AxiosResponse): Promise<AxiosResponse> {
+    const originalConfig = failedResponse.config as any;
+    if (!originalConfig) {
+      return failedResponse;
+    }
+
+    // Report the original 401 to onComplete here. The reauth interceptor is registered
+    // before the onComplete interceptor and axios runs response interceptors in
+    // registration order, so the 401 never naturally reaches the onComplete interceptor —
+    // we consume it first by returning the retry response. Fire it manually so consumers
+    // still see the failed attempt.
+    this.reportOnComplete(failedResponse);
+
+    // Try refresh-token path first (preferred, cheaper, matches existing proactive flow).
+    try {
+      this.credentials = await this.refreshAuthCredential();
+    } catch (refreshErr) {
+      // Refresh failed — fall through to full re-login if the caller opted in and we have creds.
+      if (!this.reauthCredentials) {
+        // No fallback credentials available — give up.
+        return failedResponse;
+      }
+      try {
+        const fresh = await FamisClient.login({
+          username: this.reauthCredentials.username,
+          password: this.reauthCredentials.password,
+          url: this.host,
+          debug: this.debug,
+        });
+        this.credentials = fresh.Item;
+      } catch (loginErr) {
+        // Both paths failed — return the original 401 so callers see the auth error.
+        return failedResponse;
+      }
+    }
+
+    // Mark the request so the response interceptor doesn't kick off a second reauth cycle,
+    // then swap the Authorization header and reissue exactly once. __reauthRetryReported
+    // suppresses the duplicate onComplete firing the inner chain would otherwise produce
+    // (the outer chain fires once on the returned 200, which is what consumers expect).
+    originalConfig._reauthRetry = true;
+    originalConfig.__reauthRetryReported = true;
+    if (originalConfig.headers) {
+      originalConfig.headers.Authorization =
+        this.credentials.token_type + ' ' + this.credentials.access_token;
+    }
+    const retryResponse = await this.http.request(originalConfig);
+    // Strip the suppression flag from the retry response's config so the outer chain
+    // (which is the chain that originally invoked the reauth interceptor) reports it.
+    if (retryResponse && retryResponse.config) {
+      (retryResponse.config as any).__reauthRetryReported = false;
+    }
+    return retryResponse;
+  }
+
+  private reportOnComplete(response: AxiosResponse): void {
+    if (!this.onComplete) {
+      return;
+    }
+    const startTime = (response.config as any)?.__startTime;
+    const durationMs = startTime ? Date.now() - startTime : 0;
+    const callInfo: SdkCallInfo = {
+      method: (response.config?.method ?? 'GET').toUpperCase(),
+      url: response.config?.url ?? '',
+      baseUrl: response.config?.baseURL ?? '',
+      requestHeaders: (response.config?.headers as Record<string, any>) ?? {},
+      requestBody: response.config?.data,
+      responseStatus: response.status,
+      responseBody: response.data,
+      durationMs,
+    };
+    Promise.resolve()
+      .then(() => this.onComplete!(callInfo))
+      .catch(() => {});
   }
 
   static isCredentialExpired(cred: FamisOAuthCredential): boolean {
@@ -540,9 +684,9 @@ export class FamisClient {
 
   async getCrewsForUser(opts: { userId: number }): Promise<Crew[]> {
     const crewAssocs = await this.getCrewUserAssociations(
-      new QueryContext().setFilter(`UserId eq ${opts.userId}`)
+      new QueryContext().setFilter(`UserId eq ${opts.userId}`),
     );
-    const crewIds = crewAssocs.results.map(c => c.CrewId);
+    const crewIds = crewAssocs.results.map((c) => c.CrewId);
     return this.getCrewsByIds({ ids: crewIds });
   }
 
@@ -551,9 +695,9 @@ export class FamisClient {
     const promises = [];
     const crews: Crew[] = [];
     for (const chunk of chunks) {
-      const filterString = chunk.map(c => `Id eq ${c}`).join(' or ');
-      const promise = this.getCrews(new QueryContext().setFilter(filterString)).then(res =>
-        crews.push(...res.results)
+      const filterString = chunk.map((c) => `Id eq ${c}`).join(' or ');
+      const promise = this.getCrews(new QueryContext().setFilter(filterString)).then((res) =>
+        crews.push(...res.results),
       );
       promises.push(promise);
     }
@@ -576,7 +720,7 @@ export class FamisClient {
     return this.patchObject<PatchCompanyRequest, Company>(
       company,
       'companies',
-      company.Id.toString()
+      company.Id.toString(),
     );
   }
 
@@ -597,17 +741,17 @@ export class FamisClient {
 
   async getUserById(id: number, select: string[] = DefaultUserSelect): Promise<FamisUser | null> {
     const res = await this.getUsers(
-      new QueryContext().setFilter(`Id eq ${id}`).setSelect(select.join(','))
+      new QueryContext().setFilter(`Id eq ${id}`).setSelect(select.join(',')),
     );
     return res.first;
   }
 
   async getUserByUsername(
     username: string,
-    select: string[] = DefaultUserSelect
+    select: string[] = DefaultUserSelect,
   ): Promise<FamisUser | null> {
     const res = await this.getUsers(
-      new QueryContext().setFilter(`UserName eq '${username}'`).setSelect(select.join(','))
+      new QueryContext().setFilter(`UserName eq '${username}'`).setSelect(select.join(',')),
     );
     return res.first;
   }
@@ -618,7 +762,7 @@ export class FamisClient {
 
   async getAllUsersBatch(
     context: QueryContext,
-    callback: ResultCallback<FamisUser>
+    callback: ResultCallback<FamisUser>,
   ): Promise<void> {
     return this.getAllBatch<FamisUser>(context, 'users', callback);
   }
@@ -632,19 +776,19 @@ export class FamisClient {
   }
 
   async getUserPropertyAssociations(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<UserPropertyAssociation>> {
     return this.getAll<UserPropertyAssociation>(context, 'userpropertyassociation');
   }
 
   async getUserAssetGroupAssociations(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<UserAssetGroupAssociations>> {
     return this.getAll<UserAssetGroupAssociations>(context, 'userassetgroupassociations');
   }
 
   async getUserActivityGroupAssociations(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<UserActivityGroupAssociations>> {
     return this.getAll<UserActivityGroupAssociations>(context, 'useractivitygroupassociations');
   }
@@ -658,43 +802,45 @@ export class FamisClient {
     let propertyUserIds: number[] = [];
     if (searchParams.requestTypeId && !searchParams.activityGroupId) {
       const assocs = await this.getRequestTypeActivityGroupAssociations(
-        new QueryContext().setFilter(`RequestTypeId eq ${searchParams.requestTypeId}`)
+        new QueryContext().setFilter(`RequestTypeId eq ${searchParams.requestTypeId}`),
       );
-      requestTypeActivityIds = assocs.results.map(a => a.ActivityGroupId);
+      requestTypeActivityIds = assocs.results.map((a) => a.ActivityGroupId);
     }
     if (searchParams.activityGroupId || requestTypeActivityIds.length > 0) {
-      const activityIds = searchParams.activityGroupId ? [searchParams.activityGroupId] : requestTypeActivityIds;
+      const activityIds = searchParams.activityGroupId
+        ? [searchParams.activityGroupId]
+        : requestTypeActivityIds;
       const assocPromises = [];
       const userActivityGroupAssocs: UserActivityGroupAssociations[] = [];
       for (const activityId of activityIds) {
         const promise = this.getUserActivityGroupAssociations(
           new QueryContext().setFilter(
-            `AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`
-          )
-        ).then(res => userActivityGroupAssocs.push(...res.results));
+            `AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`,
+          ),
+        ).then((res) => userActivityGroupAssocs.push(...res.results));
         assocPromises.push(promise);
       }
       await Promise.all(assocPromises);
-      activityUserIds = [...new Set(userActivityGroupAssocs.map(a => a.UserId))];
+      activityUserIds = [...new Set(userActivityGroupAssocs.map((a) => a.UserId))];
     }
     if (searchParams.propertyId) {
       const regionAssocs = await this.getPropertyRegionAssociations(
-        new QueryContext().setFilter(`PropertyId eq ${searchParams.propertyId}`)
+        new QueryContext().setFilter(`PropertyId eq ${searchParams.propertyId}`),
       );
       const regionIdString = regionAssocs.results
-        .map(r => `RegionId eq ${r.RegionId}`)
+        .map((r) => `RegionId eq ${r.RegionId}`)
         .join(' or ');
       const regionUserAssocs = await this.getUserRegionAssociations(
-        new QueryContext().setFilter(regionIdString)
+        new QueryContext().setFilter(regionIdString),
       );
-      propertyUserIds = regionUserAssocs.results.map(a => a.UserId);
+      propertyUserIds = regionUserAssocs.results.map((a) => a.UserId);
     }
     let userIds =
       searchParams.propertyId && (searchParams.requestTypeId || searchParams.activityGroupId)
-        ? activityUserIds.filter(a => propertyUserIds.includes(a))
+        ? activityUserIds.filter((a) => propertyUserIds.includes(a))
         : searchParams.requestTypeId || searchParams.activityGroupId
-        ? activityUserIds
-        : propertyUserIds;
+          ? activityUserIds
+          : propertyUserIds;
     return this.getUsersForIds({ userIds: userIds }, context);
   }
 
@@ -703,7 +849,7 @@ export class FamisClient {
     const promises = [];
     const users: FamisUser[] = [];
     for (const chunk of chunks) {
-      let filter = `(${chunk.map(c => `Id eq ${c}`).join(' or ')}) and ActiveFlag eq true`;
+      let filter = `(${chunk.map((c) => `Id eq ${c}`).join(' or ')}) and ActiveFlag eq true`;
       if (context.filter && context.filter.length > 0) {
         filter += ` and ${context.filter}`;
       }
@@ -711,10 +857,10 @@ export class FamisClient {
         new QueryContext()
           .setSelect(context.select ?? DefaultUserSelect.join(','))
           .setFilter(filter)
-          .setExpand(context.expand ?? '')
+          .setExpand(context.expand ?? ''),
       )
-        .then(res => users.push(...res.results))
-        .catch(error => {
+        .then((res) => users.push(...res.results))
+        .catch((error) => {
           if (error.response) {
             console.log(`call failed with error ${JSON.stringify(error.response.data)}`);
           }
@@ -733,14 +879,14 @@ export class FamisClient {
     includeInactive?: boolean;
   }): Promise<FamisUser[]> {
     const assocs = await this.getRequestTypeActivityGroupAssociations(
-      new QueryContext().setFilter(`RequestTypeId eq ${opts.requestTypeId}`)
+      new QueryContext().setFilter(`RequestTypeId eq ${opts.requestTypeId}`),
     );
-    const activityGroupIds = assocs.results.map(a => a.ActivityGroupId);
+    const activityGroupIds = assocs.results.map((a) => a.ActivityGroupId);
     return this.getUsersForActivityGroups({
       activityGroupIds: activityGroupIds,
       select: opts.select,
       expand: opts.expand,
-      includeInactive: opts.includeInactive
+      includeInactive: opts.includeInactive,
     });
   }
 
@@ -755,19 +901,19 @@ export class FamisClient {
     for (const activityId of opts.activityGroupIds) {
       const promise = this.getUserActivityGroupAssociations(
         new QueryContext().setFilter(
-          `AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`
-        )
-      ).then(res => userActivityGroupAssocs.push(...res.results));
+          `AllowAssignmentFlag eq true and ActivityGroupId eq ${activityId}`,
+        ),
+      ).then((res) => userActivityGroupAssocs.push(...res.results));
       assocPromises.push(promise);
     }
     await Promise.all(assocPromises);
-    const userIds = [...new Set(userActivityGroupAssocs.map(a => a.UserId))];
+    const userIds = [...new Set(userActivityGroupAssocs.map((a) => a.UserId))];
     const select = opts.select ?? DefaultUserSelect;
     const chunks = _.chunk(userIds, 6);
     const promises = [];
     const users: FamisUser[] = [];
     for (const chunk of chunks) {
-      let filter = chunk.map(c => `Id eq ${c}`).join(' or ');
+      let filter = chunk.map((c) => `Id eq ${c}`).join(' or ');
       if (!opts.includeInactive) {
         filter = `(${filter}) and ActiveFlag eq true`;
       }
@@ -775,10 +921,10 @@ export class FamisClient {
         new QueryContext()
           .setSelect(select.join(','))
           .setFilter(filter)
-          .setExpand(opts.expand ? opts.expand.join(',') : '')
+          .setExpand(opts.expand ? opts.expand.join(',') : ''),
       )
-        .then(res => users.push(...res.results))
-        .catch(error => {
+        .then((res) => users.push(...res.results))
+        .catch((error) => {
           if (error.response) {
             console.log(`call failed with error ${JSON.stringify(error.response.data)}`);
           }
@@ -810,7 +956,9 @@ export class FamisClient {
     return this.patchObject<PatchWorkOrderRequest, WorkOrder>(workOrder, 'workorders', workOrderId);
   }
 
-  async getWorkOrderChargeToAccount(context: QueryContext): Promise<Result<WorkOrderChargeToAccount>> {
+  async getWorkOrderChargeToAccount(
+    context: QueryContext,
+  ): Promise<Result<WorkOrderChargeToAccount>> {
     return this.getAll<WorkOrderChargeToAccount>(context, 'workorderchargetoaccounts');
   }
 
@@ -833,7 +981,7 @@ export class FamisClient {
 
   //#region property bill code associations
   async getPropertyBillCodeAssociations(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<PropertyBillCodeAssociations>> {
     return this.getAll<PropertyBillCodeAssociations>(context, 'propertybillcodeassociations');
   }
@@ -901,29 +1049,29 @@ export class FamisClient {
   }
 
   async adjustQuantity(
-    request: QuantityAdjustmentTransactionRequest
+    request: QuantityAdjustmentTransactionRequest,
   ): Promise<AdjustmentTransactionResponse> {
     return this.createObject<QuantityAdjustmentTransactionRequest, AdjustmentTransactionResponse>(
       request,
-      'quantityadjustmenttransactions'
+      'quantityadjustmenttransactions',
     );
   }
 
   async physicalCount(
-    request: PhysicalCountTransactionRequest
+    request: PhysicalCountTransactionRequest,
   ): Promise<AdjustmentTransactionResponse> {
     return this.createObject<PhysicalCountTransactionRequest, WorkOrder>(
       request,
-      'physicalcounttransactions'
+      'physicalcounttransactions',
     );
   }
 
   async adjustPrice(
-    request: PriceAdjustmentTransactionRequest
+    request: PriceAdjustmentTransactionRequest,
   ): Promise<AdjustmentTransactionResponse> {
     return this.createObject<PriceAdjustmentTransactionRequest, AdjustmentTransactionResponse>(
       request,
-      'priceadjustmenttransactions'
+      'priceadjustmenttransactions',
     );
   }
 
@@ -936,13 +1084,13 @@ export class FamisClient {
   async getDefaultUserProperty(
     userId: number,
     select: string[] = DefaultPropertySelect,
-    expand: string[] = DefaultPropertyExpand
+    expand: string[] = DefaultPropertyExpand,
   ): Promise<Property | null> {
     const result = await this.getUserPropertyAssociations(
-      new QueryContext().setFilter(`UserId eq ${userId}`)
+      new QueryContext().setFilter(`UserId eq ${userId}`),
     );
 
-    const defaultPropId = result.results.find(p => p.DefaultPropertyFlag);
+    const defaultPropId = result.results.find((p) => p.DefaultPropertyFlag);
     if (!defaultPropId) {
       return null;
     }
@@ -950,7 +1098,7 @@ export class FamisClient {
       new QueryContext()
         .setFilter(`Id eq ${defaultPropId.PropertyId}`)
         .setSelect(select.join(','))
-        .setExpand(expand.join(','))
+        .setExpand(expand.join(',')),
     );
     return res.first;
   }
@@ -958,13 +1106,13 @@ export class FamisClient {
   async getDefaultUserPropertyAndSpace(
     userId: number,
     select: string[] = DefaultPropertySelect,
-    expand: string[] = DefaultPropertyExpand
+    expand: string[] = DefaultPropertyExpand,
   ): Promise<DefaultPropertyAndSpace> {
     const result = await this.getUserPropertyAssociations(
-      new QueryContext().setFilter(`UserId eq ${userId}`)
+      new QueryContext().setFilter(`UserId eq ${userId}`),
     );
 
-    const defaultPropId = result.results.find(p => p.DefaultPropertyFlag);
+    const defaultPropId = result.results.find((p) => p.DefaultPropertyFlag);
     if (!defaultPropId) {
       return {};
     }
@@ -973,14 +1121,14 @@ export class FamisClient {
       new QueryContext()
         .setFilter(`Id eq ${defaultPropId.PropertyId}`)
         .setSelect(select.join(','))
-        .setExpand(expand.join(','))
+        .setExpand(expand.join(',')),
     );
     const defaults: DefaultPropertyAndSpace = {
-      property: res.first ?? undefined
+      property: res.first ?? undefined,
     };
     if (defaults.property && defaultPropId.DefaultSpaceId) {
       const spaceResponse = await this.getSpaces(
-        new QueryContext().setFilter(`Id eq ${defaultPropId.DefaultSpaceId}`)
+        new QueryContext().setFilter(`Id eq ${defaultPropId.DefaultSpaceId}`),
       );
       defaults.space = spaceResponse.first ?? undefined;
     }
@@ -993,12 +1141,12 @@ export class FamisClient {
     expand?: string[];
   }): Promise<Property[]> {
     const userRegions = await this.getUserRegionAssociations(
-      new QueryContext().setFilter(`UserId eq ${opts.userId}`)
+      new QueryContext().setFilter(`UserId eq ${opts.userId}`),
     );
     const propertyIds: number[] = [];
     for (const regAssocation of userRegions.results) {
       const propertyRegionAss = await this.getPropertyRegionAssociations(
-        new QueryContext().setFilter(`RegionId eq ${regAssocation.RegionId}`)
+        new QueryContext().setFilter(`RegionId eq ${regAssocation.RegionId}`),
       );
       for (const props of propertyRegionAss.results) {
         propertyIds.push(props.PropertyId);
@@ -1019,13 +1167,10 @@ export class FamisClient {
     const promises = [];
     const properties: Property[] = [];
     for (const chunk of chunks) {
-      const filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
+      const filterString = chunk.map((n) => `Id eq ${n}`).join(' or ');
       const promise = this.getProperties(
-        new QueryContext()
-          .setFilter(filterString!)
-          .setSelect(selects)
-          .setExpand(expands)
-      ).then(res => properties.push(...res.results));
+        new QueryContext().setFilter(filterString!).setSelect(selects).setExpand(expands),
+      ).then((res) => properties.push(...res.results));
       promises.push(promise);
     }
 
@@ -1035,28 +1180,28 @@ export class FamisClient {
 
   async getAllPropertiesBatch(
     context: QueryContext,
-    callback: ResultCallback<Property>
+    callback: ResultCallback<Property>,
   ): Promise<void> {
     return this.getAllBatch<Property>(context, 'properties', callback);
   }
 
   async getPropertyRequestTypeAssociations(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<PropertyRequestTypeAssociation>> {
     return this.getAll<PropertyRequestTypeAssociation>(context, 'propertyrequesttypeassociations');
   }
 
   async getRequestTypeActivityGroupAssociations(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<RequestTypeActivityGroupAssociations>> {
     return this.getAll<RequestTypeActivityGroupAssociations>(
       context,
-      'requesttypeactivitygroupassociations'
+      'requesttypeactivitygroupassociations',
     );
   }
 
   async getPropertyRegionAssociations(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<PropertyRegionAssociation>> {
     return this.getAll<PropertyRegionAssociation>(context, 'propertyregionassociations');
   }
@@ -1102,12 +1247,12 @@ export class FamisClient {
 
   async getRequestTypesForActivityGroup(
     activityId: number,
-    context: QueryContext
+    context: QueryContext,
   ): Promise<RequestType[]> {
     const activityGroupResponse = await this.getRequestTypeActivityGroupAssociations(
-      new QueryContext().setFilter(`ActivityGroupId eq ${activityId}`)
+      new QueryContext().setFilter(`ActivityGroupId eq ${activityId}`),
     );
-    const requestIds = activityGroupResponse.results.map(a => a.RequestTypeId);
+    const requestIds = activityGroupResponse.results.map((a) => a.RequestTypeId);
     return await this.getRequestTypesByIds({ ids: requestIds }, context);
   }
 
@@ -1115,19 +1260,19 @@ export class FamisClient {
     opts: {
       ids: number[];
     },
-    context: QueryContext
+    context: QueryContext,
   ): Promise<RequestType[]> {
     const chunks = _.chunk(opts.ids, 6);
     const promises = [];
     const requestTypes: RequestType[] = [];
     for (const chunk of chunks) {
       const subContext = new QueryContext().copyFromOther(context);
-      let filterString = chunk.map(n => `Id eq ${n}`).join(' or ');
+      let filterString = chunk.map((n) => `Id eq ${n}`).join(' or ');
       subContext.setFilter(
-        context.filter ? `(${filterString}) and ${context.filter}` : filterString
+        context.filter ? `(${filterString}) and ${context.filter}` : filterString,
       );
-      const promise = this.getRequestTypes(subContext).then(res =>
-        requestTypes.push(...res.results)
+      const promise = this.getRequestTypes(subContext).then((res) =>
+        requestTypes.push(...res.results),
       );
       promises.push(promise);
     }
@@ -1145,12 +1290,12 @@ export class FamisClient {
     const subTypes: RequestSubType[] = [];
     for (const chunk of chunks) {
       const subContext = new QueryContext().copyFromOther(context);
-      let filterString = chunk.map(id => `Id eq ${id}`).join(' or ');
+      let filterString = chunk.map((id) => `Id eq ${id}`).join(' or ');
       subContext.setFilter(
-        context.filter ? `(${filterString}) and ${context.filter}` : filterString
+        context.filter ? `(${filterString}) and ${context.filter}` : filterString,
       );
-      const promise = this.getRequestSubtypes(subContext).then(res =>
-        subTypes.push(...res.results)
+      const promise = this.getRequestSubtypes(subContext).then((res) =>
+        subTypes.push(...res.results),
       );
       promises.push(promise);
     }
@@ -1224,7 +1369,7 @@ export class FamisClient {
   }
 
   async getUserInspectionClassAssocs(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<UserInspectionClassAssoc>> {
     return this.getAll<UserInspectionClassAssoc>(context, 'userinspectionclassassociations');
   }
@@ -1232,7 +1377,7 @@ export class FamisClient {
   async createInspectionTransaction(request: InspectionTransactionRequest): Promise<Inspection> {
     return this.createObject<InspectionTransactionRequest, Inspection>(
       request,
-      'inspectiontransactions'
+      'inspectiontransactions',
     );
   }
 
@@ -1294,7 +1439,7 @@ export class FamisClient {
   async getUdfField(name: string, context: QueryContext): Promise<UdfField | undefined> {
     context.setFilter(`DisplayName eq '${name}'`);
     const fieldResp = await this.getUdfFields(context);
-    return fieldResp.results.find(f => f.DisplayName === name);
+    return fieldResp.results.find((f) => f.DisplayName === name);
   }
 
   async getUdfFields(context: QueryContext): Promise<Result<UdfField>> {
@@ -1302,7 +1447,7 @@ export class FamisClient {
   }
 
   async getUdfFieldsForNames(names: string[]): Promise<UdfField[]> {
-    const filterString = names.map(name => `DisplayName eq '${name}'`).join(' or ');
+    const filterString = names.map((name) => `DisplayName eq '${name}'`).join(' or ');
     const res = await this.getUdfFields(new QueryContext().setFilter(filterString));
     return res.results;
   }
@@ -1339,18 +1484,18 @@ export class FamisClient {
 
   async updateLaborEntry(
     laborId: string,
-    patchRequest: PostLaborEntryRequest
+    patchRequest: PostLaborEntryRequest,
   ): Promise<LaborEntry> {
     return this.patchObject<PostLaborEntryRequest, LaborEntry>(
       patchRequest,
       'laborentries',
-      laborId
+      laborId,
     );
   }
 
   async submitLaborEntry(
     postRequest: LaborEntryApprovalRequest,
-    userId: number
+    userId: number,
   ): Promise<LaborEntry> {
     const entity = `users(${userId})/SubmitTimeCard`;
     return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
@@ -1358,7 +1503,7 @@ export class FamisClient {
 
   async rejectLaborEntry(
     postRequest: LaborEntryApprovalRequest,
-    userId: number
+    userId: number,
   ): Promise<LaborEntry> {
     const entity = `users(${userId})/RejectTimeCard`;
     return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
@@ -1366,7 +1511,7 @@ export class FamisClient {
 
   async approveLaborEntry(
     postRequest: LaborEntryApprovalRequest,
-    userId: number
+    userId: number,
   ): Promise<LaborEntry> {
     const entity = `users(${userId})/ApproveTimeCard`;
     return this.createObject<LaborEntryApprovalRequest, LaborEntry>(postRequest, entity);
@@ -1379,14 +1524,21 @@ export class FamisClient {
   }
 
   async createTimecardEntry(timecardEntry: PostTimecardEntryRequest): Promise<LaborEntry> {
-    return this.createObject<PostTimecardEntryRequest, LaborEntry>(timecardEntry, 'timecardentries');
+    return this.createObject<PostTimecardEntryRequest, LaborEntry>(
+      timecardEntry,
+      'timecardentries',
+    );
   }
-  
+
   async updateTimecardEntry(
     laborId: string,
-    patchRequest: PostTimecardEntryRequest
+    patchRequest: PostTimecardEntryRequest,
   ): Promise<LaborEntry> {
-    return this.patchObject<PostTimecardEntryRequest, LaborEntry>(patchRequest, 'timecardentries', laborId);
+    return this.patchObject<PostTimecardEntryRequest, LaborEntry>(
+      patchRequest,
+      'timecardentries',
+      laborId,
+    );
   }
 
   async getTimecardConfiguration(context: QueryContext): Promise<Result<TimeCardConfiguration>> {
@@ -1403,7 +1555,7 @@ export class FamisClient {
   async createMaterialCost(materialCost: PostMaterialCostRequest): Promise<MaterialCost> {
     return this.createObject<PostMaterialCostRequest, MaterialCost>(
       materialCost,
-      'workordermaterialcosts'
+      'workordermaterialcosts',
     );
   }
 
@@ -1443,17 +1595,17 @@ export class FamisClient {
   }
 
   async createShoppingCartItem(
-    postRequest: ShoppingCartItemCreateRequest
+    postRequest: ShoppingCartItemCreateRequest,
   ): Promise<ShoppingCartItem> {
     return this.createObject<ShoppingCartItemCreateRequest, ShoppingCartItem>(
       postRequest,
-      'shoppingcartitems'
+      'shoppingcartitems',
     );
   }
 
   async updateShoppingCart(
     postRequest: ShoppingCartUpdateRequest,
-    cartId: number
+    cartId: number,
   ): Promise<ShoppingCart> {
     const entity = `shoppingcarts(${cartId})`;
     return this.patchObject<ShoppingCartUpdateRequest, ShoppingCart>(postRequest, entity);
@@ -1461,7 +1613,7 @@ export class FamisClient {
 
   async checkOutShoppingCart(
     postRequest: CheckOutShoppingCartRequest,
-    cartId: number
+    cartId: number,
   ): Promise<ShoppingCart> {
     const entity = `shoppingcarts(${cartId})/checkout`;
     return this.createObject<CheckOutShoppingCartRequest, ShoppingCart>(postRequest, entity);
@@ -1491,58 +1643,58 @@ export class FamisClient {
 
   //Region Purchase Requisition
   async getPurchaseRequisitionHeaderStatuses(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<PurchaseRequisitionHeaderStatus>> {
     return this.getAll<PurchaseRequisitionHeaderStatus>(
       context,
-      'purchaserequisitionheaderstatuses'
+      'purchaserequisitionheaderstatuses',
     );
   }
 
   async getPurchaseRequisitionTypes(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<PurchaseRequisitionType>> {
     return this.getAll<PurchaseRequisitionType>(context, 'purchaserequisitiontypes');
   }
 
   async getPurchaseRequisitionHeaders(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<PurchaseRequisitionHeader>> {
     return this.getAll<PurchaseRequisitionHeader>(context, 'purchaserequisitionheaders');
   }
 
   async getPurchaseRequisitionLines(
-    context: QueryContext
+    context: QueryContext,
   ): Promise<Result<PurchaseRequisitionLine>> {
     return this.getAll<PurchaseRequisitionLine>(context, 'purchaserequisitionlines');
   }
 
   async createPurchaseRequisitionHeader(
-    postRequest: PurchaseRequisitionCreateRequest
+    postRequest: PurchaseRequisitionCreateRequest,
   ): Promise<PurchaseRequisitionHeader> {
     return this.createObject<PurchaseRequisitionCreateRequest, PurchaseRequisitionHeader>(
       postRequest,
-      'purchaserequisitionheaders'
+      'purchaserequisitionheaders',
     );
   }
 
   async updatePurchaseRequisitionHeader(
     postRequest: PurchaseRequisitionUpdateRequest,
-    prId: number
+    prId: number,
   ): Promise<PurchaseRequisitionHeader> {
     const entity = `purchaserequisitionheaders(${prId})`;
     return this.patchObject<PurchaseRequisitionUpdateRequest, PurchaseRequisitionHeader>(
       postRequest,
-      entity
+      entity,
     );
   }
 
   async createPurchaseRequisitionLine(
-    postRequest: PurchaseRequisitionLineCreateRequest
+    postRequest: PurchaseRequisitionLineCreateRequest,
   ): Promise<PurchaseRequisitionLine> {
     return this.createObject<PurchaseRequisitionLineCreateRequest, PurchaseRequisitionLine>(
       postRequest,
-      'purchaserequisitionlines'
+      'purchaserequisitionlines',
     );
   }
 
@@ -1630,14 +1782,14 @@ export class FamisClient {
       first: items.length > 0 ? items[0] : null,
       results: items,
       totalDuration: durationMs,
-      averageDuration: durationMs / fetchCount
+      averageDuration: durationMs / fetchCount,
     };
   }
 
   async getAllBatch<T>(
     context: QueryContext,
     type: string,
-    callback: ResultCallback<T>
+    callback: ResultCallback<T>,
   ): Promise<void> {
     let top = 1000;
     const url = context.buildPagedUrl(type, top, 0, true);
@@ -1718,7 +1870,7 @@ export class FamisClient {
       first: items.length > 0 ? items[0] : null,
       averageDuration: durationMs / fetchCount,
       results: items,
-      totalDuration: durationMs
+      totalDuration: durationMs,
     };
   }
 
@@ -1736,8 +1888,8 @@ export class FamisClient {
       params: params,
       responseType: 'json',
       headers: {
-        'Content-Type': 'application/json'
-      }
+        'Content-Type': 'application/json',
+      },
     });
     this.throwResponseError(resp);
     return resp.data as T;
@@ -1746,7 +1898,7 @@ export class FamisClient {
   async getAttachmentStream(context: QueryContext) {
     const url = context.buildUrl('attachmentstream');
     return await this.http.get(url, {
-      responseType: 'arraybuffer'
+      responseType: 'arraybuffer',
     });
   }
 
