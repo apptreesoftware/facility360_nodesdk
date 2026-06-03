@@ -95,9 +95,15 @@ Rules:
   fragments (e.g. `ActiveFlag eq true`) — its content is trusted and not
   escaped.
 - `toString()` returns the OData string.
-- `Filter.any([])` (empty) and combining with empty filters should be
-  defined explicitly in implementation (e.g. empty `any` yields an empty
-  string; document the chosen behavior).
+- **Precedence-safe composition.** OData binds `and` tighter than `or`, so
+  composite operands must be parenthesized when combined. Each `Filter`
+  tracks whether it is composite (top-level `and`/`or`); `and`/`or`/`any`
+  parenthesize an operand only when that operand is itself composite. Atomic
+  terms (`eq`, `raw`) are never parenthesized. This makes
+  `any([a, b]).and(c)` render as `(a or b) and c` rather than the incorrect
+  `a or b and c`.
+- `Filter.any([])` yields an empty filter; `Filter.any([x])` returns `x`
+  unchanged.
 
 ### Phase 3 — Non-breaking integration
 
