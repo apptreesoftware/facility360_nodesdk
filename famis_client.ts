@@ -12,6 +12,7 @@ import Bottleneck from 'bottleneck';
 import _ from 'lodash';
 import { ApiError, AuthorizationError } from './errors';
 import { OnCompleteCallback, Result, SdkCallInfo } from './model/common';
+import { Filter } from './model/odata';
 import {
   AccountSegment,
   AccountSegmentValue,
@@ -751,7 +752,7 @@ export class FamisClient {
     select: string[] = DefaultUserSelect,
   ): Promise<FamisUser | null> {
     const res = await this.getUsers(
-      new QueryContext().setFilter(`UserName eq '${username}'`).setSelect(select.join(',')),
+      new QueryContext().setFilter(Filter.eq('UserName', username)).setSelect(select.join(',')),
     );
     return res.first;
   }
@@ -1437,7 +1438,7 @@ export class FamisClient {
   //#region Udfs
 
   async getUdfField(name: string, context: QueryContext): Promise<UdfField | undefined> {
-    context.setFilter(`DisplayName eq '${name}'`);
+    context.setFilter(Filter.eq('DisplayName', name));
     const fieldResp = await this.getUdfFields(context);
     return fieldResp.results.find((f) => f.DisplayName === name);
   }
@@ -1447,8 +1448,8 @@ export class FamisClient {
   }
 
   async getUdfFieldsForNames(names: string[]): Promise<UdfField[]> {
-    const filterString = names.map((name) => `DisplayName eq '${name}'`).join(' or ');
-    const res = await this.getUdfFields(new QueryContext().setFilter(filterString));
+    const filter = Filter.any(names.map((name) => Filter.eq('DisplayName', name)));
+    const res = await this.getUdfFields(new QueryContext().setFilter(filter));
     return res.results;
   }
 
