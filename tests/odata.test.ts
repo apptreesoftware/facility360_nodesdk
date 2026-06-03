@@ -25,6 +25,9 @@ describe('odataValue', () => {
   it('leaves booleans bare', () => {
     expect(odataValue(true)).toEqual('true');
   });
+  it('leaves false bare', () => {
+    expect(odataValue(false)).toEqual('false');
+  });
 });
 
 describe('Filter', () => {
@@ -37,15 +40,15 @@ describe('Filter', () => {
   it('raw passes the fragment through unescaped', () => {
     expect(Filter.raw('ActiveFlag eq true').toString()).toEqual('ActiveFlag eq true');
   });
-  it('and joins two filters', () => {
+  it('and joins two atomic filters without parentheses', () => {
     const f = Filter.eq('Id', 1).and(Filter.raw('ActiveFlag eq true'));
     expect(f.toString()).toEqual('Id eq 1 and ActiveFlag eq true');
   });
-  it('or parenthesizes both sides', () => {
+  it('or joins two atomic filters without parentheses', () => {
     const f = Filter.eq('Id', 1).or(Filter.eq('Id', 2));
-    expect(f.toString()).toEqual('(Id eq 1) or (Id eq 2)');
+    expect(f.toString()).toEqual('Id eq 1 or Id eq 2');
   });
-  it('any joins filters with " or "', () => {
+  it('any joins atomic filters with " or " and no outer parens on its own', () => {
     const f = Filter.any([Filter.eq('Id', 1), Filter.eq('Id', 2), Filter.eq('Id', 3)]);
     expect(f.toString()).toEqual('Id eq 1 or Id eq 2 or Id eq 3');
   });
@@ -54,5 +57,17 @@ describe('Filter', () => {
   });
   it('any with no filters returns an empty string', () => {
     expect(Filter.any([]).toString()).toEqual('');
+  });
+  it('parenthesizes an or-group when combined with and', () => {
+    const f = Filter.eq('Id', 1).or(Filter.eq('Id', 2)).and(Filter.raw('ActiveFlag eq true'));
+    expect(f.toString()).toEqual('(Id eq 1 or Id eq 2) and ActiveFlag eq true');
+  });
+  it('parenthesizes an any-group when combined with and', () => {
+    const f = Filter.any([Filter.eq('Id', 1), Filter.eq('Id', 2)]).and(Filter.raw('ActiveFlag eq true'));
+    expect(f.toString()).toEqual('(Id eq 1 or Id eq 2) and ActiveFlag eq true');
+  });
+  it('does not parenthesize an atomic combined with and', () => {
+    const f = Filter.eq('Id', 1).and(Filter.raw('ActiveFlag eq true'));
+    expect(f.toString()).toEqual('Id eq 1 and ActiveFlag eq true');
   });
 });

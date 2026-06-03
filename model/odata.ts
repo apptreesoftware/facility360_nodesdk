@@ -12,9 +12,12 @@ export function odataValue(value: string | number | boolean): string {
 }
 
 export class Filter {
-  private constructor(private readonly expr: string) {}
+  private constructor(
+    private readonly expr: string,
+    private readonly composite: boolean = false,
+  ) {}
 
-  /** field eq value — value is escaped/formatted automatically. */
+  /** field eq value — value is escaped/formatted automatically. `field` must be a static identifier, never user input. */
   static eq(field: string, value: string | number | boolean): Filter {
     return new Filter(`${field} eq ${odataValue(value)}`);
   }
@@ -24,17 +27,24 @@ export class Filter {
     return new Filter(fragment);
   }
 
-  /** Join filters with " or " (no extra parentheses). Empty list yields an empty filter. */
+  /** Join filters with " or ". Empty -> empty filter; single -> that filter unchanged; 2+ -> a composite that parenthesizes itself when later combined. */
   static any(filters: Filter[]): Filter {
-    return new Filter(filters.map((f) => f.toString()).join(' or '));
+    if (filters.length === 0) return new Filter('');
+    if (filters.length === 1) return filters[0];
+    return new Filter(filters.map((f) => f.wrapped()).join(' or '), true);
   }
 
   and(other: Filter): Filter {
-    return new Filter(`${this.toString()} and ${other.toString()}`);
+    return new Filter(`${this.wrapped()} and ${other.wrapped()}`, true);
   }
 
   or(other: Filter): Filter {
-    return new Filter(`(${this.toString()}) or (${other.toString()})`);
+    return new Filter(`${this.wrapped()} or ${other.wrapped()}`, true);
+  }
+
+  /** Parenthesize this expression when it is itself composite (top-level and/or). */
+  private wrapped(): string {
+    return this.composite ? `(${this.expr})` : this.expr;
   }
 
   toString(): string {
