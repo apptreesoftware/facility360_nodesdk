@@ -71,3 +71,24 @@ describe('Filter', () => {
     expect(f.toString()).toEqual('Id eq 1 and ActiveFlag eq true');
   });
 });
+
+describe('Filter.contains', () => {
+  it('builds a contains expression with an escaped string value', () => {
+    expect(Filter.contains('Name', 'Joe').toString()).toBe("contains(Name, 'Joe')");
+  });
+
+  it('escapes single quotes in the value', () => {
+    expect(Filter.contains('Name', "O'Brien").toString()).toBe("contains(Name, 'O''Brien')");
+  });
+
+  it('composes with or() and parenthesizes correctly', () => {
+    const f = Filter.contains('Name', 'a').or(Filter.contains('Description', 'b'));
+    expect(f.toString()).toBe("contains(Name, 'a') or contains(Description, 'b')");
+  });
+
+  it('composes inside Filter.any().and()', () => {
+    const f = Filter.any([Filter.contains('Name', 'a'), Filter.contains('Name', 'b')])
+      .and(Filter.raw('ActiveFlag eq true'));
+    expect(f.toString()).toBe("(contains(Name, 'a') or contains(Name, 'b')) and ActiveFlag eq true");
+  });
+});

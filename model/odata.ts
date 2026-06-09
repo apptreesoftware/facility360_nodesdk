@@ -22,6 +22,11 @@ export class Filter {
     return new Filter(`${field} eq ${odataValue(value)}`);
   }
 
+  /** contains(field, value) — value is escaped automatically. `field` must be a static identifier, never user input. */
+  static contains(field: string, value: string): Filter {
+    return new Filter(`contains(${field}, ${odataString(value)})`);
+  }
+
   /** Trusted, code-controlled fragment. Not escaped. Use only for literals you control. */
   static raw(fragment: string): Filter {
     return new Filter(fragment);
