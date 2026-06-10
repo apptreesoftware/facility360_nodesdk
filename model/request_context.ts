@@ -1,3 +1,5 @@
+import { Filter } from './odata';
+
 export class QueryContext {
     filter?: string;
     expand?: string;
@@ -6,8 +8,8 @@ export class QueryContext {
     skip?: number;
     orderBy?: string;
 
-    setFilter(filter : string) {
-        this.filter = filter;
+    setFilter(filter: string | Filter) {
+        this.filter = filter.toString();
         return this;
     }
 

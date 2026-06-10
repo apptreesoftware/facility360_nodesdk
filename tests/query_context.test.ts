@@ -1,4 +1,5 @@
 import {QueryContext} from "../model/request_context";
+import { Filter } from '../model/odata';
 
 describe('QueryContext', function () {
     it('should include select statement', function () {
@@ -24,5 +25,11 @@ describe('QueryContext', function () {
         const uri = new URL(fullUrl);
         const select = uri.searchParams.get("$filter");
         expect(select).toEqual("Name eq 'Joe'")
+    });
+    it('accepts a Filter object and renders the escaped filter', function () {
+        const context = new QueryContext().setFilter(Filter.eq('UserName', "O'Brien"));
+        const queryUrl = context.buildUrl('/test');
+        const uri = new URL(`http://example.com/${queryUrl}`);
+        expect(uri.searchParams.get('$filter')).toEqual("UserName eq 'O''Brien'");
     });
 });
