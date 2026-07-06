@@ -7,6 +7,19 @@ export class QueryContext {
     top?: number;
     skip?: number;
     orderBy?: string;
+    /**
+     * Per-call request timeout override (ms) for the HTTP requests this context drives.
+     * Overrides the client's default `requestTimeoutMs`. Use for the rare endpoint whose
+     * single (non-paginated) response legitimately runs longer than the default. Paginated
+     * fetches don't need this — each page is a separate, individually-bounded request.
+     */
+    timeoutMs?: number;
+    /**
+     * Per-call AbortSignal for the HTTP requests this context drives. Lets a caller cancel
+     * in-flight requests (e.g. a mobile user navigates away) instead of leaving them to run
+     * to the timeout. Never serialized into the OData URL.
+     */
+    signal?: AbortSignal;
 
     setFilter(filter: string | Filter) {
         this.filter = filter.toString();
@@ -35,6 +48,18 @@ export class QueryContext {
 
     setOrderBy(orderBy: string) {
         this.orderBy = orderBy;
+        return this;
+    }
+
+    /** Per-call HTTP request timeout override (ms). See `timeoutMs`. */
+    setTimeout(timeoutMs: number) {
+        this.timeoutMs = timeoutMs;
+        return this;
+    }
+
+    /** Per-call AbortSignal to cancel the HTTP requests this context drives. See `signal`. */
+    setSignal(signal: AbortSignal) {
+        this.signal = signal;
         return this;
     }
 
@@ -104,6 +129,8 @@ export class QueryContext {
         this.filter = other.filter;
         this.top = other.top;
         this.skip = other.skip;
+        this.timeoutMs = other.timeoutMs;
+        this.signal = other.signal;
         return this;
     }
 }
