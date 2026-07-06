@@ -2,12 +2,13 @@ import {
   default as Axios,
   AxiosError,
   AxiosInstance,
+  AxiosRequestConfig,
   AxiosResponse,
   Method,
   default as axios,
 } from 'axios';
 import * as AxiosLogger from 'axios-logger';
-import axiosRetry from 'axios-retry';
+import axiosRetry, { isNetworkOrIdempotentRequestError } from 'axios-retry';
 import Bottleneck from 'bottleneck';
 import _ from 'lodash';
 import { ApiError, AuthorizationError } from './errors';
@@ -187,6 +188,22 @@ export const DefaultPropertyExpand = [
 ];
 export const DefaultSpaceSelect = ['Id', 'Name', 'LongDescription'];
 
+/**
+ * Default per-REQUEST timeout (ms). This bounds a single HTTP round-trip, NOT a whole
+ * paginated fetch: the client pages at $top=1000 and each page is its own request, so a
+ * multi-page (multi-minute/hour) fetch is unaffected — only an individual request that
+ * stalls (e.g. queued server-side under load, or hitting an unhealthy endpoint) trips it.
+ * Without this, a stalled request waits forever (axios default timeout = 0) and holds the
+ * caller's slot indefinitely. Generous by design; override per-client or per-call as needed.
+ */
+export const DEFAULT_REQUEST_TIMEOUT_MS = 120_000;
+
+/**
+ * Default timeout (ms) for the login/token request specifically — always a small, quick
+ * call, so a much tighter bound is safe. A hung login is never legitimate.
+ */
+export const DEFAULT_LOGIN_TIMEOUT_MS = 30_000;
+
 export class FamisClient {
   host: string;
   http: AxiosInstance;
@@ -218,12 +235,17 @@ export class FamisClient {
      * here) if a request returns 401 AND the refresh-token attempt also fails. Defaults to false.
      */
     reauthOnFailure?: boolean;
+    /** Per-request timeout (ms) for all subsequent calls. Defaults to DEFAULT_REQUEST_TIMEOUT_MS. */
+    requestTimeoutMs?: number;
+    /** Timeout (ms) for the initial login request. Defaults to DEFAULT_LOGIN_TIMEOUT_MS. */
+    loginTimeoutMs?: number;
   }) {
     const cred = await this.login({
       username: opts.username,
       password: opts.password,
       url: opts.host,
       debug: opts.debug,
+      timeoutMs: opts.loginTimeoutMs,
     });
     if (opts.debug === true) {
       console.log(`Logged in with ${JSON.stringify(cred)}`);
@@ -238,6 +260,7 @@ export class FamisClient {
       opts.reauthOnFailure ?? false,
       // Only retain credentials when the caller explicitly opted in.
       opts.reauthOnFailure ? { username: opts.username, password: opts.password } : undefined,
+      opts.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS,
     );
   }
 
@@ -247,6 +270,8 @@ export class FamisClient {
     debug?: boolean;
     autoRetry?: boolean;
     onComplete?: OnCompleteCallback;
+    /** Per-request timeout (ms) for all calls. Defaults to DEFAULT_REQUEST_TIMEOUT_MS. */
+    requestTimeoutMs?: number;
   }): FamisClient {
     return new FamisClient(
       {
@@ -267,6 +292,9 @@ export class FamisClient {
       opts.debug ?? false,
       opts.autoRetry ?? false,
       opts.onComplete,
+      false,
+      undefined,
+      opts.requestTimeoutMs ?? DEFAULT_REQUEST_TIMEOUT_MS,
     );
   }
 
@@ -275,9 +303,12 @@ export class FamisClient {
     password: string;
     url: string;
     debug?: boolean;
+    /** Timeout (ms) for the login request. Defaults to DEFAULT_LOGIN_TIMEOUT_MS. */
+    timeoutMs?: number;
   }): Promise<LoginResponse> {
     const http = axios.create({
       baseURL: opts.url,
+      timeout: opts.timeoutMs ?? DEFAULT_LOGIN_TIMEOUT_MS,
     });
     if (opts?.debug === true)
       console.log(`Logging into ${opts.url}. ${(opts.username, opts.password)}`);
@@ -333,6 +364,7 @@ export class FamisClient {
     onComplete?: OnCompleteCallback,
     reauthOnFailure: boolean = false,
     reauthCredentials?: { username: string; password: string },
+    requestTimeoutMs: number = DEFAULT_REQUEST_TIMEOUT_MS,
   ) {
     this.credentials = credentials;
     this.host = host;
@@ -344,11 +376,25 @@ export class FamisClient {
       baseURL: host,
       validateStatus: (status) => true,
       maxBodyLength: Infinity,
+      // Per-request timeout so a stalled request fails fast (and axios destroys the
+      // socket, freeing the slot) instead of hanging forever. Per-request, not
+      // per-operation — safe for paginated fetches (each page is its own request).
+      timeout: requestTimeoutMs,
     });
     if (autoRetry) {
       axiosRetry(this.http, {
         retries: 2,
         retryDelay: () => 2,
+        // A per-request timeout (ECONNABORTED) fires on a stall; retrying it repeatedly just
+        // multiplies the wait. Allow at most ONE retry on timeout, while leaving the normal
+        // network/idempotent retry behavior (up to `retries`) intact for other failures.
+        retryCondition: (error: AxiosError) => {
+          if (error.code === 'ECONNABORTED') {
+            const retryCount = (error.config as any)?.['axios-retry']?.retryCount ?? 0;
+            return retryCount < 1;
+          }
+          return isNetworkOrIdempotentRequestError(error);
+        },
       });
     }
 
@@ -1787,6 +1833,35 @@ export class FamisClient {
     };
   }
 
+  /**
+   * Per-request axios config carrying a QueryContext's timeout override and/or AbortSignal,
+   * if set. Only includes keys that are set, so the client-level default `timeout` still
+   * applies when the context provides no override.
+   *
+   * axios 0.21 has no native `signal` support, so a caller-supplied AbortSignal is bridged
+   * to an axios CancelToken: aborting the signal cancels the in-flight request (and an
+   * already-aborted signal cancels immediately, before the request is dispatched).
+   */
+  private requestConfig(context?: QueryContext): AxiosRequestConfig {
+    const config: AxiosRequestConfig = {};
+    if (context?.timeoutMs != null) {
+      config.timeout = context.timeoutMs;
+    }
+    if (context?.signal != null) {
+      const signal = context.signal;
+      const source = axios.CancelToken.source();
+      if (signal.aborted) {
+        source.cancel('Request aborted by caller');
+      } else {
+        signal.addEventListener('abort', () => source.cancel('Request aborted by caller'), {
+          once: true,
+        });
+      }
+      config.cancelToken = source.token;
+    }
+    return config;
+  }
+
   async getAllBatch<T>(
     context: QueryContext,
     type: string,
@@ -1794,7 +1869,7 @@ export class FamisClient {
   ): Promise<void> {
     let top = 1000;
     const url = context.buildPagedUrl(type, top, 0, true);
-    const resp = await this.http.get(url);
+    const resp = await this.http.get(url, this.requestConfig(context));
 
     this.throwResponseError(resp);
     const famisResp = resp.data as FamisResponse<T>;
@@ -1815,7 +1890,7 @@ export class FamisClient {
       const url = context.buildPagedUrl(type, top, i * top);
 
       const req = limiter
-        .schedule(() => this.http.get(url))
+        .schedule(() => this.http.get(url, this.requestConfig(context)))
         .then((resp: AxiosResponse<FamisResponse<T>>) => {
           this.throwResponseError(resp);
           if (this.debug) {
@@ -1852,7 +1927,7 @@ export class FamisClient {
       if (this.debug) {
         console.log(`Fetching ${url}`);
       }
-      const resp = await this.http.get(url);
+      const resp = await this.http.get(url, this.requestConfig(context));
       durationMs += moment(Date.now()).diff(startDate);
       this.throwResponseError(resp);
       const famisResp = resp.data as FamisResponse<T>;
@@ -1900,6 +1975,7 @@ export class FamisClient {
     const url = context.buildUrl('attachmentstream');
     return await this.http.get(url, {
       responseType: 'arraybuffer',
+      ...this.requestConfig(context),
     });
   }
 
