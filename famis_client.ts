@@ -382,9 +382,19 @@ export class FamisClient {
       timeout: requestTimeoutMs,
     });
     if (autoRetry) {
+      const RETRIES = 6;
       axiosRetry(this.http, {
-        retries: 2,
-        retryDelay: () => 2,
+        retries: RETRIES,
+        // Exponential backoff WITH JITTER so a transient network reset — e.g. ECONNRESET from a
+        // shared host / stale keep-alive / sustained load — has time to clear before the retry.
+        // The previous 2ms delay fired all attempts within ~6ms, so a reset lingering >1s failed
+        // every attempt and killed the whole paged fetch. Jitter de-synchronizes the many
+        // concurrent pages of getAllBatch so a shared-host reset doesn't trigger a lockstep
+        // thundering-herd retry. Budget: base 1/2/4/8/16/30s (capped) + up to +25% jitter.
+        retryDelay: (retryCount: number) => {
+          const base = Math.min(1000 * 2 ** (retryCount - 1), 30000);
+          return base + Math.floor(Math.random() * base * 0.25);
+        },
         // A per-request timeout (ECONNABORTED) fires on a stall; retrying it repeatedly just
         // multiplies the wait. Allow at most ONE retry on timeout, while leaving the normal
         // network/idempotent retry behavior (up to `retries`) intact for other failures.
@@ -394,6 +404,14 @@ export class FamisClient {
             return retryCount < 1;
           }
           return isNetworkOrIdempotentRequestError(error);
+        },
+        // Observability: one concise line per retry so absorbed transient resets are visible in
+        // logs even when `debug` (full response logging) is off. Proves the retry is doing work.
+        onRetry: (retryCount: number, error: AxiosError) => {
+          const tail = (error.config?.url ?? '').split('/').pop();
+          console.warn(
+            `[facility360] retry ${retryCount}/${RETRIES} (${error.code ?? error.response?.status ?? 'ERR'}) ${tail}`,
+          );
         },
       });
     }
@@ -1899,7 +1917,15 @@ export class FamisClient {
           callback(resp.data);
         })
         .catch((e: AxiosError) => {
-          this.throwResponseError(e.response!);
+          // A network error (e.g. ECONNRESET) has no `response`. Passing `undefined`
+          // to throwResponseError built an ApiError whose getters then dereferenced
+          // `this.resp.status` and threw "Cannot read properties of undefined
+          // (reading 'status')", masking the real cause. Rethrow the real error instead.
+          if (e.response) {
+            this.throwResponseError(e.response);
+          } else {
+            throw e;
+          }
         });
       promises.push(req);
     }
