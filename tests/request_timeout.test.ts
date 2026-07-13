@@ -112,18 +112,36 @@ describe('FamisClient request timeouts', () => {
     expect(attempts).toBe(2);
   });
 
-  it('still retries a normal network error up to the default retry count', async () => {
-    const client = makeClient({ autoRetry: true });
-    let attempts = 0;
-    (client.http.defaults as any).adapter = async (config: any) => {
-      attempts++;
-      const err: any = new Error('socket hang up');
-      err.code = 'ECONNRESET'; // network error (no response) -> retryable
-      err.config = config;
-      throw err;
-    };
-    await expect(client.getAllPaged(new QueryContext(), 'users')).rejects.toBeTruthy();
-    // Non-timeout network error keeps the default behavior: original + 2 retries = 3 total.
-    expect(attempts).toBe(3);
+  it('retries a normal network error up to the raised retry count (original + 6)', async () => {
+    // Fake timers so the exponential backoff (base 1/2/4/8/16/30s) does not consume real
+    // wall-clock; we drive the retry chain by flushing microtasks + firing pending timers.
+    jest.useFakeTimers();
+    try {
+      const client = makeClient({ autoRetry: true });
+      let attempts = 0;
+      (client.http.defaults as any).adapter = async (config: any) => {
+        attempts++;
+        const err: any = new Error('socket hang up');
+        err.code = 'ECONNRESET'; // network error (no response) -> retryable
+        err.config = config;
+        throw err;
+      };
+      const settled = client
+        .getAllPaged(new QueryContext(), 'users')
+        .then(() => 'resolved')
+        .catch(() => 'rejected');
+      // Each retry is scheduled via setTimeout(backoff). Flush microtasks so the rejection
+      // propagates and the next timer is scheduled, then fire it — repeat until exhausted.
+      for (let i = 0; i < 50; i++) {
+        await Promise.resolve();
+        await Promise.resolve();
+        jest.runOnlyPendingTimers();
+      }
+      await expect(settled).resolves.toBe('rejected');
+      // retries: 6 -> original request + 6 retries = 7 total.
+      expect(attempts).toBe(7);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 });
