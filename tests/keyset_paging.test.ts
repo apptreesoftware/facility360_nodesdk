@@ -1,4 +1,5 @@
 import { QueryContext } from '../model/request_context';
+import { FamisClient } from '../famis_client';
 
 function params(url: string) {
   return new URL(`http://example.com/${url}`).searchParams;
@@ -35,5 +36,64 @@ describe('QueryContext.buildKeysetBoundUrl', () => {
     expect(min.get('$filter')).toEqual('ActiveFlag eq true');
     const max = params(ctx.buildKeysetBoundUrl('assets', true));
     expect(max.get('$orderby')).toEqual('Id desc');
+  });
+});
+
+// Adapter that answers keyset + bound probes from an in-memory Id list.
+function installKeysetAdapter(client: FamisClient, ids: number[], pageSize = 1000) {
+  const sorted = [...ids].sort((a, b) => a - b);
+  let maxInFlight = 0, inFlight = 0;
+  (client.http.defaults as any).adapter = async (config: any) => {
+    inFlight++; maxInFlight = Math.max(maxInFlight, inFlight);
+    await new Promise((r) => setTimeout(r, 5)); // force overlap so the cap is observable
+    const sp = new URL(`http://h/${config.url}`).searchParams;
+    const top = Number(sp.get('$top'));
+    const filter = sp.get('$filter') ?? '';
+    const desc = (sp.get('$orderby') ?? '') === 'Id desc';
+    let rows: { Id: number }[];
+    if (top === 1) {
+      rows = [{ Id: desc ? sorted[sorted.length - 1] : sorted[0] }];
+    } else {
+      const gt = Number(/Id gt (\d+)/.exec(filter)?.[1]);
+      const le = Number(/Id le (\d+)/.exec(filter)?.[1]);
+      rows = sorted.filter((id) => id > gt && id <= le).slice(0, top).map((Id) => ({ Id }));
+    }
+    inFlight--;
+    return { data: { value: rows }, status: 200, statusText: 'OK', headers: {}, config, request: {} };
+  };
+  return { getMaxInFlight: () => maxInFlight };
+}
+
+describe('FamisClient.getAllBatchKeyset', () => {
+  const HOST = 'https://h.example.com';
+  const make = () => FamisClient.withAccessToken({ token: 't', host: HOST });
+
+  it('delivers every row exactly once across ranges (parity), with sparse gaps', async () => {
+    const client = make();
+    const ids = [1, 2, 3, 50, 51, 900, 901, 5000, 9999]; // gaps + clustering
+    installKeysetAdapter(client, ids, 2); // tiny page size → forces multi-page ranges
+    const got: number[] = [];
+    await client.getAllBatchKeyset(
+      new QueryContext().setSelect('Id'),
+      'assets',
+      (resp) => got.push(...resp.value.map((r: any) => r.Id)),
+    );
+    expect(got.sort((a, b) => a - b)).toEqual(ids);
+  });
+
+  it('never exceeds 4 concurrent requests', async () => {
+    const client = make();
+    const ids = Array.from({ length: 2000 }, (_, i) => i + 1);
+    const { getMaxInFlight } = installKeysetAdapter(client, ids, 100);
+    await client.getAllBatchKeyset(new QueryContext().setSelect('Id'), 'assets', () => {});
+    expect(getMaxInFlight()).toBeLessThanOrEqual(4);
+  });
+
+  it('returns without calling back on an empty set', async () => {
+    const client = make();
+    installKeysetAdapter(client, [], 1000);
+    const cb = jest.fn();
+    await client.getAllBatchKeyset(new QueryContext().setSelect('Id'), 'assets', cb);
+    expect(cb).not.toHaveBeenCalled();
   });
 });

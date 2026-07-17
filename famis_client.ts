@@ -198,6 +198,11 @@ export const DefaultSpaceSelect = ['Id', 'Name', 'LongDescription'];
  */
 export const DEFAULT_REQUEST_TIMEOUT_MS = 120_000;
 
+// Keyset partition count. Granularity for load-balancing an uneven Id distribution across
+// the worker pool — NOT concurrency (pool stays maxConcurrent:4). More ranges than workers
+// so a worker that drains a sparse range picks up another instead of idling.
+export const KEYSET_PARTITIONS = 16;
+
 /**
  * Default timeout (ms) for the login/token request specifically — always a small, quick
  * call, so a much tighter bound is safe. A hung login is never legitimate.
@@ -1931,6 +1936,55 @@ export class FamisClient {
     }
 
     await Promise.all(promises);
+  }
+
+  /**
+   * Keyset (Id-range-partitioned) parallel batch fetch. Opt-in alternative to getAllBatch's
+   * $count+$skip: flat page latency at depth (no OFFSET). Same 4-way concurrency. Requires
+   * `Id gt` support in $filter and an ordered Id PK. See the plan doc.
+   */
+  async getAllBatchKeyset<T extends { Id: number }>(
+    context: QueryContext,
+    type: string,
+    callback: ResultCallback<T>,
+  ): Promise<void> {
+    const minResp = await this.http.get(context.buildKeysetBoundUrl(type, false), this.requestConfig(context));
+    this.throwResponseError(minResp);
+    const minRows = (minResp.data as FamisResponse<T>).value;
+    if (minRows.length === 0) return;
+    const min = minRows[0].Id;
+
+    const maxResp = await this.http.get(context.buildKeysetBoundUrl(type, true), this.requestConfig(context));
+    this.throwResponseError(maxResp);
+    const max = (maxResp.data as FamisResponse<T>).value[0].Id;
+
+    const top = 1000;
+    const width = Math.ceil((max - min + 1) / KEYSET_PARTITIONS);
+    const ranges: { lo: number; hi: number }[] = [];
+    for (let i = 0; i < KEYSET_PARTITIONS; i++) {
+      const lo = min - 1 + i * width;
+      const hi = i === KEYSET_PARTITIONS - 1 ? max : min - 1 + (i + 1) * width;
+      if (lo < hi) ranges.push({ lo, hi });
+    }
+
+    const limiter = new Bottleneck({ maxConcurrent: 4 });
+    const tasks = ranges.map((r) =>
+      limiter.schedule(async () => {
+        let cursor = r.lo;
+        // sequential keyset within this range; the pool bounds concurrency across ranges
+        while (true) {
+          const url = context.buildKeysetUrl(type, top, cursor, r.hi);
+          const resp = await this.http.get(url, this.requestConfig(context));
+          this.throwResponseError(resp);
+          const page = resp.data as FamisResponse<T>;
+          callback(page);
+          const rows = page.value;
+          if (rows.length < top) break;
+          cursor = rows[rows.length - 1].Id;
+        }
+      }),
+    );
+    await Promise.all(tasks);
   }
 
   async getAllPaged<T>(context: QueryContext, type: string): Promise<Result<T>> {
