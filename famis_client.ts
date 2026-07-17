@@ -682,7 +682,14 @@ export class FamisClient {
     return this.getAll<Schedule>(context, 'schedules');
   }
 
-  async getAllAssetsBatch(context: QueryContext, callback: ResultCallback<Asset>): Promise<void> {
+  async getAllAssetsBatch(
+    context: QueryContext,
+    callback: ResultCallback<Asset>,
+    opts?: { paging?: 'keyset' | 'skip' },
+  ): Promise<void> {
+    if (opts?.paging === 'keyset') {
+      return this.getAllBatchKeyset<Asset>(context, 'assets', callback);
+    }
     return this.getAllBatch(context, 'assets', callback);
   }
 

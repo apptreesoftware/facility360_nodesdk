@@ -97,3 +97,33 @@ describe('FamisClient.getAllBatchKeyset', () => {
     expect(cb).not.toHaveBeenCalled();
   });
 });
+
+describe('getAllAssetsBatch paging opt-in', () => {
+  const HOST = 'https://h.example.com';
+  function recordUrls(client: FamisClient, count = 0) {
+    const urls: string[] = [];
+    (client.http.defaults as any).adapter = async (config: any) => {
+      urls.push(config.url);
+      const sp = new URL(`http://h/${config.url}`).searchParams;
+      const rows = Number(sp.get('$top')) === 1 ? [{ Id: 1 }] : [];
+      return { data: { value: rows, '@odata.count': count }, status: 200, statusText: 'OK', headers: {}, config, request: {} };
+    };
+    return urls;
+  }
+
+  it('defaults to the $skip path (unchanged behavior)', async () => {
+    const client = FamisClient.withAccessToken({ token: 't', host: HOST });
+    const urls = recordUrls(client, 0);
+    await client.getAllAssetsBatch(new QueryContext().setSelect('Id'), () => {});
+    expect(urls[0]).toContain('$skip=0');
+    expect(urls.join()).not.toContain('Id gt');
+  });
+
+  it('uses keyset when paging: "keyset"', async () => {
+    const client = FamisClient.withAccessToken({ token: 't', host: HOST });
+    const urls = recordUrls(client, 0);
+    await client.getAllAssetsBatch(new QueryContext().setSelect('Id'), () => {}, { paging: 'keyset' });
+    expect(urls.some((u) => u.includes('$orderby=Id') && u.includes('$top=1'))).toBe(true); // bound probe
+    expect(urls.join()).not.toContain('$skip=');
+  });
+});
