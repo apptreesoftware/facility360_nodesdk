@@ -39,8 +39,13 @@ describe('QueryContext.buildKeysetBoundUrl', () => {
   });
 });
 
-// Adapter that answers keyset + bound probes from an in-memory Id list.
-function installKeysetAdapter(client: FamisClient, ids: number[], pageSize = 1000) {
+// Adapter that answers keyset + bound probes from an in-memory Id list. Mirrors the real
+// server contract: a page returns up to $top matching rows; getAllBatchKeyset's cursor loop
+// (famis_client.ts) only continues within a range when a response comes back exactly $top long,
+// so genuinely exercising that loop requires a partition that holds more than $top (1000) ids —
+// not an artificial per-call cap unrelated to $top (which would just truncate results and drop
+// data, since the client has no independent knowledge of such a cap).
+function installKeysetAdapter(client: FamisClient, ids: number[]) {
   const sorted = [...ids].sort((a, b) => a - b);
   let maxInFlight = 0, inFlight = 0;
   (client.http.defaults as any).adapter = async (config: any) => {
@@ -70,28 +75,36 @@ describe('FamisClient.getAllBatchKeyset', () => {
 
   it('delivers every row exactly once across ranges (parity), with sparse gaps', async () => {
     const client = make();
-    const ids = [1, 2, 3, 50, 51, 900, 901, 5000, 9999]; // gaps + clustering
-    installKeysetAdapter(client, ids, 2); // tiny page size → forces multi-page ranges
+    const sparse = [1, 2, 3, 50, 51, 900, 901, 5000, 9999]; // gaps + clustering
+    // A dense cluster of 1500 consecutive ids, placed high enough (30001..31500) that it lands
+    // entirely inside a single keyset partition. Since $top is 1000, the first page for that
+    // partition fills exactly 1000 rows (a "full page"), which is the only condition under
+    // which getAllBatchKeyset's cursor loop continues (famis_client.ts: `if (rows.length < top)
+    // break`) — so this genuinely drives a 2-page fetch (1000 then 500) for that range, unlike
+    // the sparse ids alone which each resolve in a single under-$top page.
+    const dense = Array.from({ length: 1500 }, (_, i) => 30001 + i);
+    const ids = [...sparse, ...dense];
+    installKeysetAdapter(client, ids);
     const got: number[] = [];
     await client.getAllBatchKeyset(
       new QueryContext().setSelect('Id'),
       'assets',
       (resp) => got.push(...resp.value.map((r: any) => r.Id)),
     );
-    expect(got.sort((a, b) => a - b)).toEqual(ids);
+    expect(got.sort((a, b) => a - b)).toEqual([...ids].sort((a, b) => a - b));
   });
 
   it('never exceeds 4 concurrent requests', async () => {
     const client = make();
     const ids = Array.from({ length: 2000 }, (_, i) => i + 1);
-    const { getMaxInFlight } = installKeysetAdapter(client, ids, 100);
+    const { getMaxInFlight } = installKeysetAdapter(client, ids);
     await client.getAllBatchKeyset(new QueryContext().setSelect('Id'), 'assets', () => {});
     expect(getMaxInFlight()).toBeLessThanOrEqual(4);
   });
 
   it('returns without calling back on an empty set', async () => {
     const client = make();
-    installKeysetAdapter(client, [], 1000);
+    installKeysetAdapter(client, []);
     const cb = jest.fn();
     await client.getAllBatchKeyset(new QueryContext().setSelect('Id'), 'assets', cb);
     expect(cb).not.toHaveBeenCalled();

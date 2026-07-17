@@ -1963,7 +1963,9 @@ export class FamisClient {
 
     const maxResp = await this.http.get(context.buildKeysetBoundUrl(type, true), this.requestConfig(context));
     this.throwResponseError(maxResp);
-    const max = (maxResp.data as FamisResponse<T>).value[0].Id;
+    const maxRows = (maxResp.data as FamisResponse<T>).value;
+    if (maxRows.length === 0) return;
+    const max = maxRows[0].Id;
 
     const top = 1000;
     const width = Math.ceil((max - min + 1) / KEYSET_PARTITIONS);
