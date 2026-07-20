@@ -98,7 +98,10 @@ export class QueryContext {
      */
     buildKeysetUrl(entity: string, top: number, gt: number, le: number) {
         const bounds = `Id gt ${gt} and Id le ${le}`;
-        const filter = this.filter ? `${this.filter} and ${bounds}` : bounds;
+        // Parenthesize the base filter: OData `and` binds tighter than `or`, so a base
+        // filter like `A or B` must be grouped or the Id bounds would attach only to `B`
+        // (`A or (B and Id gt..)`), letting `A` rows escape the range → duplication.
+        const filter = this.filter ? `(${this.filter}) and ${bounds}` : bounds;
         let urlPath = `${basePath}/${entity}?$top=${top}&$orderby=Id&$filter=${filter}`;
         if (this.expand) urlPath += `&$expand=${this.expand}`;
         if (this.select) urlPath += `&$select=${this.select}`;

@@ -198,9 +198,11 @@ export const DefaultSpaceSelect = ['Id', 'Name', 'LongDescription'];
  */
 export const DEFAULT_REQUEST_TIMEOUT_MS = 120_000;
 
-// Keyset partition count. Granularity for load-balancing an uneven Id distribution across
-// the worker pool — NOT concurrency (pool stays maxConcurrent:4). More ranges than workers
-// so a worker that drains a sparse range picks up another instead of idling.
+// Keyset partition count. Splits the Id SPACE (not the row count) into more ranges than
+// workers, so the pool (maxConcurrent:4, unchanged — this is NOT concurrency) stays busy
+// as workers drain ranges. Note the speedup depends on Id distribution: rows spread across
+// ranges parallelize well, but a tenant whose Ids cluster into one/two ranges pages those
+// mostly sequentially and gains little over $skip. NOT concurrency.
 export const KEYSET_PARTITIONS = 16;
 
 /**
@@ -1973,7 +1975,10 @@ export class FamisClient {
     for (let i = 0; i < KEYSET_PARTITIONS; i++) {
       const lo = min - 1 + i * width;
       const hi = i === KEYSET_PARTITIONS - 1 ? max : min - 1 + (i + 1) * width;
-      if (lo < hi) ranges.push({ lo, hi });
+      // Skip empty ranges: lo<hi drops rounding-overshoot tails; lo<max drops ranges
+      // wholly above the data (e.g. a tiny/sparse tenant would otherwise fire ~15 empty
+      // probes, since every range past the single populated one has lo >= max).
+      if (lo < hi && lo < max) ranges.push({ lo, hi });
     }
 
     const limiter = new Bottleneck({ maxConcurrent: 4 });

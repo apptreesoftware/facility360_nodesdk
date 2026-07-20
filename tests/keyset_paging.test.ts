@@ -16,13 +16,23 @@ describe('QueryContext.buildKeysetUrl', () => {
     expect(p.get('$orderby')).toEqual('Id');
     expect(p.get('$select')).toEqual('Id,Name');
     expect(p.get('$expand')).toEqual('Space');
-    expect(p.get('$filter')).toEqual('ActiveFlag eq true and Id gt 100 and Id le 200');
+    expect(p.get('$filter')).toEqual('(ActiveFlag eq true) and Id gt 100 and Id le 200');
     expect(p.get('$skip')).toBeNull();
   });
 
   it('uses only the Id bounds when no base filter is set', () => {
     const p = params(new QueryContext().buildKeysetUrl('assets', 500, 0, 50));
     expect(p.get('$filter')).toEqual('Id gt 0 and Id le 50');
+  });
+
+  it('parenthesizes an `or` base filter so the Id bounds bind to the whole filter', () => {
+    // Without the parens this would be `A or B and Id gt.. and Id le..`, which OData
+    // parses as `A or (B and ..)` — rows matching A would ignore the Id range.
+    const ctx = new QueryContext().setFilter('PropertyId eq 1 or PropertyId eq 2');
+    const p = params(ctx.buildKeysetUrl('assets', 1000, 100, 200));
+    expect(p.get('$filter')).toEqual(
+      '(PropertyId eq 1 or PropertyId eq 2) and Id gt 100 and Id le 200',
+    );
   });
 });
 

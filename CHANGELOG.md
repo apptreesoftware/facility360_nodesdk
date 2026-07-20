@@ -12,8 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Opt-in **keyset (Id-range-partitioned) parallel paging** for the assets batch fetch.
   `getAllAssetsBatch(context, callback, { paging: 'keyset' })` fetches min/max `Id`, splits
   the Id space into 16 half-open ranges, and pages each with `Id gt`/`Id le` under the same
-  4-way concurrency as `getAllBatch` — ~2–2.6× faster than `$skip` OFFSET paging on large
-  tenants. **Default is unchanged** (`$skip`); existing callers are unaffected. New
+  4-way concurrency as `getAllBatch`. For reasonably uniform Id distributions this is
+  ~2–2.6× faster than `$skip` OFFSET paging on large tenants (measured 2.71× on a ~215k
+  tenant); tenants whose Ids cluster into a few ranges see less benefit. **Default is
+  unchanged** (`$skip`); existing callers are unaffected. New
   `FamisClient.getAllBatchKeyset` + `QueryContext.buildKeysetUrl`/`buildKeysetBoundUrl`.
 
 ## [1.3.0] — 2026-07-13
