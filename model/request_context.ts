@@ -92,6 +92,29 @@ export class QueryContext {
         return urlPath;
     }
 
+    /**
+     * Keyset page URL: forces $orderby=Id and appends half-open Id bounds to the base
+     * filter (Id gt <gt> and Id le <le>). No $skip. See docs/.../assets-keyset-parallel-paging.
+     */
+    buildKeysetUrl(entity: string, top: number, gt: number, le: number) {
+        const bounds = `Id gt ${gt} and Id le ${le}`;
+        // Parenthesize the base filter: OData `and` binds tighter than `or`, so a base
+        // filter like `A or B` must be grouped or the Id bounds would attach only to `B`
+        // (`A or (B and Id gt..)`), letting `A` rows escape the range → duplication.
+        const filter = this.filter ? `(${this.filter}) and ${bounds}` : bounds;
+        let urlPath = `${basePath}/${entity}?$top=${top}&$orderby=Id&$filter=${filter}`;
+        if (this.expand) urlPath += `&$expand=${this.expand}`;
+        if (this.select) urlPath += `&$select=${this.select}`;
+        return urlPath;
+    }
+
+    /** One-row Id probe to find min (desc=false) / max (desc=true), carrying the base filter. */
+    buildKeysetBoundUrl(entity: string, desc: boolean) {
+        let urlPath = `${basePath}/${entity}?$top=1&$orderby=Id${desc ? ' desc' : ''}&$select=Id`;
+        if (this.filter) urlPath += `&$filter=${this.filter}`;
+        return urlPath;
+    }
+
     addFiltersToUrl(path: string) {
         let urlPath = path;
         let hasQuery = false;
