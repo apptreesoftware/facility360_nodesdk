@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Entries before 1.2.0 were not tracked in this file; see the git history for details.
 
-## [Unreleased]
+## [1.4.1] — 2026-08-14
 ### Fixed
 - Non-JSON error bodies (e.g. a plain-text `"Service Unavailable"` on a FAMIS 503) no
   longer crash requests with a raw `SyntaxError`/`"... is not valid JSON"`. The shared
