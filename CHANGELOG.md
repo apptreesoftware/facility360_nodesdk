@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Entries before 1.2.0 were not tracked in this file; see the git history for details.
 
+## [Unreleased]
+### Fixed
+- Non-JSON error bodies (e.g. a plain-text `"Service Unavailable"` on a FAMIS 503) no
+  longer crash requests with a raw `SyntaxError`/`"... is not valid JSON"`. The shared
+  axios instance now parses defensively and falls back to the raw string, so
+  `throwResponseError`/`ApiError` always get a real response to work with instead of
+  axios's transform throwing before one exists. (#458)
+
 ## [1.4.0] — 2026-07-17
 ### Added
 - Opt-in **keyset (Id-range-partitioned) parallel paging** for the assets batch fetch.
