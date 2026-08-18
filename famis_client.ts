@@ -387,6 +387,24 @@ export class FamisClient {
       // socket, freeing the slot) instead of hanging forever. Per-request, not
       // per-operation — safe for paginated fetches (each page is its own request).
       timeout: requestTimeoutMs,
+      // FAMIS sometimes returns a non-JSON body (e.g. plain-text "Service Unavailable")
+      // on 5xx errors. Axios's default transformResponse can throw a raw SyntaxError in
+      // that case instead of resolving, which skips throwResponseError entirely and
+      // surfaces an unhandled parse error instead of a clean ApiError with the real
+      // status. Parse defensively and fall back to the raw string so every request
+      // resolves to a normal AxiosResponse.
+      transformResponse: [
+        (data: any) => {
+          if (typeof data === 'string' && data.length) {
+            try {
+              return JSON.parse(data);
+            } catch (e) {
+              return data;
+            }
+          }
+          return data;
+        },
+      ],
     });
     if (autoRetry) {
       const RETRIES = 6;
