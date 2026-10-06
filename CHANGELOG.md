@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Entries before 1.2.0 were not tracked in this file; see the git history for details.
 
+## [1.4.2] — 2026-10-06
+### Added
+- `FamisClient.getBillCodes(context)` — fetches `GET /billcodes`, with a new `BillCode`
+  model. (EY)
+
 ## [1.4.1] — 2026-08-14
 ### Fixed
 - Non-JSON error bodies (e.g. a plain-text `"Service Unavailable"` on a FAMIS 503) no

@@ -18,6 +18,7 @@ import {
   AccountSegment,
   AccountSegmentValue,
   ActivityGroup,
+  BillCode,
   AdjustmentTransactionResponse,
   AdjustmentType,
   Asset,
@@ -639,6 +640,10 @@ export class FamisClient {
 
   async getPayPeriods(context: QueryContext): Promise<Result<PayPeriod>> {
     return this.getAll<PayPeriod>(context, 'payperiods');
+  }
+
+  async getBillCodes(context: QueryContext): Promise<Result<BillCode>> {
+    return this.getAll<BillCode>(context, 'billcodes');
   }
 
   //region TimeZones
