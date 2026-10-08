@@ -642,10 +642,6 @@ export class FamisClient {
     return this.getAll<PayPeriod>(context, 'payperiods');
   }
 
-  async getBillCodes(context: QueryContext): Promise<Result<BillCode>> {
-    return this.getAll<BillCode>(context, 'billcodes');
-  }
-
   //region TimeZones
   async getTimeZones(context: QueryContext): Promise<Result<TimeZone>> {
     return this.getAll<TimeZone>(context, 'timezones');
@@ -1077,6 +1073,13 @@ export class FamisClient {
 
   getAttachmentStreamUrl(context: QueryContext): string {
     return `${this.host}${context.buildUrl('attachmentstream')}`;
+  }
+
+  //#endregion
+
+  //#region bill codes
+  async getBillCodes(context: QueryContext): Promise<Result<BillCode>> {
+    return this.getAll<BillCode>(context, 'billcodes');
   }
 
   //#endregion

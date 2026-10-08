@@ -55,6 +55,12 @@ describe('Lists', async () => {
     });
   });
 
+  it('should fetch all bill codes', async function() {
+    const resp = await famisClient.getBillCodes(baseContext);
+    expect(resp).toBeTruthy();
+    expect(resp.results).toBeTruthy();
+  });
+
   it('should fetch all account segments', async function() {
     const resp = await famisClient.getAccountSegments(baseContext);
     expect(resp).toBeTruthy();

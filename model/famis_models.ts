@@ -1656,17 +1656,6 @@ export interface PayPeriod {
   PayPeriodNumber: number;
 }
 
-export interface BillCode {
-  Id: number;
-  Description: string;
-  UpdateDate: Date;
-  UpdatedById: number;
-  UpdatedByExternalId: string;
-  Active: boolean;
-  BillTypeId: number;
-  GlIncomeAccount: string;
-}
-
 export interface Property {
   Id: number;
   UpdateDate: Date;
