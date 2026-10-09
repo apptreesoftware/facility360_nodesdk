@@ -18,6 +18,7 @@ import {
   AccountSegment,
   AccountSegmentValue,
   ActivityGroup,
+  BillCode,
   AdjustmentTransactionResponse,
   AdjustmentType,
   Asset,
@@ -1072,6 +1073,13 @@ export class FamisClient {
 
   getAttachmentStreamUrl(context: QueryContext): string {
     return `${this.host}${context.buildUrl('attachmentstream')}`;
+  }
+
+  //#endregion
+
+  //#region bill codes
+  async getBillCodes(context: QueryContext): Promise<Result<BillCode>> {
+    return this.getAll<BillCode>(context, 'billcodes');
   }
 
   //#endregion

@@ -2459,7 +2459,7 @@ export interface ChargeType {
 export interface BillCode {
   Id: number;
   Description: string;
-  UpdateDate: Date;
+  UpdateDate: string;
   UpdatedById: number;
   UpdatedByExternalId: string;
   Active: boolean;
