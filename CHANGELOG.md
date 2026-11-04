@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Entries before 1.2.0 were not tracked in this file; see the git history for details.
 
+## [1.6.0] — 2026-11-04
+### Added
+- `FamisClient.updateLaborCost(laborCostId, request)` — updates a labor cost via
+  `PATCH /laborcosts/{id}`. (EY)
+
 ## [1.5.0] — 2026-10-06
 ### Added
 - `FamisClient.getBillCodes(context)` — fetches `GET /billcodes`, with a new `BillCode`
