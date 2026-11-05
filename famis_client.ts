@@ -1572,6 +1572,17 @@ export class FamisClient {
     return this.createObject<PostLaborCostRequest, LaborCost>(laborCost, 'laborcosts');
   }
 
+  async updateLaborCost(
+    laborCostId: string,
+    patchRequest: PostLaborCostRequest,
+  ): Promise<LaborCost> {
+    return this.patchObject<PostLaborCostRequest, LaborCost>(
+      patchRequest,
+      'laborcosts',
+      laborCostId,
+    );
+  }
+
   async deleteLaborCost(entityId: string) {
     return this.deleteObject('laborcosts', entityId);
   }
