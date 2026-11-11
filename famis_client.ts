@@ -61,6 +61,7 @@ import {
   InstallationConfig,
   LaborCost,
   LaborEntry,
+  LaborRateScheduleBillingRate,
   LaborRateType,
   LaborReason,
   LogbookConfiguration,
@@ -90,6 +91,7 @@ import {
   PurchaseRequisitionHeaderStatus,
   PurchaseRequisitionLine,
   PurchaseRequisitionType,
+  RateSchedule,
   Region,
   RequestPriority,
   RequestStatus,
@@ -1114,6 +1116,16 @@ export class FamisClient {
 
   async getLaborRateTypes(context: QueryContext): Promise<Result<LaborRateType>> {
     return this.getAll<LaborRateType>(context, 'laborratetypes');
+  }
+
+  async getLaborRateScheduleBillingRates(
+    context: QueryContext,
+  ): Promise<Result<LaborRateScheduleBillingRate>> {
+    return this.getAll<LaborRateScheduleBillingRate>(context, 'laborrateschedulebillingrates');
+  }
+
+  async getRateSchedules(context: QueryContext): Promise<Result<RateSchedule>> {
+    return this.getAll<RateSchedule>(context, 'rateschedules');
   }
 
   async getLaborReasons(context: QueryContext): Promise<Result<LaborReason>> {

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > Entries before 1.2.0 were not tracked in this file; see the git history for details.
 
+## [1.7.0] — 2026-11-11
+### Added
+- `getLaborRateScheduleBillingRates(context)` — `GET /laborrateschedulebillingrates`
+  (supports `$filter`) with a new `LaborRateScheduleBillingRate` model. (EY, #115)
+- `getRateSchedules(context)` — `GET /rateschedules` with a new `RateSchedule` model. (EY, #115)
+
 ## [1.6.0] — 2026-11-04
 ### Added
 - `FamisClient.updateLaborCost(laborCostId, request)` — updates a labor cost via

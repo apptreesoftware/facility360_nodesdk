@@ -61,6 +61,18 @@ describe('Lists', async () => {
     expect(resp.results).toBeTruthy();
   });
 
+  it('should fetch labor rate schedule billing rates', async function() {
+    const resp = await famisClient.getLaborRateScheduleBillingRates(baseContext);
+    expect(resp).toBeTruthy();
+    expect(resp.results).toBeTruthy();
+  });
+
+  it('should fetch rate schedules', async function() {
+    const resp = await famisClient.getRateSchedules(baseContext);
+    expect(resp).toBeTruthy();
+    expect(resp.results).toBeTruthy();
+  });
+
   it('should fetch all account segments', async function() {
     const resp = await famisClient.getAccountSegments(baseContext);
     expect(resp).toBeTruthy();
