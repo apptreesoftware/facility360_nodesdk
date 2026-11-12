@@ -2467,6 +2467,24 @@ export interface BillCode {
   GlIncomeAccount: string;
 }
 
+export interface RateSchedule {
+  Id: number;
+  Name: string;
+  ActiveFlag: boolean;
+  TabOrder: number;
+}
+
+export interface LaborRateScheduleBillingRate {
+  Id: number;
+  RateScheduleId: number;
+  RequestTypeActivityId: number;
+  EmployeeId?: number;
+  PositionId?: number;
+  HourlyRate: number;
+  OtHourlyRate: number;
+  TwoOtHourlyRate: number;
+}
+
 export interface PropertyBillCodeAssociations {
   PropertyExternalId: string;
   RequestSubTypeExternalId: string;
